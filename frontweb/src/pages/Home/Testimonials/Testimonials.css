@@ -1,0 +1,26 @@
+/* Testimonials.css */
+.testimonials-container {
+  text-align: left;
+  padding: 20px;
+}
+
+.testimonials-container h3 {
+  margin-bottom: 10px;
+}
+
+.testimonials-container p {
+  margin-bottom: 20px;
+}
+
+.testimonials-button {
+  padding: 10px 20px;
+  background-color: #ffc107;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.testimonials-button:hover {
+  background-color: #e0a800;
+}

@@ -1,0 +1,27 @@
+/* HomeJob.css */
+.home-job-container {
+  text-align: left;
+  padding: 20px;
+}
+
+.home-job-container h3 {
+  margin-bottom: 10px;
+}
+
+.home-job-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.home-job-container li {
+  margin: 5px 0;
+}
+
+.home-job-container a {
+  text-decoration: none;
+  color: #007bff;
+}
+
+.home-job-container a:hover {
+  text-decoration: underline;
+}

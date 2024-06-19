@@ -1,0 +1,109 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-logo {
+  height: 40px;
+}
+
+.navbar-links {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+}
+
+.navbar-links li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.navbar-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.navbar-links a:hover {
+  color: #ffdd57;
+}
+
+.navbar-user {
+  position: relative;
+}
+
+.navbar-user:hover .navbar-dropdown {
+  display: block;
+}
+
+.navbar-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  color: black;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-dropdown button {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  width: 100%;
+  text-align: left;
+  color: black;
+  cursor: pointer;
+}
+
+.navbar-dropdown button:hover {
+  background: #f0f0f0;
+}
+
+.navbar-search {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.navbar-search input {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+}
+
+.navbar-search button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #ffdd57;
+  color: black;
+  cursor: pointer;
+}
+
+.navbar-search button:hover {
+  background-color: #ffd700;
+}
+
+.navbar-separator {
+  width: 1px;
+  height: 40px;
+  background-color: white;
+  margin: 0 20px;
+}
+
+.navbar-auth {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+}
