@@ -128,3 +128,21 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Python specific
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Virtual environments
+venv/
+.venv/
+ENV/
+env.bak/
+env/
+
+# Exclude specific file in venv
+venv/Lib/site-packages/absl/flags/_exceptions.py

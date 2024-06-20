@@ -1,10 +1,6 @@
 // src/controllers/UserController.ts
 import { Request, Response } from "express";
 import User from "../models/User";
-import fs from "fs";
-import path from "path";
-
-const UPLOAD_DIR = "uploads/";
 
 export const getUsers = async (req: Request, res: Response) => {
   try {

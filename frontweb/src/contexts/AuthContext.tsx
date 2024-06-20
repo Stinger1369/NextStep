@@ -36,9 +36,11 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (userData: Omit<User, "_id">, password: string) => Promise<void>;
+  register: (formData: FormData) => Promise<void>;
   logout: () => void;
 }
+
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -84,17 +86,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     ] = `Bearer ${response.data.token}`;
   };
 
-  const register = async (userData: Omit<User, "_id">, password: string) => {
-    try {
-      await axiosInstance.post("/api/auth/register", {
-        ...userData,
-        password,
-      });
-    } catch (error) {
-      console.error("Error registering user:", error);
-      throw error;
-    }
-  };
+const register = async (formData: FormData) => {
+  try {
+    await axiosInstance.post("/api/auth/register", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  } catch (error) {
+    console.error("Error registering user:", error);
+    throw error;
+  }
+};
+
+
 
   const logout = () => {
     setToken(null);

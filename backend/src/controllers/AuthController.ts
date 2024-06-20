@@ -5,9 +5,11 @@ import {
   verifyPassword,
   generateToken,
 } from "../utils/authUtils";
+import axios from "axios";
 import fs from "fs";
 import path from "path";
 
+const IMAGE_SERVER_URL = "http://localhost:7000/server-image";
 const UPLOAD_DIR = "uploads/";
 
 export const register = async (req: Request, res: Response) => {
@@ -44,9 +46,12 @@ export const register = async (req: Request, res: Response) => {
         ? req.files.images
         : [req.files.images];
       for (const image of images) {
-        const imagePath = path.join(UPLOAD_DIR, image.name);
-        fs.writeFileSync(imagePath, image.data);
-        user.images.push(imagePath);
+        const imageBase64 = image.data.toString("base64");
+        const response = await axios.post(`${IMAGE_SERVER_URL}/ajouter-image`, {
+          nom: image.name,
+          base64: imageBase64,
+        });
+        user.images.push(response.data.link);
       }
     }
 

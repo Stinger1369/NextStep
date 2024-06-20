@@ -18,25 +18,36 @@ const RegisterComponent: React.FC = () => {
     zipCode: "",
     country: "",
   });
+  const [images, setImages] = useState<FileList | null>(null);
   const { register } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("firstName", firstName);
+    formData.append("lastName", lastName);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("userType", userType);
+    formData.append("phone", phone);
+    formData.append("dateOfBirth", dateOfBirth);
+    formData.append("address[street]", address.street);
+    formData.append("address[city]", address.city);
+    formData.append("address[state]", address.state);
+    formData.append("address[zipCode]", address.zipCode);
+    formData.append("address[country]", address.country);
+
+    if (images) {
+      for (let i = 0; i < images.length; i++) {
+        formData.append("images", images[i]);
+      }
+    }
+
     try {
-      await register(
-        {
-          firstName,
-          lastName,
-          email,
-          userType,
-          phone,
-          dateOfBirth: new Date(dateOfBirth),
-          address,
-        },
-        password
-      );
+      await register(formData);
       navigate("/login");
     } catch (error) {
       setError("Error registering user. Please check the form and try again.");
@@ -46,7 +57,11 @@ const RegisterComponent: React.FC = () => {
   return (
     <div className="register-container">
       {error && <div className="error">{error}</div>}
-      <form onSubmit={handleSubmit} className="register-form">
+      <form
+        onSubmit={handleSubmit}
+        className="register-form"
+        encType="multipart/form-data"
+      >
         <input
           type="text"
           value={firstName}
@@ -141,6 +156,12 @@ const RegisterComponent: React.FC = () => {
           placeholder="Country"
           className="register-input"
           required
+        />
+        <input
+          type="file"
+          multiple
+          onChange={(e) => setImages(e.target.files)}
+          className="register-input"
         />
         <button type="submit" className="register-button">
           Register
