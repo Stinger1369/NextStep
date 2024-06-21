@@ -1,23 +1,23 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 interface Address {
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
+  street?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
 }
 
 interface IUser extends Document {
-  firstName: string;
-  lastName: string;
-  email: string;
+  firstName?: string;
+  lastName?: string;
+  emailOrPhone: string;
   password: string;
-  userType: string;
-  phone: string;
-  dateOfBirth: Date;
+  userType?: string;
+  phone?: string;
+  dateOfBirth?: Date;
   age?: number;
-  address: Address;
+  address?: Address;
   profession?: string;
   company?: string;
   bio?: string;
@@ -29,20 +29,20 @@ interface IUser extends Document {
 }
 
 const UserSchema: Schema = new Schema({
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
+  firstName: { type: String },
+  lastName: { type: String },
+  emailOrPhone: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  userType: { type: String, required: true },
-  phone: { type: String, required: true },
-  dateOfBirth: { type: Date, required: true },
-  age: { type: Number }, // Calculé automatiquement
+  userType: { type: String },
+  phone: { type: String },
+  dateOfBirth: { type: Date },
+  age: { type: Number },
   address: {
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    zipCode: { type: String, required: true },
-    country: { type: String, required: true },
+    street: { type: String },
+    city: { type: String },
+    state: { type: String },
+    zipCode: { type: String },
+    country: { type: String },
   },
   profession: { type: String },
   company: { type: String },
@@ -56,17 +56,19 @@ const UserSchema: Schema = new Schema({
 
 // Méthode pour calculer l'âge
 UserSchema.pre<IUser>("save", function (next) {
-  const now = new Date();
-  const birthDate = new Date(this.dateOfBirth);
-  let age = now.getFullYear() - birthDate.getFullYear();
-  const monthDiff = now.getMonth() - birthDate.getMonth();
-  if (
-    monthDiff < 0 ||
-    (monthDiff === 0 && now.getDate() < birthDate.getDate())
-  ) {
-    age--;
+  if (this.dateOfBirth) {
+    const now = new Date();
+    const birthDate = new Date(this.dateOfBirth);
+    let age = now.getFullYear() - birthDate.getFullYear();
+    const monthDiff = now.getMonth() - birthDate.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && now.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    this.age = age;
   }
-  this.age = age;
   next();
 });
 

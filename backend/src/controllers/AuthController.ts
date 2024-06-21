@@ -1,3 +1,4 @@
+// src/controllers/AuthController.ts
 import { Request, Response } from "express";
 import User from "../models/User";
 import {
@@ -5,67 +6,32 @@ import {
   verifyPassword,
   generateToken,
 } from "../utils/authUtils";
-import axios from "axios";
-import fs from "fs";
-import path from "path";
-
-const IMAGE_SERVER_URL = "http://localhost:7000/server-image";
-const UPLOAD_DIR = "uploads/";
 
 export const register = async (req: Request, res: Response) => {
-  const {
-    firstName,
-    lastName,
-    email,
-    password,
-    userType,
-    phone,
-    dateOfBirth,
-    address,
-  } = req.body;
+  const { emailOrPhone, password } = req.body;
+
+  console.log("Register request body:", req.body); // Log pour vérifier le corps de la requête
+
+  if (!emailOrPhone || !password) {
+    return res
+      .status(400)
+      .json({ message: "Email or phone and password are required" });
+  }
 
   try {
+    const existingUser = await User.findOne({ emailOrPhone });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
     const hashedPassword = await hashPassword(password);
 
     const user = new User({
-      firstName,
-      lastName,
-      email,
+      emailOrPhone,
       password: hashedPassword,
-      userType,
-      phone,
-      dateOfBirth,
-      address,
       images: [],
       videos: [],
     });
-
-    // Sauvegarder les images
-    if (req.files && req.files.images) {
-      const images = Array.isArray(req.files.images)
-        ? req.files.images
-        : [req.files.images];
-      for (const image of images) {
-        const imageBase64 = image.data.toString("base64");
-        const response = await axios.post(`${IMAGE_SERVER_URL}/ajouter-image`, {
-          nom: image.name,
-          base64: imageBase64,
-        });
-        user.images.push(response.data.link);
-      }
-    }
-
-    // Sauvegarder les vidéos
-    if (req.files && req.files.videos) {
-      const videos = Array.isArray(req.files.videos)
-        ? req.files.videos
-        : [req.files.videos];
-      for (const video of videos) {
-        const videoPath = path.join(UPLOAD_DIR, video.name);
-        fs.writeFileSync(videoPath, video.data);
-        user.videos.push(videoPath);
-      }
-    }
 
     await user.save();
 
@@ -73,18 +39,34 @@ export const register = async (req: Request, res: Response) => {
 
     res.status(201).json({ token, user });
   } catch (error) {
-    console.error(error);
+    console.error("Register error:", error); // Log pour vérifier les erreurs d'enregistrement
     res.status(500).json({ message: "Error registering user", error });
   }
 };
 
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { emailOrPhone, password } = req.body;
+
+  console.log("Login request body:", req.body); // Log pour vérifier le corps de la requête
+
+  if (!emailOrPhone || !password) {
+    return res
+      .status(400)
+      .json({ message: "Email or phone and password are required" });
+  }
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      $or: [{ emailOrPhone }, { phone: emailOrPhone }],
+    });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    if (typeof user.password !== "string") {
+      return res
+        .status(500)
+        .json({ message: "Password is not a valid string" });
     }
 
     const isPasswordValid = await verifyPassword(user.password, password);
@@ -96,6 +78,7 @@ export const login = async (req: Request, res: Response) => {
 
     res.status(200).json({ token, user });
   } catch (error) {
+    console.error("Login error:", error); // Log pour vérifier les erreurs de connexion
     res.status(500).json({ message: "Error logging in", error });
   }
 };

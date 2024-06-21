@@ -14,6 +14,7 @@ import logo from "../../assests/Images/nextstep.webp";
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
+  console.log(user);
 
   return (
     <nav className="navbar">
@@ -56,7 +57,9 @@ const Navbar: React.FC = () => {
           </>
         ) : (
           <li className="navbar-user">
-            <span>Welcome, {user.firstName}!</span>
+            <span>
+              Welcome, {user.firstName ? user.firstName : user.emailOrPhone}!
+            </span>
             <div className="navbar-dropdown">
               <button onClick={logout}>
                 <FaSignOutAlt /> Logout

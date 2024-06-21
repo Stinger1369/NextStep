@@ -13,14 +13,17 @@ export const getUsers = async (req: Request, res: Response) => {
 
 export const getUserById = async (req: Request, res: Response) => {
   const { id } = req.params;
+  console.log("Fetching user by ID:", id); // Log pour vérifier l'ID
 
   try {
     const user = await User.findById(id);
     if (!user) {
+      console.log("User not found:", id); // Log pour vérifier si l'utilisateur n'est pas trouvé
       return res.status(404).json({ message: "User not found" });
     }
     res.status(200).json(user);
   } catch (error) {
+    console.log("Error fetching user:", error); // Log pour vérifier les erreurs
     res.status(500).json({ message: "Error fetching user", error });
   }
 };

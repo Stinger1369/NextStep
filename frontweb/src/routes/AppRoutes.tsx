@@ -7,6 +7,7 @@ import RegisterComponent from "../pages/RegisterPages/RegisterComponent";
 import PasswordResetComponent from "../pages/PasswordReset/PasswordResetComponent";
 import JobOffers from "../pages/JobOffers/JobOffers";
 import Navbar from "../components/Navbar/Navbar";
+import ProfileEdit from "../pages/ProfileSection/ProfileEdit/ProfileEdit"; // Importer ProfileEdit
 
 const AppRoutes: React.FC = () => {
   return (
@@ -19,6 +20,8 @@ const AppRoutes: React.FC = () => {
         <Route path="/register" element={<RegisterComponent />} />
         <Route path="/password-reset" element={<PasswordResetComponent />} />
         <Route path="/job-offers" element={<JobOffers />} />
+        <Route path="/profile-edit" element={<ProfileEdit />} />{" "}
+        {/* Ajouter la route pour ProfileEdit */}
       </Routes>
     </Router>
   );

@@ -14,9 +14,11 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
       token,
       process.env.JWT_SECRET || "defaultSecret"
     );
+    console.log("Decoded JWT:", decoded); // Log pour vérifier le token décodé
     (req as any).user = decoded; // Adding user to the request object
     next();
   } catch (error) {
+    console.log("JWT verification error:", error); // Log pour vérifier les erreurs de vérification du JWT
     return res.status(401).json({ message: "Invalid token" });
   }
 };

@@ -4,21 +4,9 @@ import { useNavigate } from "react-router-dom";
 import "./RegisterComponent.css";
 
 const RegisterComponent: React.FC = () => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+  const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [userType, setUserType] = useState("jobSeeker");
-  const [phone, setPhone] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [address, setAddress] = useState({
-    street: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    country: "",
-  });
-  const [images, setImages] = useState<FileList | null>(null);
+  const [confirmPassword, setConfirmPassword] = useState("");
   const { register } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
@@ -26,25 +14,14 @@ const RegisterComponent: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("firstName", firstName);
-    formData.append("lastName", lastName);
-    formData.append("email", email);
-    formData.append("password", password);
-    formData.append("userType", userType);
-    formData.append("phone", phone);
-    formData.append("dateOfBirth", dateOfBirth);
-    formData.append("address[street]", address.street);
-    formData.append("address[city]", address.city);
-    formData.append("address[state]", address.state);
-    formData.append("address[zipCode]", address.zipCode);
-    formData.append("address[country]", address.country);
-
-    if (images) {
-      for (let i = 0; i < images.length; i++) {
-        formData.append("images", images[i]);
-      }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
     }
+
+    const formData = new FormData();
+    formData.append("emailOrPhone", emailOrPhone);
+    formData.append("password", password);
 
     try {
       await register(formData);
@@ -57,32 +34,12 @@ const RegisterComponent: React.FC = () => {
   return (
     <div className="register-container">
       {error && <div className="error">{error}</div>}
-      <form
-        onSubmit={handleSubmit}
-        className="register-form"
-        encType="multipart/form-data"
-      >
+      <form onSubmit={handleSubmit} className="register-form">
         <input
           type="text"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          placeholder="First Name"
-          className="register-input"
-          required
-        />
-        <input
-          type="text"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          placeholder="Last Name"
-          className="register-input"
-          required
-        />
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
+          value={emailOrPhone}
+          onChange={(e) => setEmailOrPhone(e.target.value)}
+          placeholder="Email or Phone"
           className="register-input"
           required
         />
@@ -94,74 +51,13 @@ const RegisterComponent: React.FC = () => {
           className="register-input"
           required
         />
-        <select
-          value={userType}
-          onChange={(e) => setUserType(e.target.value)}
-          className="register-input"
-        >
-          <option value="jobSeeker">Job Seeker</option>
-          <option value="employer">Employer</option>
-        </select>
         <input
-          type="text"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder="Phone"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Confirm Password"
           className="register-input"
           required
-        />
-        <input
-          type="date"
-          value={dateOfBirth}
-          onChange={(e) => setDateOfBirth(e.target.value)}
-          className="register-input"
-          required
-        />
-        <input
-          type="text"
-          value={address.street}
-          onChange={(e) => setAddress({ ...address, street: e.target.value })}
-          placeholder="Street"
-          className="register-input"
-          required
-        />
-        <input
-          type="text"
-          value={address.city}
-          onChange={(e) => setAddress({ ...address, city: e.target.value })}
-          placeholder="City"
-          className="register-input"
-          required
-        />
-        <input
-          type="text"
-          value={address.state}
-          onChange={(e) => setAddress({ ...address, state: e.target.value })}
-          placeholder="State"
-          className="register-input"
-          required
-        />
-        <input
-          type="text"
-          value={address.zipCode}
-          onChange={(e) => setAddress({ ...address, zipCode: e.target.value })}
-          placeholder="Zip Code"
-          className="register-input"
-          required
-        />
-        <input
-          type="text"
-          value={address.country}
-          onChange={(e) => setAddress({ ...address, country: e.target.value })}
-          placeholder="Country"
-          className="register-input"
-          required
-        />
-        <input
-          type="file"
-          multiple
-          onChange={(e) => setImages(e.target.files)}
-          className="register-input"
         />
         <button type="submit" className="register-button">
           Register

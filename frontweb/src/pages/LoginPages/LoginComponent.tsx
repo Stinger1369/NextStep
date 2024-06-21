@@ -12,34 +12,37 @@ const LoginComponent: React.FC = () => {
 
   const formik = useFormik({
     initialValues: {
-      email: "",
+      emailOrPhone: "",
       password: "",
     },
     validationSchema: Yup.object({
-      email: Yup.string().email("Invalid email address").required("Required"),
+      emailOrPhone: Yup.string().required("Required"),
       password: Yup.string()
         .min(6, "Password must be at least 6 characters")
         .required("Required"),
     }),
     onSubmit: async (values, { setSubmitting, setErrors }) => {
       try {
-        await login(values.email, values.password);
+        await login(values.emailOrPhone, values.password);
         navigate("/"); // Rediriger vers la page d'accueil après une connexion réussie
       } catch (error: unknown) {
         if (isAxiosError(error)) {
           if (error.response && error.response.status === 404) {
             setErrors({
-              email: "Email does not exist. Would you like to register?",
+              emailOrPhone:
+                "Email or phone does not exist. Would you like to register?",
             });
           } else if (error.response && error.response.status === 400) {
             setErrors({
               password: "Incorrect password. Forgot your password?",
             });
           } else {
-            setErrors({ email: "An error occurred. Please try again." });
+            setErrors({ emailOrPhone: "An error occurred. Please try again." });
           }
         } else {
-          setErrors({ email: "An unknown error occurred. Please try again." });
+          setErrors({
+            emailOrPhone: "An unknown error occurred. Please try again.",
+          });
         }
       } finally {
         setSubmitting(false);
@@ -55,23 +58,28 @@ const LoginComponent: React.FC = () => {
     <div className="login-container">
       {user ? (
         <div>
-          <p>Welcome, {user.firstName}!</p>
+          <p>Welcome, {user.firstName ? user.firstName : user.emailOrPhone}!</p>
+          <button onClick={() => navigate("/profile-edit")}>
+            Complete your profile
+          </button>
           <button onClick={logout}>Logout</button>
         </div>
       ) : (
         <form onSubmit={formik.handleSubmit} className="login-form">
           <div className="form-field">
             <input
-              type="email"
-              id="email"
-              {...formik.getFieldProps("email")}
-              placeholder="Email"
+              type="text"
+              id="emailOrPhone"
+              {...formik.getFieldProps("emailOrPhone")}
+              placeholder="Email or Phone"
               className={`login-input ${
-                formik.touched.email && formik.errors.email ? "error-input" : ""
+                formik.touched.emailOrPhone && formik.errors.emailOrPhone
+                  ? "error-input"
+                  : ""
               }`}
             />
-            {formik.touched.email && formik.errors.email ? (
-              <div className="error">{formik.errors.email}</div>
+            {formik.touched.emailOrPhone && formik.errors.emailOrPhone ? (
+              <div className="error">{formik.errors.emailOrPhone}</div>
             ) : null}
           </div>
           <div className="form-field">
