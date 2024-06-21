@@ -1,3 +1,4 @@
+// src/contexts/AuthContext.tsx
 import React, {
   createContext,
   useContext,
@@ -7,6 +8,18 @@ import React, {
 } from "react";
 import axiosInstance from "../axiosConfig";
 import { useUser } from "./UserContext";
+import { login } from "./authContext/authLogin";
+import { register } from "./authContext/authRegister";
+import { verifyEmail } from "./authContext/authVerifyEmail";
+import { resendVerificationCode } from "./authContext/authResendVerificationCode";
+import { requestPasswordReset } from "./authContext/authRequestPasswordReset"; // Import the requestPasswordReset function
+import { resetPassword } from "./authContext/authResetPassword"; // Import the resetPassword function
+import { logout } from "./authContext/authLogout";
+import {
+  getUserFromLocalStorage,
+  getTokenFromLocalStorage,
+  parseJwt,
+} from "./authContext/authUtils";
 
 interface User {
   _id: string;
@@ -39,6 +52,14 @@ interface AuthContextType {
   token: string | null;
   login: (emailOrPhone: string, password: string) => Promise<void>;
   register: (formData: FormData) => Promise<void>;
+  verifyEmail: (emailOrPhone: string, code: string) => Promise<void>;
+  resendVerificationCode: (emailOrPhone: string) => Promise<void>;
+  requestPasswordReset: (emailOrPhone: string) => Promise<void>;
+  resetPassword: (
+    emailOrPhone: string,
+    code: string,
+    newPassword: string
+  ) => Promise<void>;
   logout: () => void;
 }
 
@@ -48,23 +69,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const { getUserById } = useUser();
-
-  const getUserFromLocalStorage = () => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      try {
-        return JSON.parse(savedUser);
-      } catch (error) {
-        console.error("Failed to parse user from localStorage", error);
-        return null;
-      }
-    }
-    return null;
-  };
-
-  const getTokenFromLocalStorage = () => {
-    return localStorage.getItem("token");
-  };
 
   const [user, setUser] = useState<User | null>(getUserFromLocalStorage);
   const [token, setToken] = useState<string | null>(getTokenFromLocalStorage);
@@ -87,7 +91,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           }
         } catch (error) {
           console.error("Error fetching user:", error);
-          logout();
+          logout(setUser, setToken);
         }
       }
     };
@@ -96,65 +100,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, [token]);
 
-  const login = async (emailOrPhone: string, password: string) => {
-    const response = await axiosInstance.post("/auth/login", {
-      emailOrPhone,
-      password,
-    });
-    setToken(response.data.token);
-    setUser(response.data.user);
-    localStorage.setItem("token", response.data.token);
-    localStorage.setItem("user", JSON.stringify(response.data.user));
-    axiosInstance.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${response.data.token}`;
-  };
-
-  const register = async (formData: FormData) => {
-    try {
-      await axiosInstance.post("/auth/register", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-    } catch (error) {
-      console.error("Error registering user:", error);
-      throw error;
-    }
-  };
-
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    delete axiosInstance.defaults.headers.common["Authorization"];
-  };
-
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        login: (emailOrPhone, password) =>
+          login(emailOrPhone, password, setUser, setToken),
+        register: (formData) => register(formData, setUser),
+        verifyEmail,
+        resendVerificationCode,
+        requestPasswordReset, // Add the requestPasswordReset function to the context
+        resetPassword, // Add the resetPassword function to the context
+        logout: () => logout(setUser, setToken),
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-};
-
-const parseJwt = (token: string) => {
-  try {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map((c) => {
-          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-        })
-        .join("")
-    );
-    return JSON.parse(jsonPayload);
-  } catch (e) {
-    console.error("Failed to parse JWT", e);
-    return null;
-  }
 };
 
 export const useAuth = (): AuthContextType => {

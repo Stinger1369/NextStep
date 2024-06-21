@@ -16,7 +16,7 @@ export const verifyPassword = async (
 
 export const generateToken = (user: any): string => {
   return jwt.sign(
-    { id: user._id, email: user.email, userType: user.userType },
+    { id: user._id, email: user.emailOrPhone, userType: user.userType },
     process.env.JWT_SECRET || "defaultSecret",
     { expiresIn: "1h" }
   );

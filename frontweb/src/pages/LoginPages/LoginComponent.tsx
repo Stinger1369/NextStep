@@ -1,14 +1,15 @@
+// src/pages/Login/LoginComponent.tsx
 import React from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Link, useNavigate } from "react-router-dom";
-import { AxiosError } from "axios"; // Importer AxiosError
+import { AxiosError } from "axios";
 import "./LoginComponent.css";
 
 const LoginComponent: React.FC = () => {
   const { login, user, logout } = useAuth();
-  const navigate = useNavigate(); // Utiliser useNavigate pour la redirection
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
@@ -36,6 +37,16 @@ const LoginComponent: React.FC = () => {
             setErrors({
               password: "Incorrect password. Forgot your password?",
             });
+          } else if (
+            error.response &&
+            error.response.status === 401 &&
+            isErrorWithMessage(error.response.data) &&
+            error.response.data.message === "Email not verified"
+          ) {
+            setErrors({
+              emailOrPhone:
+                "Your account is not verified. Please verify your account to continue.",
+            });
           } else {
             setErrors({ emailOrPhone: "An error occurred. Please try again." });
           }
@@ -52,6 +63,10 @@ const LoginComponent: React.FC = () => {
 
   function isAxiosError(error: any): error is AxiosError {
     return error.isAxiosError === true;
+  }
+
+  function isErrorWithMessage(error: any): error is { message: string } {
+    return typeof error === "object" && error !== null && "message" in error;
   }
 
   return (
@@ -79,7 +94,35 @@ const LoginComponent: React.FC = () => {
               }`}
             />
             {formik.touched.emailOrPhone && formik.errors.emailOrPhone ? (
-              <div className="error">{formik.errors.emailOrPhone}</div>
+              <div className="error">
+                {formik.errors.emailOrPhone}
+                {formik.errors.emailOrPhone.includes(
+                  "Email or phone does not exist."
+                ) && (
+                  <button
+                    type="button"
+                    className="register-button"
+                    onClick={() => navigate("/register")}
+                  >
+                    Register
+                  </button>
+                )}
+                {formik.errors.emailOrPhone.includes(
+                  "Your account is not verified."
+                ) && (
+                  <button
+                    type="button"
+                    className="verify-button"
+                    onClick={() =>
+                      navigate("/verify-email", {
+                        state: { emailOrPhone: formik.values.emailOrPhone },
+                      })
+                    }
+                  >
+                    Verify Account
+                  </button>
+                )}
+              </div>
             ) : null}
           </div>
           <div className="form-field">
@@ -105,7 +148,7 @@ const LoginComponent: React.FC = () => {
           >
             {formik.isSubmitting ? "Logging in..." : "Login"}
           </button>
-          <Link to="/password-reset" className="forgot-password-link">
+          <Link to="/password-Request-reset" className="forgot-password-link">
             Forgot your password?
           </Link>
         </form>

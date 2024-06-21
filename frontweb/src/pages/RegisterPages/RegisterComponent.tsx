@@ -1,3 +1,4 @@
+// src/pages/RegisterPages/RegisterComponent.tsx
 import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -25,7 +26,7 @@ const RegisterComponent: React.FC = () => {
 
     try {
       await register(formData);
-      navigate("/login");
+      navigate("/verify-email", { state: { emailOrPhone } });
     } catch (error) {
       setError("Error registering user. Please check the form and try again.");
     }

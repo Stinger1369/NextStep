@@ -26,8 +26,11 @@ interface IUser extends Document {
   skills?: string[];
   images: string[];
   videos: string[];
-  verificationCode?: string; // Ajoutez ce champ
-  isVerified: boolean; // Et ce champ
+  verificationCode?: string;
+  verificationCodeExpiresAt?: Date;
+  isVerified: boolean;
+  resetPasswordCode?: string;
+  resetPasswordExpiresAt?: Date;
 }
 
 const UserSchema: Schema = new Schema({
@@ -55,10 +58,12 @@ const UserSchema: Schema = new Schema({
   images: [{ type: String }],
   videos: [{ type: String }],
   verificationCode: { type: String },
+  verificationCodeExpiresAt: { type: Date },
   isVerified: { type: Boolean, default: false },
+  resetPasswordCode: { type: String },
+  resetPasswordExpiresAt: { type: Date },
 });
 
-// Méthode pour calculer l'âge
 UserSchema.pre<IUser>("save", function (next) {
   if (this.dateOfBirth) {
     const now = new Date();
