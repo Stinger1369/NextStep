@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
-import User, { IUser } from "../../models/User"; // Importation de IUser
+import User from "../../models/User";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import {
   hashPassword,
@@ -9,8 +9,8 @@ import {
   generateRefreshToken,
 } from "../../utils/authUtils";
 import crypto from "crypto";
-import { sendVerificationEmail } from "../../config/nodemailerConfig";
 import { createSession } from "../../utils/sessionUtils";
+import NotificationService from "notiflib";
 
 // Middleware de validation
 const validateRegister = [
@@ -38,6 +38,8 @@ const validateRefreshToken = [
     .trim()
     .escape(),
 ];
+
+const notificationService = new NotificationService();
 
 // Fonction pour enregistrer un utilisateur
 export const register = [
@@ -84,7 +86,12 @@ export const register = [
       });
 
       await user.save();
-      await sendVerificationEmail(emailOrPhone, verificationCode);
+      await notificationService.sendEmailNotification(
+        emailOrPhone,
+        "Email Verification",
+        "verificationEmail",
+        { verificationCode }
+      );
 
       console.log(`User registered successfully: ${user._id}`);
 
@@ -104,17 +111,17 @@ export const login = [
   ...validateLogin,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
-    console.log('Validation errors for login:', errors.array());
+    console.log("Validation errors for login:", errors.array());
     if (!errors.isEmpty()) {
-      console.log('Login validation failed:', errors.array());
+      console.log("Login validation failed:", errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
-    console.log('Login validation passed');
+    console.log("Login validation passed");
     const { emailOrPhone, password } = req.body;
 
     if (!emailOrPhone || !password) {
-      console.log('Missing email or password');
+      console.log("Missing email or password");
       return res
         .status(400)
         .json({ message: "Email or phone and password are required" });
@@ -128,7 +135,9 @@ export const login = [
       }
 
       if (!user.isVerified) {
-        console.log(`Login failed: Email not verified for user ${emailOrPhone}`);
+        console.log(
+          `Login failed: Email not verified for user ${emailOrPhone}`
+        );
         return res.status(401).json({ message: "Email not verified" });
       }
 
@@ -160,8 +169,6 @@ export const login = [
     }
   },
 ];
-
-
 
 // Fonction pour rafraîchir un token
 export const refreshToken = [

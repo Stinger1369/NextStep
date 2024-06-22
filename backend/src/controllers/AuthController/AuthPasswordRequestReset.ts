@@ -2,7 +2,9 @@ import { Request, Response } from "express";
 import User from "../../models/User";
 import crypto from "crypto";
 import { hashPassword } from "../../utils/authUtils";
-import { sendPasswordResetEmail } from "../../config/nodemailerConfig";
+import NotificationService from "notiflib";
+
+const notificationService = new NotificationService();
 
 export const requestPasswordReset = async (req: Request, res: Response) => {
   const { emailOrPhone } = req.body;
@@ -20,7 +22,12 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
     user.resetPasswordCode = resetPasswordCode;
     user.resetPasswordExpiresAt = new Date(Date.now() + 20 * 60 * 1000); // 20 minutes from now
     await user.save();
-    await sendPasswordResetEmail(emailOrPhone, resetPasswordCode);
+    await notificationService.sendEmailNotification(
+      emailOrPhone,
+      "Password Reset",
+      "passwordResetEmail",
+      { resetCode: resetPasswordCode } // Assurez-vous que la clé est `resetCode`
+    );
 
     console.log(`Password reset code sent successfully to user: ${user._id}`);
 
