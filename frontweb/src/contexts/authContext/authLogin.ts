@@ -1,20 +1,21 @@
+// src/contexts/authContext/authLogin.ts
 import axiosInstance from "../../axiosConfig";
 
 export const login = async (
   emailOrPhone: string,
   password: string,
-  setUser: Function,
-  setToken: Function
+  setUser: any,
+  setToken: any,
+  setRefreshToken: any
 ) => {
   const response = await axiosInstance.post("/auth/login", {
     emailOrPhone,
     password,
   });
-  setToken(response.data.token);
-  setUser(response.data.user);
-  localStorage.setItem("token", response.data.token);
-  localStorage.setItem("user", JSON.stringify(response.data.user));
-  axiosInstance.defaults.headers.common[
-    "Authorization"
-  ] = `Bearer ${response.data.token}`;
+  const { token, refreshToken, user } = response.data;
+  setUser(user);
+  setToken(token);
+  setRefreshToken(refreshToken);
+  localStorage.setItem("token", token);
+  localStorage.setItem("refreshToken", refreshToken);
 };

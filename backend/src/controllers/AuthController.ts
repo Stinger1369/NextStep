@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import User from "../models/User";
+import jwt, { JwtPayload } from "jsonwebtoken";
+
 import {
   hashPassword,
   verifyPassword,
   generateToken,
+  generateRefreshToken, // Assurez-vous que cette fonction est importée
 } from "../utils/authUtils";
 import crypto from "crypto";
 import {
@@ -92,15 +95,9 @@ export const login = async (req: Request, res: Response) => {
   }
 
   try {
-    const user = await User.findOne({
-      $or: [{ emailOrPhone }, { phone: emailOrPhone }],
-    });
+    const user = await User.findOne({ emailOrPhone });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
-    }
-
-    if (!user.isVerified) {
-      return res.status(401).json({ message: "Email not verified" });
     }
 
     const isPasswordValid = await verifyPassword(user.password, password);
@@ -109,8 +106,9 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const token = generateToken(user);
+    const refreshToken = generateRefreshToken(user);
 
-    res.status(200).json({ token, user });
+    res.status(200).json({ token, refreshToken, user });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Error logging in", error });
@@ -189,5 +187,33 @@ export const resetPassword = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Password reset error:", error);
     res.status(500).json({ message: "Error resetting password", error });
+  }
+};
+
+export const refreshToken = async (req: Request, res: Response) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(400).json({ message: "Refresh token is required" });
+  }
+
+  try {
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET || "defaultRefreshSecret"
+    ) as JwtPayload; // Cast to JwtPayload to access the id property
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const newToken = generateToken(user);
+    const newRefreshToken = generateRefreshToken(user);
+
+    res.status(200).json({ token: newToken, refreshToken: newRefreshToken });
+  } catch (error) {
+    console.error("Refresh token error:", error);
+    res.status(500).json({ message: "Error refreshing token", error });
   }
 };

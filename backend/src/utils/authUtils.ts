@@ -21,3 +21,11 @@ export const generateToken = (user: any): string => {
     { expiresIn: "1h" }
   );
 };
+
+export const generateRefreshToken = (user: any): string => {
+  return jwt.sign(
+    { id: user._id, email: user.emailOrPhone, userType: user.userType },
+    process.env.JWT_REFRESH_SECRET || "defaultRefreshSecret",
+    { expiresIn: "7d" } // Token de rafraîchissement valide pendant 7 jours
+  );
+};

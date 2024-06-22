@@ -1,4 +1,5 @@
 import express from "express";
+import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import cors from "cors";
 import fileUpload from "express-fileupload";
@@ -14,7 +15,8 @@ import { config } from "./config/config";
 dotenv.config();
 
 const app = express();
-
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 // Increase request size limit
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));

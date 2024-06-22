@@ -1,9 +1,15 @@
-import axiosInstance from "../../axiosConfig";
+// src/contexts/authContext/authLogout.ts
+import { User } from "../AuthContext";
 
-export const logout = (setUser: Function, setToken: Function) => {
-  setToken(null);
+export const logout = (
+  setUser: React.Dispatch<React.SetStateAction<User | null>>,
+  setToken: React.Dispatch<React.SetStateAction<string | null>>,
+  setRefreshToken: React.Dispatch<React.SetStateAction<string | null>>
+) => {
   setUser(null);
-  localStorage.removeItem("token");
+  setToken(null);
+  setRefreshToken(null);
   localStorage.removeItem("user");
-  delete axiosInstance.defaults.headers.common["Authorization"];
+  localStorage.removeItem("token");
+  localStorage.removeItem("refreshToken");
 };

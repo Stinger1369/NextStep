@@ -1,21 +1,18 @@
-// src/routes/authRoutes.ts
+// src/routes/userRoutes.ts
 import { Router } from "express";
 import {
-  register,
-  login,
-  verifyEmail,
-  resendVerificationCode,
-  requestPasswordReset,
-  resetPassword,
-} from "../controllers/AuthController";
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+} from "../controllers/UserController";
+import authMiddleware from "../middlewares/authMiddleware";
 
 const router = Router();
 
-router.post("/register", register);
-router.post("/login", login);
-router.post("/verify-email", verifyEmail);
-router.post("/resend-verification-code", resendVerificationCode);
-router.post("/request-password-reset", requestPasswordReset);
-router.post("/reset-password", resetPassword);
+router.get("/", authMiddleware, getUsers);
+router.get("/:id", authMiddleware, getUserById);
+router.put("/:id", authMiddleware, updateUser);
+router.delete("/:id", authMiddleware, deleteUser);
 
 export default router;

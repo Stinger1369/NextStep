@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/server.ts",
-     "dev": "nodemon src/server.ts"
+    "dev": "nodemon src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,7 @@
     "@tensorflow/tfjs-node": "^4.20.0",
     "argon2": "^0.40.3",
     "axios": "^1.7.2",
+    "body-parser": "^1.20.2",
     "canvas": "^2.11.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
