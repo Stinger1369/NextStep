@@ -24,3 +24,11 @@ SOLID Principles : Appliquez les principes SOLID pour écrire un code plus maint
 Linting : Utilisez ESLint pour maintenir un style de code cohérent.
 Pré-commit Hooks : Utilisez Husky pour exécuter des scripts (comme les tests ou le linting) avant chaque commit.
 CI/CD : Mettez en place des pipelines d'intégration continue et de déploiement continu pour automatiser les tests et les déploiements.
+
+versions des packages sont disponibles et compatibles avec votre projet.
+npm show ws versions
+npm install ws@latest
+npm audit fix
+
+
+
