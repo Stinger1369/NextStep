@@ -8,7 +8,7 @@ import {
   requestPasswordReset,
   resetPassword,
   refreshToken,
-} from "../controllers/AuthController";
+} from "../controllers/AuthController/AuthController";
 
 const router = Router();
 

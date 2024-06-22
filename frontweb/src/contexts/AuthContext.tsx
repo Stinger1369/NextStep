@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.tsx
 import React, {
   createContext,
   useContext,
@@ -6,6 +5,7 @@ import React, {
   ReactNode,
   useEffect,
   useCallback,
+  useMemo,
 } from "react";
 import axiosInstance from "../axiosConfig";
 import { useUser } from "./UserContext";
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     localStorage.getItem("refreshToken")
   );
 
-  const memoizedGetUserById = useCallback(getUserById, []);
+  const memoizedGetUserById = useCallback(getUserById, [getUserById]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -136,23 +136,35 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return () => clearInterval(interval);
   }, [refresh]);
 
+  const authContextValue = useMemo(
+    () => ({
+      user,
+      token,
+      refreshToken,
+      login: (emailOrPhone: string, password: string) =>
+        login(emailOrPhone, password, setUser, setToken, setRefreshToken),
+      register: (formData: FormData) => register(formData, setUser),
+      verifyEmail,
+      resendVerificationCode,
+      requestPasswordReset,
+      resetPassword,
+      logout: () => logout(setUser, setToken, setRefreshToken),
+      refresh,
+    }),
+    [
+      user,
+      token,
+      refreshToken,
+      setUser,
+      setToken,
+      setRefreshToken,
+      memoizedGetUserById,
+      refresh,
+    ]
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        refreshToken,
-        login: (emailOrPhone, password) =>
-          login(emailOrPhone, password, setUser, setToken, setRefreshToken),
-        register: (formData) => register(formData, setUser),
-        verifyEmail,
-        resendVerificationCode,
-        requestPasswordReset,
-        resetPassword,
-        logout: () => logout(setUser, setToken, setRefreshToken),
-        refresh,
-      }}
-    >
+    <AuthContext.Provider value={authContextValue}>
       {children}
     </AuthContext.Provider>
   );

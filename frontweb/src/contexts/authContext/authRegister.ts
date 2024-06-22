@@ -1,17 +1,17 @@
+// src/contexts/authContext/authRegister.ts
 import axiosInstance from "../../axiosConfig";
+import { User } from "../AuthContext";
 
-export const register = async (formData: FormData, setUser: Function) => {
+export const register = async (
+  formData: FormData,
+  setUser: (user: User | null) => void
+) => {
   try {
-    const response = await axiosInstance.post("/auth/register", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    const userData = response.data.user;
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+    const response = await axiosInstance.post("/auth/register", formData);
+    const { user } = response.data;
+    setUser(user);
+    localStorage.setItem("user", JSON.stringify(user));
   } catch (error) {
-    console.error("Error registering user:", error);
-    throw error;
+    console.error("Register error:", error);
   }
 };

@@ -1,15 +1,15 @@
-import express from "express";
+// src/server.ts
 import http from "http";
-import { initializeSocket } from "./socket/socket"; // Importer la configuration de Socket.IO
+import { initializeSocket } from "./socket/socket";
 import { config } from "./config/config";
 import initMongo from "./config/mongo";
-import app from "./app"; // Assurez-vous que le fichier app.ts existe et configure Express
-
-const server = http.createServer(app);
-const PORT = config.port;
+import app from "./app";
 
 // Initialiser MongoDB
 initMongo();
+
+const server = http.createServer(app);
+const PORT = config.port;
 
 console.log(`Attempting to start server on port ${PORT}`);
 

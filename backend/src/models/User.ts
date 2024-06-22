@@ -8,7 +8,7 @@ interface Address {
   country?: string;
 }
 
-interface IUser extends Document {
+export interface IUser extends Document {
   firstName?: string;
   lastName?: string;
   emailOrPhone: string;

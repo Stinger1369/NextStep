@@ -1,4 +1,3 @@
-// src/pages/Login/LoginComponent.tsx
 import React from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useFormik } from "formik";
@@ -27,6 +26,7 @@ const LoginComponent: React.FC = () => {
         await login(values.emailOrPhone, values.password);
         navigate("/"); // Rediriger vers la page d'accueil après une connexion réussie
       } catch (error: unknown) {
+        setSubmitting(false);
         if (isAxiosError(error)) {
           if (error.response && error.response.status === 404) {
             setErrors({
@@ -47,6 +47,9 @@ const LoginComponent: React.FC = () => {
               emailOrPhone:
                 "Your account is not verified. Please verify your account to continue.",
             });
+            navigate("/verify-email", {
+              state: { emailOrPhone: values.emailOrPhone },
+            });
           } else {
             setErrors({ emailOrPhone: "An error occurred. Please try again." });
           }
@@ -55,8 +58,6 @@ const LoginComponent: React.FC = () => {
             emailOrPhone: "An unknown error occurred. Please try again.",
           });
         }
-      } finally {
-        setSubmitting(false);
       }
     },
   });
@@ -148,7 +149,7 @@ const LoginComponent: React.FC = () => {
           >
             {formik.isSubmitting ? "Logging in..." : "Login"}
           </button>
-          <Link to="/password-Request-reset" className="forgot-password-link">
+          <Link to="/password-request-reset" className="forgot-password-link">
             Forgot your password?
           </Link>
         </form>

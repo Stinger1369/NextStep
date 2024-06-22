@@ -6,9 +6,13 @@ export const resetPassword = async (
   code: string,
   newPassword: string
 ) => {
-  await axiosInstance.post("/auth/reset-password", {
-    emailOrPhone,
-    code,
-    newPassword,
-  });
+  try {
+    await axiosInstance.post("/auth/reset-password", {
+      emailOrPhone,
+      code,
+      newPassword,
+    });
+  } catch (error) {
+    console.error("Reset password error:", error);
+  }
 };
