@@ -31,11 +31,13 @@ export interface IUser extends Document {
   isVerified: boolean;
   resetPasswordCode?: string;
   resetPasswordExpiresAt?: Date;
+  role?: string; // 'employer' or 'recruiter'
+  sex?: string; // 'male', 'female', or 'other'
 }
 
 const UserSchema: Schema = new Schema({
-  firstName: { type: String },
-  lastName: { type: String },
+  firstName: { type: String, index: true },
+  lastName: { type: String, index: true },
   emailOrPhone: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   userType: { type: String },
@@ -62,8 +64,11 @@ const UserSchema: Schema = new Schema({
   isVerified: { type: Boolean, default: false },
   resetPasswordCode: { type: String },
   resetPasswordExpiresAt: { type: Date },
+  role: { type: String, index: true }, // 'employer' or 'recruiter'
+  sex: { type: String }, // 'male', 'female', or 'other'
 });
 
+// Méthode pour calculer l'âge
 UserSchema.pre<IUser>("save", function (next) {
   if (this.dateOfBirth) {
     const now = new Date();

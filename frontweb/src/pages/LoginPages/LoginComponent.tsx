@@ -24,7 +24,11 @@ const LoginComponent: React.FC = () => {
     onSubmit: async (values, { setSubmitting, setErrors }) => {
       try {
         await login(values.emailOrPhone, values.password);
-        navigate("/"); // Rediriger vers la page d'accueil après une connexion réussie
+        if (!user?.role) {
+          navigate("/role-selection"); // Rediriger vers la page de sélection de rôle
+        } else {
+          navigate("/"); // Rediriger vers la page d'accueil après une connexion réussie
+        }
       } catch (error: unknown) {
         setSubmitting(false);
         if (isAxiosError(error)) {
@@ -75,10 +79,9 @@ const LoginComponent: React.FC = () => {
       {user ? (
         <div>
           <p>Welcome, {user.firstName ? user.firstName : user.emailOrPhone}!</p>
-          <button onClick={() => navigate("/profile-edit")}>
+          <button onClick={() => navigate("/role-selection")}>
             Complete your profile
           </button>
-          <button onClick={logout}>Logout</button>
         </div>
       ) : (
         <form onSubmit={formik.handleSubmit} className="login-form">

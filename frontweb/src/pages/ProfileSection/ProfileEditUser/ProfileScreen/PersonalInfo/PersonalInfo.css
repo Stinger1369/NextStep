@@ -1,0 +1,25 @@
+.personal-info-form {
+  background-color: #f7f7f7;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.form-field {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+}
+
+.text-danger {
+  font-size: 14px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+}

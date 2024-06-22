@@ -46,6 +46,8 @@ export interface User {
   skills?: string[];
   images: string[];
   videos: string[];
+  role?: string;
+  sex?: string;
 }
 
 interface AuthContextType {

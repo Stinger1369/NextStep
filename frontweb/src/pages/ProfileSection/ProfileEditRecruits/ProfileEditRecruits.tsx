@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import { useUser } from "../../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import FileUpload from "../../../components/FileUploadAndCrop/FileUpload/FileUpload";
-import "./ProfileEdit.css";
+import "./ProfileEditRecruits.css";
 
 const ProfileEdit: React.FC = () => {
   const { user, updateUser } = useUser();
@@ -134,10 +134,9 @@ const ProfileEdit: React.FC = () => {
     formik.setFieldValue("images", updatedImages);
   };
 
- const handleRemoveVideo = () => {
-   handleVideoChange(null); // Use handleVideoChange to pass null and remove the video
- };
-
+  const handleRemoveVideo = () => {
+    handleVideoChange(null); // Use handleVideoChange to pass null and remove the video
+  };
 
   const updateProgress = (index: number, value: number) => {
     setUploadProgress((prevProgress) => {
