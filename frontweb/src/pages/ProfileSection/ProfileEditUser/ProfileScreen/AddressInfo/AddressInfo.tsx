@@ -2,6 +2,7 @@ import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
+import { FaArrowLeft, FaTimes } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./AddressInfo.css";
 
@@ -36,95 +37,104 @@ const AddressInfo: React.FC = () => {
   };
 
   return (
-    <form onSubmit={formik.handleSubmit} className="address-info-form">
-      <div className="mb-3">
-        <label htmlFor="street" className="form-label">
-          Street
-        </label>
-        <input
-          type="text"
-          id="street"
-          {...formik.getFieldProps("street")}
-          className="form-control"
+    <div className="address-info-container">
+      <div className="header-icons">
+        <FaArrowLeft
+          className="icon"
+          onClick={() => navigate("/profile-edit-user/personal-info")}
         />
-        {formik.touched.street && formik.errors.street ? (
-          <div className="text-danger">{formik.errors.street}</div>
-        ) : null}
+        <FaTimes className="icon" onClick={() => navigate("/")} />
       </div>
+      <form onSubmit={formik.handleSubmit} className="address-info-form">
+        <div className="mb-3">
+          <label htmlFor="street" className="form-label">
+            Street
+          </label>
+          <input
+            type="text"
+            id="street"
+            {...formik.getFieldProps("street")}
+            className="form-control"
+          />
+          {formik.touched.street && formik.errors.street ? (
+            <div className="text-danger">{formik.errors.street}</div>
+          ) : null}
+        </div>
 
-      <div className="mb-3">
-        <label htmlFor="city" className="form-label">
-          City
-        </label>
-        <input
-          type="text"
-          id="city"
-          {...formik.getFieldProps("city")}
-          className="form-control"
-        />
-        {formik.touched.city && formik.errors.city ? (
-          <div className="text-danger">{formik.errors.city}</div>
-        ) : null}
-      </div>
+        <div className="mb-3">
+          <label htmlFor="city" className="form-label">
+            City
+          </label>
+          <input
+            type="text"
+            id="city"
+            {...formik.getFieldProps("city")}
+            className="form-control"
+          />
+          {formik.touched.city && formik.errors.city ? (
+            <div className="text-danger">{formik.errors.city}</div>
+          ) : null}
+        </div>
 
-      <div className="mb-3">
-        <label htmlFor="state" className="form-label">
-          State
-        </label>
-        <input
-          type="text"
-          id="state"
-          {...formik.getFieldProps("state")}
-          className="form-control"
-        />
-        {formik.touched.state && formik.errors.state ? (
-          <div className="text-danger">{formik.errors.state}</div>
-        ) : null}
-      </div>
+        <div className="mb-3">
+          <label htmlFor="state" className="form-label">
+            State
+          </label>
+          <input
+            type="text"
+            id="state"
+            {...formik.getFieldProps("state")}
+            className="form-control"
+          />
+          {formik.touched.state && formik.errors.state ? (
+            <div className="text-danger">{formik.errors.state}</div>
+          ) : null}
+        </div>
 
-      <div className="mb-3">
-        <label htmlFor="zipCode" className="form-label">
-          Zip Code
-        </label>
-        <input
-          type="text"
-          id="zipCode"
-          {...formik.getFieldProps("zipCode")}
-          className="form-control"
-        />
-        {formik.touched.zipCode && formik.errors.zipCode ? (
-          <div className="text-danger">{formik.errors.zipCode}</div>
-        ) : null}
-      </div>
+        <div className="mb-3">
+          <label htmlFor="zipCode" className="form-label">
+            Zip Code
+          </label>
+          <input
+            type="text"
+            id="zipCode"
+            {...formik.getFieldProps("zipCode")}
+            className="form-control"
+          />
+          {formik.touched.zipCode && formik.errors.zipCode ? (
+            <div className="text-danger">{formik.errors.zipCode}</div>
+          ) : null}
+        </div>
 
-      <div className="mb-3">
-        <label htmlFor="country" className="form-label">
-          Country
-        </label>
-        <input
-          type="text"
-          id="country"
-          {...formik.getFieldProps("country")}
-          className="form-control"
-        />
-        {formik.touched.country && formik.errors.country ? (
-          <div className="text-danger">{formik.errors.country}</div>
-        ) : null}
-      </div>
+        <div className="mb-3">
+          <label htmlFor="country" className="form-label">
+            Country
+          </label>
+          <input
+            type="text"
+            id="country"
+            {...formik.getFieldProps("country")}
+            className="form-control"
+          />
+          {formik.touched.country && formik.errors.country ? (
+            <div className="text-danger">{formik.errors.country}</div>
+          ) : null}
+        </div>
 
-      <div className="d-flex justify-content-between">
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={handleSave}
-        >
-          Save
-        </button>
-        <button type="submit" className="btn btn-primary">
-          Continue
-        </button>
-      </div>
-    </form>
+        <div className="button-container mt-3">
+          <button
+            type="button"
+            className="btn btn-secondary me-2"
+            onClick={handleSave}
+          >
+            Save
+          </button>
+          <button type="submit" className="btn btn-primary">
+            Continue
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

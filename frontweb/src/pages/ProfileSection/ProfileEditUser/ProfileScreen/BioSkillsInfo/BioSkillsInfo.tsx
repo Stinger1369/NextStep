@@ -2,6 +2,7 @@ import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
+import { FaArrowLeft, FaTimes } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./BioSkillsInfo.css";
 
@@ -34,69 +35,78 @@ const BioSkillsInfo: React.FC = () => {
   };
 
   return (
-    <form onSubmit={formik.handleSubmit} className="bio-skills-form">
-      <div className="form-group">
-        <label htmlFor="bio">Bio</label>
-        <textarea
-          id="bio"
-          {...formik.getFieldProps("bio")}
-          className="form-control"
+    <div className="bio-skills-container">
+      <div className="header-icons">
+        <FaArrowLeft
+          className="icon"
+          onClick={() => navigate("/profile-edit-user/profession-info")}
         />
-        {formik.touched.bio && formik.errors.bio ? (
-          <div className="text-danger">{formik.errors.bio}</div>
-        ) : null}
+        <FaTimes className="icon" onClick={() => navigate("/")} />
       </div>
+      <form onSubmit={formik.handleSubmit} className="bio-skills-form">
+        <div className="form-group">
+          <label htmlFor="bio">Bio</label>
+          <textarea
+            id="bio"
+            {...formik.getFieldProps("bio")}
+            className="form-control"
+          />
+          {formik.touched.bio && formik.errors.bio ? (
+            <div className="text-danger">{formik.errors.bio}</div>
+          ) : null}
+        </div>
 
-      <div className="form-group">
-        <label htmlFor="experience">Experience</label>
-        <textarea
-          id="experience"
-          {...formik.getFieldProps("experience")}
-          className="form-control"
-        />
-        {formik.touched.experience && formik.errors.experience ? (
-          <div className="text-danger">{formik.errors.experience}</div>
-        ) : null}
-      </div>
+        <div className="form-group">
+          <label htmlFor="experience">Experience</label>
+          <textarea
+            id="experience"
+            {...formik.getFieldProps("experience")}
+            className="form-control"
+          />
+          {formik.touched.experience && formik.errors.experience ? (
+            <div className="text-danger">{formik.errors.experience}</div>
+          ) : null}
+        </div>
 
-      <div className="form-group">
-        <label htmlFor="education">Education</label>
-        <textarea
-          id="education"
-          {...formik.getFieldProps("education")}
-          className="form-control"
-        />
-        {formik.touched.education && formik.errors.education ? (
-          <div className="text-danger">{formik.errors.education}</div>
-        ) : null}
-      </div>
+        <div className="form-group">
+          <label htmlFor="education">Education</label>
+          <textarea
+            id="education"
+            {...formik.getFieldProps("education")}
+            className="form-control"
+          />
+          {formik.touched.education && formik.errors.education ? (
+            <div className="text-danger">{formik.errors.education}</div>
+          ) : null}
+        </div>
 
-      <div className="form-group">
-        <label htmlFor="skills">Skills (comma separated)</label>
-        <input
-          type="text"
-          id="skills"
-          {...formik.getFieldProps("skills")}
-          className="form-control"
-        />
-        {formik.touched.skills && formik.errors.skills ? (
-          <div className="text-danger">{formik.errors.skills}</div>
-        ) : null}
-      </div>
+        <div className="form-group">
+          <label htmlFor="skills">Skills (comma separated)</label>
+          <input
+            type="text"
+            id="skills"
+            {...formik.getFieldProps("skills")}
+            className="form-control"
+          />
+          {formik.touched.skills && formik.errors.skills ? (
+            <div className="text-danger">{formik.errors.skills}</div>
+          ) : null}
+        </div>
 
-      <div className="button-container">
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={handleSave}
-        >
-          Save
-        </button>
-        <button type="submit" className="btn btn-primary">
-          Continue
-        </button>
-      </div>
-    </form>
+        <div className="button-container">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={handleSave}
+          >
+            Save
+          </button>
+          <button type="submit" className="btn btn-primary">
+            Continue
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

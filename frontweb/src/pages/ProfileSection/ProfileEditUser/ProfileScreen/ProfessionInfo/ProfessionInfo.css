@@ -1,10 +1,27 @@
-.profession-info-form {
+.profession-info-container {
+  position: relative;
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
   background-color: #f7f7f7;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-icons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.icon {
+  font-size: 24px;
+  cursor: pointer;
+  color: #007bff;
+}
+
+.icon:hover {
+  color: #0056b3;
 }
 
 .form-group {

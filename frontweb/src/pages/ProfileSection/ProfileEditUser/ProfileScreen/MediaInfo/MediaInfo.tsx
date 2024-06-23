@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import { FaArrowLeft, FaTimes } from "react-icons/fa";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./MediaInfo.css";
 
 const MediaInfo: React.FC = () => {
+  const navigate = useNavigate();
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
 
@@ -37,52 +41,61 @@ const MediaInfo: React.FC = () => {
   };
 
   return (
-    <form onSubmit={formik.handleSubmit} className="media-info-form">
-      <div className="form-group">
-        <label htmlFor="images">Upload Images (up to 5)</label>
-        <input
-          type="file"
-          id="images"
-          accept="image/*"
-          multiple
-          onChange={handleImagesChange}
-          className="form-control"
+    <div className="media-info-container">
+      <div className="header-icons">
+        <FaArrowLeft
+          className="icon"
+          onClick={() => navigate("/profile-edit-user/bio-skills-info")}
         />
-        {formik.touched.images && formik.errors.images ? (
-          <div className="text-danger">{formik.errors.images}</div>
-        ) : null}
-        <div className="image-previews">
-          {imagePreviews.map((src, index) => (
-            <img key={index} src={src} alt={`Preview ${index}`} />
-          ))}
+        <FaTimes className="icon" onClick={() => navigate("/")} />
+      </div>
+      <form onSubmit={formik.handleSubmit} className="media-info-form">
+        <div className="form-group">
+          <label htmlFor="images">Upload Images (up to 5)</label>
+          <input
+            type="file"
+            id="images"
+            accept="image/*"
+            multiple
+            onChange={handleImagesChange}
+            className="form-control"
+          />
+          {formik.touched.images && formik.errors.images ? (
+            <div className="text-danger">{formik.errors.images}</div>
+          ) : null}
+          <div className="image-previews">
+            {imagePreviews.map((src, index) => (
+              <img key={index} src={src} alt={`Preview ${index}`} />
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="form-group">
-        <label htmlFor="video">Upload Video</label>
-        <input
-          type="file"
-          id="video"
-          accept="video/*"
-          onChange={handleVideoChange}
-          className="form-control"
-        />
-        {formik.touched.video && formik.errors.video ? (
-          <div className="text-danger">{formik.errors.video}</div>
-        ) : null}
-        {videoPreview && (
-          <video controls>
-            <source src={videoPreview} type="video/mp4" />
-          </video>
-        )}
-      </div>
+        <div className="form-group">
+          <label htmlFor="video">Upload Video</label>
+          <input
+            type="file"
+            id="video"
+            accept="video/*"
+            onChange={handleVideoChange}
+            className="form-control"
+          />
+          {formik.touched.video && formik.errors.video ? (
+            <div className="text-danger">{formik.errors.video}</div>
+          ) : null}
+          {videoPreview && (
+            <video controls>
+              <source src={videoPreview} type="video/mp4" />
+            </video>
+          )}
+        </div>
 
-      <div className="button-container">
-        <button type="submit" className="btn btn-primary">
-          Save
-        </button>
-      </div>
-    </form>
+        <div className="button-container">
+          <button type="submit" className="btn btn-primary">
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 
