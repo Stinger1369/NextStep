@@ -1,43 +1,115 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaTimes } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./MediaInfo.css";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../../../../../redux/store";
+import {
+  updateUser,
+  getUserById,
+} from "../../../../../redux/features/user/userSlice";
+import { addImage } from "../../../../../redux/features/image/imageSlice"; // Import addImage action
+
+interface FormValues {
+  images: File[];
+}
 
 const MediaInfo: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const userData = useSelector((state: RootState) => state.user.user);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [videoPreview, setVideoPreview] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const formik = useFormik({
+  useEffect(() => {
+    if (user?._id) {
+      dispatch(getUserById(user._id));
+    }
+  }, [dispatch, user]);
+
+  useEffect(() => {
+    if (userData) {
+      const imageFiles: File[] = userData.images
+        ? userData.images.map((image) => new File([], image))
+        : [];
+
+      setImagePreviews(userData.images || []);
+      formik.setValues({
+        images: imageFiles,
+      });
+    }
+  }, [userData]);
+
+  const formik = useFormik<FormValues>({
     initialValues: {
       images: [],
-      video: null,
     },
     validationSchema: Yup.object({
       images: Yup.array().max(5, "You can upload up to 5 images"),
-      video: Yup.mixed(),
     }),
-    onSubmit: (values) => {
-      // Save
-      console.log("Media Info:", values);
+    onSubmit: async (values) => {
+      console.log("Submitting form with values:", values);
+      setErrorMessage(null);
+
+      if (user?._id) {
+        const base64Images = await Promise.all(
+          values.images.map(async (image) => {
+            const base64 = await encodeFileToBase64(image);
+            console.log(
+              `Encoded base64 for ${image.name}: ${base64.slice(0, 100)}...`
+            );
+            return { imageName: image.name, imageBase64: base64 };
+          })
+        );
+
+        for (const img of base64Images) {
+          try {
+            await dispatch(addImage({ userId: user._id, ...img })).unwrap();
+          } catch (error: any) {
+            if (error.message.includes("inappropriate content")) {
+              setErrorMessage(
+                "Votre image contient du contenu inapproprié et a été rejetée."
+              );
+            } else {
+              setErrorMessage("Échec du téléchargement de l'image");
+            }
+            return;
+          }
+        }
+
+        const updatedValues = {
+          ...userData,
+          images: base64Images.map((img) => img.imageName),
+        };
+        console.log("Updating user with media info:", updatedValues);
+        await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+      }
     },
   });
 
+  const encodeFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = (reader.result as string).split(",")[1];
+        resolve(base64String);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   const handleImagesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.currentTarget.files || []);
+    console.log("Selected image files:", files);
+
     const previews = files.map((file) => URL.createObjectURL(file));
     setImagePreviews(previews);
     formik.setFieldValue("images", files);
-  };
-
-  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.currentTarget.files?.[0] || null;
-    const preview = file ? URL.createObjectURL(file) : null;
-    setVideoPreview(preview);
-    formik.setFieldValue("video", file);
   };
 
   return (
@@ -61,7 +133,14 @@ const MediaInfo: React.FC = () => {
             className="form-control"
           />
           {formik.touched.images && formik.errors.images ? (
-            <div className="text-danger">{formik.errors.images}</div>
+            <div className="text-danger">
+              {Array.isArray(formik.errors.images) &&
+                formik.errors.images.map((error, index) => (
+                  <div key={index}>
+                    {typeof error === "string" ? error : "Invalid file type"}
+                  </div>
+                ))}
+            </div>
           ) : null}
           <div className="image-previews">
             {imagePreviews.map((src, index) => (
@@ -70,24 +149,11 @@ const MediaInfo: React.FC = () => {
           </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="video">Upload Video</label>
-          <input
-            type="file"
-            id="video"
-            accept="video/*"
-            onChange={handleVideoChange}
-            className="form-control"
-          />
-          {formik.touched.video && formik.errors.video ? (
-            <div className="text-danger">{formik.errors.video}</div>
-          ) : null}
-          {videoPreview && (
-            <video controls>
-              <source src={videoPreview} type="video/mp4" />
-            </video>
-          )}
-        </div>
+        {errorMessage && (
+          <div className="alert alert-danger" role="alert">
+            {errorMessage}
+          </div>
+        )}
 
         <div className="button-container">
           <button type="submit" className="btn btn-primary">

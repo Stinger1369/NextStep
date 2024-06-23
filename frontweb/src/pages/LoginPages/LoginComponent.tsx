@@ -1,13 +1,16 @@
 import React from "react";
-import { useAuth } from "../../contexts/AuthContext";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
+import { login } from "../../redux/features/auth/authSlice";
 import { AxiosError } from "axios";
 import "./LoginComponent.css";
 
 const LoginComponent: React.FC = () => {
-  const { login, user, logout } = useAuth();
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
 
   const formik = useFormik({
@@ -23,44 +26,37 @@ const LoginComponent: React.FC = () => {
     }),
     onSubmit: async (values, { setSubmitting, setErrors }) => {
       try {
-        await login(values.emailOrPhone, values.password);
-        if (!user?.role) {
-          navigate("/role-selection"); // Rediriger vers la page de sélection de rôle
-        } else {
-          navigate("/"); // Rediriger vers la page d'accueil après une connexion réussie
-        }
-      } catch (error: unknown) {
+        await dispatch(
+          login({
+            emailOrPhone: values.emailOrPhone,
+            password: values.password,
+          })
+        ).unwrap();
+        navigate("/"); // Rediriger vers la page d'accueil après une connexion réussie
+      } catch (error: any) {
         setSubmitting(false);
-        if (isAxiosError(error)) {
-          if (error.response && error.response.status === 404) {
-            setErrors({
-              emailOrPhone:
-                "Email or phone does not exist. Would you like to register?",
-            });
-          } else if (error.response && error.response.status === 400) {
-            setErrors({
-              password: "Incorrect password. Forgot your password?",
-            });
-          } else if (
-            error.response &&
-            error.response.status === 401 &&
-            isErrorWithMessage(error.response.data) &&
-            error.response.data.message === "Email not verified"
-          ) {
-            setErrors({
-              emailOrPhone:
-                "Your account is not verified. Please verify your account to continue.",
-            });
-            navigate("/verify-email", {
-              state: { emailOrPhone: values.emailOrPhone },
-            });
-          } else {
-            setErrors({ emailOrPhone: "An error occurred. Please try again." });
-          }
-        } else {
+        if (error.message === "Request failed with status code 404") {
           setErrors({
-            emailOrPhone: "An unknown error occurred. Please try again.",
+            emailOrPhone:
+              "Email or phone does not exist. Would you like to register?",
           });
+        } else if (error.message === "Request failed with status code 400") {
+          setErrors({
+            password: "Incorrect password. Forgot your password?",
+          });
+        } else if (
+          error.message === "Request failed with status code 401" &&
+          error.response.data.message === "Email not verified"
+        ) {
+          setErrors({
+            emailOrPhone:
+              "Your account is not verified. Please verify your account to continue.",
+          });
+          navigate("/verify-email", {
+            state: { emailOrPhone: values.emailOrPhone },
+          });
+        } else {
+          setErrors({ emailOrPhone: "An error occurred. Please try again." });
         }
       }
     },

@@ -7,7 +7,6 @@ import RegisterComponent from "../pages/RegisterPages/RegisterComponent";
 import PasswordResetComponent from "../pages/PasswordReset/PasswordReset/PasswordResetComponent";
 import JobOffers from "../pages/JobOffers/JobOffers";
 import Navbar from "../components/Navbar/Navbar";
-import ProfileEditUser from "../pages/ProfileSection/ProfileEditUser/ProfileEditUser";
 import ProfileEditRecruiter from "../pages/ProfileSection/ProfileEditRecruits/ProfileEditRecruits";
 import VerifyEmailComponent from "../components/VerifyEmail/EmailVerificationComponent";
 import PasswordResetRequestComponent from "../pages/PasswordReset/PasswordRequest/PasswordResetRequestComponent";
@@ -29,7 +28,6 @@ const AppRoutes: React.FC = () => {
         <Route path="/register" element={<RegisterComponent />} />
         <Route path="/password-reset" element={<PasswordResetComponent />} />
         <Route path="/job-offers" element={<JobOffers />} />
-        <Route path="/profile-edit-user" element={<ProfileEditUser />} />
         <Route
           path="/profile-edit-recruiter"
           element={<ProfileEditRecruiter />}

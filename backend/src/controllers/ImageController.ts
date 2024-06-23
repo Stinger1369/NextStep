@@ -1,12 +1,15 @@
 import { Request, Response } from "express";
-import axios from "axios";
-import User from "../models/User";
+import axios, { AxiosError } from "axios";
+import User, { IUser } from "../models/User";
 
 const IMAGE_SERVER_URL = "http://localhost:7000/server-image";
 
-export const addImage = async (req: Request, res: Response) => {
+export const addImage = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const { imageName, imageBase64 } = req.body;
+
+  console.log(`Received request to add image for user ${id}`);
+  console.log(`Image name: ${imageName}`);
 
   try {
     const response = await axios.post(`${IMAGE_SERVER_URL}/ajouter-image`, {
@@ -14,33 +17,52 @@ export const addImage = async (req: Request, res: Response) => {
       base64: imageBase64,
     });
 
+    console.log(`Response from image server: ${JSON.stringify(response.data)}`);
+
+    // Vérifiez si l'image a été rejetée par le serveur d'images
+    if (response.status === 400 && response.data.error) {
+      console.log(`Image rejected by image server: ${response.data.error}`);
+      res.status(400).json({ message: response.data.error });
+      return;
+    }
+
     const imageUrl = response.data.link;
-    const user = await User.findById(id);
+    const user: IUser | null = await User.findById(id);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      console.log(`User ${id} not found`);
+      res.status(404).json({ message: "User not found" });
+      return;
     }
 
     user.images.push(imageUrl);
     await user.save();
 
+    console.log(`Image added successfully for user ${id}: ${imageUrl}`);
     res.status(200).json(user);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error uploading image", error });
+    const err = error as AxiosError;
+    console.error(`Error uploading image: ${err.message}`, err);
+    res
+      .status(500)
+      .json({ message: "Error uploading image", error: err.message });
   }
 };
 
-export const deleteImage = async (req: Request, res: Response) => {
+export const deleteImage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { id, imageName } = req.params;
 
   try {
     await axios.delete(`${IMAGE_SERVER_URL}/delete-image/${imageName}`);
 
-    const user = await User.findById(id);
+    const user: IUser | null = await User.findById(id);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
 
     user.images = user.images.filter((image) => !image.includes(imageName));
@@ -48,12 +70,18 @@ export const deleteImage = async (req: Request, res: Response) => {
 
     res.status(200).json(user);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error deleting image", error });
+    const err = error as AxiosError;
+    console.error(`Error deleting image: ${err.message}`, err);
+    res
+      .status(500)
+      .json({ message: "Error deleting image", error: err.message });
   }
 };
 
-export const updateImage = async (req: Request, res: Response) => {
+export const updateImage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { id, imageName } = req.params;
   const { imageBase64 } = req.body;
 
@@ -65,11 +93,19 @@ export const updateImage = async (req: Request, res: Response) => {
       }
     );
 
+    // Vérifiez si l'image a été rejetée par le serveur d'images
+    if (response.status === 400 && response.data.error) {
+      console.log(`Image rejected by image server: ${response.data.error}`);
+      res.status(400).json({ message: response.data.error });
+      return;
+    }
+
     const imageUrl = response.data.link;
-    const user = await User.findById(id);
+    const user: IUser | null = await User.findById(id);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
 
     const imageIndex = user.images.findIndex((image) =>
@@ -85,7 +121,10 @@ export const updateImage = async (req: Request, res: Response) => {
 
     res.status(200).json(user);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error updating image", error });
+    const err = error as AxiosError;
+    console.error(`Error updating image: ${err.message}`, err);
+    res
+      .status(500)
+      .json({ message: "Error updating image", error: err.message });
   }
 };

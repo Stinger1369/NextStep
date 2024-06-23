@@ -1,373 +1,551 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useUser } from "../../../contexts/UserContext";
-import { useNavigate } from "react-router-dom";
-import FileUpload from "../../../components/FileUploadAndCrop/FileUpload/FileUpload";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../redux/store";
+import {
+  getCompanyById,
+  updateCompany,
+} from "../../../redux/features/company/companySlice";
+import { useParams } from "react-router-dom";
 import "./ProfileEditRecruits.css";
 
-const ProfileEdit: React.FC = () => {
-  const { user, updateUser } = useUser();
-  const navigate = useNavigate();
+const ProfileEditRecruits: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { id } = useParams<{ id: string }>();
+  const company = useSelector((state: RootState) => state.company.company);
+  const status = useSelector((state: RootState) => state.company.status);
+  const error = useSelector((state: RootState) => state.company.error);
 
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [videoPreview, setVideoPreview] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<number[]>([]);
-  const [videoProgress, setVideoProgress] = useState<number>(0);
+  useEffect(() => {
+    if (id) {
+      dispatch(getCompanyById(id));
+    }
+  }, [dispatch, id]);
 
   const formik = useFormik({
     initialValues: {
-      firstName: user?.firstName || "",
-      lastName: user?.lastName || "",
-      phone: user?.phone || "",
-      dateOfBirth: user?.dateOfBirth
-        ? new Date(user.dateOfBirth).toISOString().split("T")[0]
-        : "",
-      street: user?.address?.street || "",
-      city: user?.address?.city || "",
-      state: user?.address?.state || "",
-      zipCode: user?.address?.zipCode || "",
-      country: user?.address?.country || "",
-      profession: user?.profession || "",
-      company: user?.company || "",
-      bio: user?.bio || "",
-      experience: user?.experience || "",
-      education: user?.education || "",
-      skills: user?.skills ? user.skills.join(", ") : "",
-      images: [], // Initialiser les images
-      video: null, // Initialiser la vidéo
+      companyName: "",
+      companyRegistrationNumber: "",
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "",
+      numberOfEmployees: 0,
+      industryType: "",
+      contactEmail: "",
+      contactPhone: "",
+      website: "",
+      description: "",
+      foundedDate: "" as string | Date,
+      logo: "",
+      linkedin: "",
+      facebook: "",
+      twitter: "",
+      instagram: "",
+      companySize: "small" as "small" | "medium" | "large" | undefined,
+      headquarterLocation: "",
+      subsidiaries: [] as string[],
+      certifications: [] as string[],
     },
     validationSchema: Yup.object({
-      firstName: Yup.string(),
-      lastName: Yup.string(),
-      phone: Yup.string(),
-      dateOfBirth: Yup.date(),
-      street: Yup.string(),
-      city: Yup.string(),
-      state: Yup.string(),
-      zipCode: Yup.string(),
-      country: Yup.string(),
-      profession: Yup.string(),
-      company: Yup.string(),
-      bio: Yup.string(),
-      experience: Yup.string(),
-      education: Yup.string(),
-      skills: Yup.string(),
-      images: Yup.array().max(5, "You can upload up to 5 images"),
-      video: Yup.mixed(),
+      companyName: Yup.string().required("Required"),
+      companyRegistrationNumber: Yup.string().required("Required"),
+      street: Yup.string().required("Required"),
+      city: Yup.string().required("Required"),
+      state: Yup.string().required("Required"),
+      zipCode: Yup.string().required("Required"),
+      country: Yup.string().required("Required"),
+      numberOfEmployees: Yup.number().required("Required"),
+      industryType: Yup.string().required("Required"),
+      contactEmail: Yup.string()
+        .email("Invalid email address")
+        .required("Required"),
+      contactPhone: Yup.string().required("Required"),
+      website: Yup.string().url("Invalid URL"),
+      description: Yup.string(),
+      foundedDate: Yup.date().nullable(),
+      logo: Yup.string().url("Invalid URL"),
+      linkedin: Yup.string().url("Invalid URL"),
+      facebook: Yup.string().url("Invalid URL"),
+      twitter: Yup.string().url("Invalid URL"),
+      instagram: Yup.string().url("Invalid URL"),
+      companySize: Yup.string()
+        .oneOf(["small", "medium", "large"])
+        .required("Required") as Yup.StringSchema<"small" | "medium" | "large">,
+      headquarterLocation: Yup.string(),
+      subsidiaries: Yup.array().of(Yup.string()),
+      certifications: Yup.array().of(Yup.string()),
     }),
+    enableReinitialize: true,
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        const updatedUserData = {
-          firstName: values.firstName,
-          lastName: values.lastName,
-          phone: values.phone,
-          dateOfBirth: new Date(values.dateOfBirth),
-          address: {
-            street: values.street,
-            city: values.city,
-            state: values.state,
-            zipCode: values.zipCode,
-            country: values.country,
-          },
-          profession: values.profession,
-          company: values.company,
-          bio: values.bio,
-          experience: values.experience,
-          education: values.education,
-          skills: values.skills.split(",").map((skill) => skill.trim()),
-          images: values.images,
-          video: values.video,
+        const updatedValues = {
+          ...values,
+          foundedDate: values.foundedDate
+            ? new Date(values.foundedDate)
+            : undefined,
+          companySize: values.companySize as
+            | "small"
+            | "medium"
+            | "large"
+            | undefined,
         };
-        await updateUser(user?._id || "", updatedUserData);
-        navigate("/");
-      } catch (error) {
-        console.error("Error updating profile", error);
-      } finally {
+
+        await dispatch(
+          updateCompany({ id: company?._id || "", companyData: updatedValues })
+        ).unwrap();
         setSubmitting(false);
+        // Navigate to another page or show a success message
+      } catch (error) {
+        setSubmitting(false);
+        // Handle the error
       }
     },
   });
 
-  const handleImagesChange = (newFiles: File[]) => {
-    const updatedFiles = [...formik.values.images, ...newFiles].slice(0, 5); // Merge new files with existing ones
-    formik.setFieldValue("images", updatedFiles);
-
-    const previews = updatedFiles.map((file) => URL.createObjectURL(file));
-    setImagePreviews(previews);
-    setUploadProgress(new Array(updatedFiles.length).fill(0));
-
-    // Simulate upload progress
-    updatedFiles.forEach((file, index) => {
-      const reader = new FileReader();
-      reader.onloadstart = () => updateProgress(index, 0);
-      reader.onprogress = (e) =>
-        updateProgress(index, Math.round((e.loaded / e.total) * 100));
-      reader.onloadend = () => updateProgress(index, 100);
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleVideoChange = (file: File | null) => {
-    formik.setFieldValue("video", file);
-    if (file) {
-      setVideoPreview(URL.createObjectURL(file));
-      setVideoProgress(0);
-
-      // Simulate upload progress
-      const reader = new FileReader();
-      reader.onloadstart = () => setVideoProgress(0);
-      reader.onprogress = (e) =>
-        setVideoProgress(Math.round((e.loaded / e.total) * 100));
-      reader.onloadend = () => setVideoProgress(100);
-      reader.readAsDataURL(file);
-    } else {
-      setVideoPreview(null);
-      setVideoProgress(0);
+  useEffect(() => {
+    if (company) {
+      formik.setValues({
+        companyName: company.companyName || "",
+        companyRegistrationNumber: company.companyRegistrationNumber || "",
+        street: company.address.street || "",
+        city: company.address.city || "",
+        state: company.address.state || "",
+        zipCode: company.address.zipCode || "",
+        country: company.address.country || "",
+        numberOfEmployees: company.numberOfEmployees || 0,
+        industryType: company.industryType || "",
+        contactEmail: company.contactEmail || "",
+        contactPhone: company.contactPhone || "",
+        website: company.website || "",
+        description: company.description || "",
+        foundedDate: company.foundedDate ? new Date(company.foundedDate) : "",
+        logo: company.logo || "",
+        linkedin: company.socialMediaLinks?.linkedin || "",
+        facebook: company.socialMediaLinks?.facebook || "",
+        twitter: company.socialMediaLinks?.twitter || "",
+        instagram: company.socialMediaLinks?.instagram || "",
+        companySize: company.companySize || "small",
+        headquarterLocation: company.headquarterLocation || "",
+        subsidiaries: company.subsidiaries || [],
+        certifications: company.certifications || [],
+      });
     }
-  };
-
-  const handleRemoveImage = (index: number) => {
-    const updatedImagePreviews = imagePreviews.filter((_, i) => i !== index);
-    const updatedImages = formik.values.images.filter((_, i) => i !== index);
-    setImagePreviews(updatedImagePreviews);
-    formik.setFieldValue("images", updatedImages);
-  };
-
-  const handleRemoveVideo = () => {
-    handleVideoChange(null); // Use handleVideoChange to pass null and remove the video
-  };
-
-  const updateProgress = (index: number, value: number) => {
-    setUploadProgress((prevProgress) => {
-      const newProgress = [...prevProgress];
-      newProgress[index] = value;
-      return newProgress;
-    });
-  };
-
+  }, [company]);
   return (
-    <div className="profile-edit-container">
-      <form onSubmit={formik.handleSubmit} className="profile-edit-form">
-        <div className="form-columns">
-          <div className="column">
-            <div className="form-field">
-              <input
-                type="text"
-                id="firstName"
-                {...formik.getFieldProps("firstName")}
-                placeholder="First Name"
-                className={`profile-input ${
-                  formik.touched.firstName && formik.errors.firstName
-                    ? "error-input"
-                    : ""
-                }`}
-              />
-              {formik.touched.firstName && formik.errors.firstName ? (
-                <div className="error">{formik.errors.firstName}</div>
-              ) : null}
-            </div>
-            <div className="form-field">
-              <input
-                type="text"
-                id="lastName"
-                {...formik.getFieldProps("lastName")}
-                placeholder="Last Name"
-                className={`profile-input ${
-                  formik.touched.lastName && formik.errors.lastName
-                    ? "error-input"
-                    : ""
-                }`}
-              />
-              {formik.touched.lastName && formik.errors.lastName ? (
-                <div className="error">{formik.errors.lastName}</div>
-              ) : null}
-            </div>
-            <div className="form-field">
-              <input
-                type="text"
-                id="phone"
-                {...formik.getFieldProps("phone")}
-                placeholder="Phone"
-                className={`profile-input ${
-                  formik.touched.phone && formik.errors.phone
-                    ? "error-input"
-                    : ""
-                }`}
-              />
-              {formik.touched.phone && formik.errors.phone ? (
-                <div className="error">{formik.errors.phone}</div>
-              ) : null}
-            </div>
-            <div className="form-field">
-              <input
-                type="date"
-                id="dateOfBirth"
-                {...formik.getFieldProps("dateOfBirth")}
-                placeholder="Date of Birth"
-                className={`profile-input ${
-                  formik.touched.dateOfBirth && formik.errors.dateOfBirth
-                    ? "error-input"
-                    : ""
-                }`}
-              />
-              {formik.touched.dateOfBirth && formik.errors.dateOfBirth ? (
-                <div className="error">{formik.errors.dateOfBirth}</div>
-              ) : null}
-            </div>
-            <div className="form-field">
-              <input
-                type="text"
-                id="street"
-                {...formik.getFieldProps("street")}
-                placeholder="Street"
-                className={`profile-input ${
-                  formik.touched.street && formik.errors.street
-                    ? "error-input"
-                    : ""
-                }`}
-              />
-              {formik.touched.street && formik.errors.street ? (
-                <div className="error">{formik.errors.street}</div>
-              ) : null}
-            </div>
-            <div className="form-field">
-              <input
-                type="text"
-                id="city"
-                {...formik.getFieldProps("city")}
-                placeholder="City"
-                className={`profile-input ${
-                  formik.touched.city && formik.errors.city ? "error-input" : ""
-                }`}
-              />
-              {formik.touched.city && formik.errors.city ? (
-                <div className="error">{formik.errors.city}</div>
-              ) : null}
-            </div>
-            <div className="form-field">
-              <input
-                type="text"
-                id="state"
-                {...formik.getFieldProps("state")}
-                placeholder="State"
-                className={`profile-input ${
-                  formik.touched.state && formik.errors.state
-                    ? "error-input"
-                    : ""
-                }`}
-              />
-              {formik.touched.state && formik.errors.state ? (
-                <div className="error">{formik.errors.state}</div>
-              ) : null}
-            </div>
-            <div className="form-field">
-              <input
-                type="text"
-                id="zipCode"
-                {...formik.getFieldProps("zipCode")}
-                placeholder="Zip Code"
-                className={`profile-input ${
-                  formik.touched.zipCode && formik.errors.zipCode
-                    ? "error-input"
-                    : ""
-                }`}
-              />
-              {formik.touched.zipCode && formik.errors.zipCode ? (
-                <div className="error">{formik.errors.zipCode}</div>
-              ) : null}
-            </div>
-            <div className="form-field">
-              <input
-                type="text"
-                id="country"
-                {...formik.getFieldProps("country")}
-                placeholder="Country"
-                className={`profile-input ${
-                  formik.touched.country && formik.errors.country
-                    ? "error-input"
-                    : ""
-                }`}
-              />
-              {formik.touched.country && formik.errors.country ? (
-                <div className="error">{formik.errors.country}</div>
-              ) : null}
-            </div>
-          </div>
-          <div className="column">
-            <div className="form-field">
-              <input
-                type="text"
-                id="profession"
-                {...formik.getFieldProps("profession")}
-                placeholder="Profession"
-                className="profile-input"
-              />
-            </div>
-            <div className="form-field">
-              <input
-                type="text"
-                id="company"
-                {...formik.getFieldProps("company")}
-                placeholder="Company"
-                className="profile-input"
-              />
-            </div>
-            <div className="form-field">
-              <textarea
-                id="bio"
-                {...formik.getFieldProps("bio")}
-                placeholder="Bio"
-                className="profile-input"
-              />
-            </div>
-            <div className="form-field">
-              <textarea
-                id="experience"
-                {...formik.getFieldProps("experience")}
-                placeholder="Experience"
-                className="profile-input"
-              />
-            </div>
-            <div className="form-field">
-              <textarea
-                id="education"
-                {...formik.getFieldProps("education")}
-                placeholder="Education"
-                className="profile-input"
-              />
-            </div>
-            <div className="form-field">
-              <input
-                type="text"
-                id="skills"
-                {...formik.getFieldProps("skills")}
-                placeholder="Skills (comma separated)"
-                className="profile-input"
-              />
-            </div>
-            <FileUpload
-              onImagesChange={handleImagesChange}
-              onVideoChange={handleVideoChange}
-              onRemoveImage={handleRemoveImage}
-              onRemoveVideo={handleRemoveVideo}
-              imagePreviews={imagePreviews}
-              videoPreview={videoPreview}
-              uploadProgress={uploadProgress}
-              videoProgress={videoProgress}
-            />
-          </div>
+    <div className="profile-edit-recruits-container">
+      <h1>Edit Company Profile</h1>
+      {status === "loading" && <p>Loading...</p>}
+      {error && <p className="error">{error}</p>}
+      <form
+        onSubmit={formik.handleSubmit}
+        className="profile-edit-recruits-form"
+      >
+        <div className="form-group">
+          <label htmlFor="companyName">Company Name</label>
+          <input
+            type="text"
+            id="companyName"
+            {...formik.getFieldProps("companyName")}
+            className={
+              formik.touched.companyName && formik.errors.companyName
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.companyName && formik.errors.companyName ? (
+            <div className="error">{formik.errors.companyName}</div>
+          ) : null}
         </div>
+
+        <div className="form-group">
+          <label htmlFor="companyRegistrationNumber">
+            Company Registration Number
+          </label>
+          <input
+            type="text"
+            id="companyRegistrationNumber"
+            {...formik.getFieldProps("companyRegistrationNumber")}
+            className={
+              formik.touched.companyRegistrationNumber &&
+              formik.errors.companyRegistrationNumber
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.companyRegistrationNumber &&
+          formik.errors.companyRegistrationNumber ? (
+            <div className="error">
+              {formik.errors.companyRegistrationNumber}
+            </div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="street">Street</label>
+          <input
+            type="text"
+            id="street"
+            {...formik.getFieldProps("street")}
+            className={
+              formik.touched.street && formik.errors.street ? "error-input" : ""
+            }
+          />
+          {formik.touched.street && formik.errors.street ? (
+            <div className="error">{formik.errors.street}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="city">City</label>
+          <input
+            type="text"
+            id="city"
+            {...formik.getFieldProps("city")}
+            className={
+              formik.touched.city && formik.errors.city ? "error-input" : ""
+            }
+          />
+          {formik.touched.city && formik.errors.city ? (
+            <div className="error">{formik.errors.city}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="state">State</label>
+          <input
+            type="text"
+            id="state"
+            {...formik.getFieldProps("state")}
+            className={
+              formik.touched.state && formik.errors.state ? "error-input" : ""
+            }
+          />
+          {formik.touched.state && formik.errors.state ? (
+            <div className="error">{formik.errors.state}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="zipCode">Zip Code</label>
+          <input
+            type="text"
+            id="zipCode"
+            {...formik.getFieldProps("zipCode")}
+            className={
+              formik.touched.zipCode && formik.errors.zipCode
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.zipCode && formik.errors.zipCode ? (
+            <div className="error">{formik.errors.zipCode}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="country">Country</label>
+          <input
+            type="text"
+            id="country"
+            {...formik.getFieldProps("country")}
+            className={
+              formik.touched.country && formik.errors.country
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.country && formik.errors.country ? (
+            <div className="error">{formik.errors.country}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="numberOfEmployees">Number of Employees</label>
+          <input
+            type="number"
+            id="numberOfEmployees"
+            {...formik.getFieldProps("numberOfEmployees")}
+            className={
+              formik.touched.numberOfEmployees &&
+              formik.errors.numberOfEmployees
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.numberOfEmployees &&
+          formik.errors.numberOfEmployees ? (
+            <div className="error">{formik.errors.numberOfEmployees}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="industryType">Industry Type</label>
+          <input
+            type="text"
+            id="industryType"
+            {...formik.getFieldProps("industryType")}
+            className={
+              formik.touched.industryType && formik.errors.industryType
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.industryType && formik.errors.industryType ? (
+            <div className="error">{formik.errors.industryType}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="contactEmail">Contact Email</label>
+          <input
+            type="email"
+            id="contactEmail"
+            {...formik.getFieldProps("contactEmail")}
+            className={
+              formik.touched.contactEmail && formik.errors.contactEmail
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.contactEmail && formik.errors.contactEmail ? (
+            <div className="error">{formik.errors.contactEmail}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="contactPhone">Contact Phone</label>
+          <input
+            type="text"
+            id="contactPhone"
+            {...formik.getFieldProps("contactPhone")}
+            className={
+              formik.touched.contactPhone && formik.errors.contactPhone
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.contactPhone && formik.errors.contactPhone ? (
+            <div className="error">{formik.errors.contactPhone}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="website">Website</label>
+          <input
+            type="url"
+            id="website"
+            {...formik.getFieldProps("website")}
+            className={
+              formik.touched.website && formik.errors.website
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.website && formik.errors.website ? (
+            <div className="error">{formik.errors.website}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="description">Description</label>
+          <textarea
+            id="description"
+            {...formik.getFieldProps("description")}
+            className={
+              formik.touched.description && formik.errors.description
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.description && formik.errors.description ? (
+            <div className="error">{formik.errors.description}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="foundedDate">Founded Date</label>
+          <input
+            type="date"
+            id="foundedDate"
+            {...formik.getFieldProps("foundedDate")}
+            className={
+              formik.touched.foundedDate && formik.errors.foundedDate
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.foundedDate && formik.errors.foundedDate ? (
+            <div className="error">{formik.errors.foundedDate}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="logo">Logo URL</label>
+          <input
+            type="url"
+            id="logo"
+            {...formik.getFieldProps("logo")}
+            className={
+              formik.touched.logo && formik.errors.logo ? "error-input" : ""
+            }
+          />
+          {formik.touched.logo && formik.errors.logo ? (
+            <div className="error">{formik.errors.logo}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="linkedin">LinkedIn</label>
+          <input
+            type="url"
+            id="linkedin"
+            {...formik.getFieldProps("linkedin")}
+            className={
+              formik.touched.linkedin && formik.errors.linkedin
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.linkedin && formik.errors.linkedin ? (
+            <div className="error">{formik.errors.linkedin}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="facebook">Facebook</label>
+          <input
+            type="url"
+            id="facebook"
+            {...formik.getFieldProps("facebook")}
+            className={
+              formik.touched.facebook && formik.errors.facebook
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.facebook && formik.errors.facebook ? (
+            <div className="error">{formik.errors.facebook}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="twitter">Twitter</label>
+          <input
+            type="url"
+            id="twitter"
+            {...formik.getFieldProps("twitter")}
+            className={
+              formik.touched.twitter && formik.errors.twitter
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.twitter && formik.errors.twitter ? (
+            <div className="error">{formik.errors.twitter}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="instagram">Instagram</label>
+          <input
+            type="url"
+            id="instagram"
+            {...formik.getFieldProps("instagram")}
+            className={
+              formik.touched.instagram && formik.errors.instagram
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.instagram && formik.errors.instagram ? (
+            <div className="error">{formik.errors.instagram}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="companySize">Company Size</label>
+          <select
+            id="companySize"
+            {...formik.getFieldProps("companySize")}
+            className={
+              formik.touched.companySize && formik.errors.companySize
+                ? "error-input"
+                : ""
+            }
+          >
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+          </select>
+          {formik.touched.companySize && formik.errors.companySize ? (
+            <div className="error">{formik.errors.companySize}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="headquarterLocation">Headquarter Location</label>
+          <input
+            type="text"
+            id="headquarterLocation"
+            {...formik.getFieldProps("headquarterLocation")}
+            className={
+              formik.touched.headquarterLocation &&
+              formik.errors.headquarterLocation
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.headquarterLocation &&
+          formik.errors.headquarterLocation ? (
+            <div className="error">{formik.errors.headquarterLocation}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="subsidiaries">Subsidiaries</label>
+          <textarea
+            id="subsidiaries"
+            {...formik.getFieldProps("subsidiaries")}
+            className={
+              formik.touched.subsidiaries && formik.errors.subsidiaries
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.subsidiaries && formik.errors.subsidiaries ? (
+            <div className="error">{formik.errors.subsidiaries}</div>
+          ) : null}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="certifications">Certifications</label>
+          <textarea
+            id="certifications"
+            {...formik.getFieldProps("certifications")}
+            className={
+              formik.touched.certifications && formik.errors.certifications
+                ? "error-input"
+                : ""
+            }
+          />
+          {formik.touched.certifications && formik.errors.certifications ? (
+            <div className="error">{formik.errors.certifications}</div>
+          ) : null}
+        </div>
+
         <button
           type="submit"
-          className="profile-button"
+          className="save-button"
           disabled={formik.isSubmitting}
         >
-          {formik.isSubmitting ? "Updating..." : "Update Profile"}
+          {formik.isSubmitting ? "Saving..." : "Save Changes"}
         </button>
       </form>
     </div>
   );
 };
 
-export default ProfileEdit;
+export default ProfileEditRecruits;

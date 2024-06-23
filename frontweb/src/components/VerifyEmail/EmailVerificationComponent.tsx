@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
+import { AppDispatch } from "../../redux/store";
+import {
+  performVerifyEmail,
+  performResendVerificationCode,
+} from "../../redux/features/auth/authVerifyEmail";
+//import "./VerifyEmailComponent.css";
 
 const VerifyEmailComponent: React.FC = () => {
   const [code, setCode] = useState("");
@@ -8,7 +14,7 @@ const VerifyEmailComponent: React.FC = () => {
   const [canResend, setCanResend] = useState<boolean>(true);
   const [resendTimeout, setResendTimeout] = useState<number>(0);
   const navigate = useNavigate();
-  const { verifyEmail, resendVerificationCode } = useAuth();
+  const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
   const emailOrPhone = location.state?.emailOrPhone;
 
@@ -43,7 +49,7 @@ const VerifyEmailComponent: React.FC = () => {
   const handleResendCode = async () => {
     if (canResend) {
       try {
-        await resendVerificationCode(emailOrPhone);
+        await dispatch(performResendVerificationCode(emailOrPhone));
         localStorage.setItem("resendTimestamp", Date.now().toString());
         setCanResend(false);
         setResendTimeout(5 * 60); // 5 minutes
@@ -67,7 +73,7 @@ const VerifyEmailComponent: React.FC = () => {
         "and code:",
         code
       );
-      await verifyEmail(emailOrPhone, code);
+      await dispatch(performVerifyEmail(emailOrPhone, code));
       navigate("/login");
     } catch (err) {
       console.error("Verification failed:", err);

@@ -1,15 +1,16 @@
-// src/pages/RegisterPages/RegisterComponent.tsx
 import React, { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { AppDispatch } from "../../redux/store";
+import { registerUser } from "../../redux/features/auth/authRegister";
 import "./RegisterComponent.css";
 
 const RegisterComponent: React.FC = () => {
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { register } = useAuth();
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,7 +26,7 @@ const RegisterComponent: React.FC = () => {
     formData.append("password", password);
 
     try {
-      await register(formData);
+      await registerUser(formData, dispatch);
       navigate("/verify-email", { state: { emailOrPhone } });
     } catch (error) {
       setError("Error registering user. Please check the form and try again.");

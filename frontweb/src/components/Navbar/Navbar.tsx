@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
-import "./NavBar.css";
+import { useDispatch, useSelector } from "react-redux";
 import {
   FaHome,
   FaInfoCircle,
@@ -11,10 +10,17 @@ import {
   FaBriefcase,
 } from "react-icons/fa";
 import logo from "../../assests/Images/nextstep.webp";
+import { RootState } from "../../redux/store"; // Import RootState
+import { logout } from "../../redux/features/auth/authSlice"; // Import the logout action
+import "./NavBar.css";
 
 const Navbar: React.FC = () => {
-  const { user, logout } = useAuth();
-  console.log(user);
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
   return (
     <nav className="navbar">
@@ -61,7 +67,7 @@ const Navbar: React.FC = () => {
               Welcome, {user.firstName ? user.firstName : user.emailOrPhone}!
             </span>
             <div className="navbar-dropdown">
-              <button onClick={logout}>
+              <button onClick={handleLogout}>
                 <FaSignOutAlt /> Logout
               </button>
             </div>

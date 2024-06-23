@@ -1,13 +1,37 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaTimes } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./ProfessionInfo.css";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../../../../../redux/store";
+import {
+  updateUser,
+  getUserById,
+} from "../../../../../redux/features/user/userSlice";
 
 const ProfessionInfo: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const userData = useSelector((state: RootState) => state.user.user);
+
+  useEffect(() => {
+    if (user?._id) {
+      dispatch(getUserById(user._id));
+    }
+  }, [dispatch, user]);
+
+  useEffect(() => {
+    if (userData) {
+      formik.setValues({
+        profession: userData.profession || "",
+        company: userData.company || "",
+      });
+    }
+  }, [userData]);
 
   const formik = useFormik({
     initialValues: {
@@ -18,16 +42,30 @@ const ProfessionInfo: React.FC = () => {
       profession: Yup.string(),
       company: Yup.string(),
     }),
-    onSubmit: (values) => {
-      // Save and navigate to next step
-      console.log("Profession Info:", values);
-      navigate("/profile-edit-user/bio-skills-info");
+    onSubmit: async (values) => {
+      if (user?._id) {
+        const updatedValues = {
+          ...userData,
+          profession: values.profession,
+          company: values.company,
+        };
+        console.log("Updating user with profession info:", updatedValues);
+        await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+        navigate("/profile-edit-user/bio-skills-info");
+      }
     },
   });
 
-  const handleSave = () => {
+  const handleSave = async () => {
     console.log("Saved Profession Info:", formik.values);
-    // Add any save logic here if necessary
+    if (user?._id) {
+      const updatedValues = {
+        ...userData,
+        profession: formik.values.profession,
+        company: formik.values.company,
+      };
+      await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+    }
   };
 
   return (

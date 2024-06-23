@@ -13,16 +13,16 @@ export interface IUser extends Document {
   lastName?: string;
   emailOrPhone: string;
   password: string;
-  userType?: string;
+  userType: "employer" | "recruiter" | "jobSeeker";
   phone?: string;
   dateOfBirth?: Date;
   age?: number;
+  showAge?: boolean;
   address?: Address;
   profession?: string;
-  company?: string;
   bio?: string;
-  experience?: string;
-  education?: string;
+  experience?: string[];
+  education?: string[];
   skills?: string[];
   images: string[];
   videos: string[];
@@ -31,7 +31,6 @@ export interface IUser extends Document {
   isVerified: boolean;
   resetPasswordCode?: string;
   resetPasswordExpiresAt?: Date;
-  role?: string; // 'employer' or 'recruiter'
   sex?: string; // 'male', 'female', or 'other'
 }
 
@@ -40,10 +39,14 @@ const UserSchema: Schema = new Schema({
   lastName: { type: String, index: true },
   emailOrPhone: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  userType: { type: String },
+  userType: {
+    type: String,
+    enum: ["employer", "recruiter", "jobSeeker"],
+  },
   phone: { type: String },
   dateOfBirth: { type: Date },
   age: { type: Number },
+  showAge: { type: Boolean, default: false },
   address: {
     street: { type: String },
     city: { type: String },
@@ -52,23 +55,20 @@ const UserSchema: Schema = new Schema({
     country: { type: String },
   },
   profession: { type: String },
-  company: { type: String },
   bio: { type: String },
-  experience: { type: String },
-  education: { type: String },
-  skills: [{ type: String }],
-  images: [{ type: String }],
-  videos: [{ type: String }],
+  experience: { type: [String], default: [] },
+  education: { type: [String], default: [] },
+  skills: { type: [String], default: [] },
+  images: { type: [String], default: [] },
+  videos: { type: [String], default: [] },
   verificationCode: { type: String },
   verificationCodeExpiresAt: { type: Date },
   isVerified: { type: Boolean, default: false },
   resetPasswordCode: { type: String },
   resetPasswordExpiresAt: { type: Date },
-  role: { type: String, index: true }, // 'employer' or 'recruiter'
-  sex: { type: String }, // 'male', 'female', or 'other'
+  sex: { type: String },
 });
 
-// Méthode pour calculer l'âge
 UserSchema.pre<IUser>("save", function (next) {
   if (this.dateOfBirth) {
     const now = new Date();

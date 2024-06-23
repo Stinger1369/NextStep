@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useAuth } from "../../../contexts/AuthContext";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { AppDispatch } from "../../../redux/store";
+import { performResetPassword } from "../../../redux/features/auth/authPasswordReset";
 import "./PasswordResetComponent.css";
 
 const PasswordResetComponent: React.FC = () => {
-  const { resetPassword } = useAuth();
+  const dispatch = useDispatch<AppDispatch>();
   const [message, setMessage] = useState<string | null>(null);
   const [emailOrPhone, setEmailOrPhone] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -38,7 +40,9 @@ const PasswordResetComponent: React.FC = () => {
         return;
       }
       try {
-        await resetPassword(emailOrPhone, values.code, values.newPassword);
+        await dispatch(
+          performResetPassword(emailOrPhone, values.code, values.newPassword)
+        );
         setMessage(
           "Password reset successfully. You will be redirected to the login page."
         );

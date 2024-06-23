@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useAuth } from "../../../contexts/AuthContext";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { AppDispatch } from "../../../redux/store";
+import { performRequestPasswordReset } from "../../../redux/features/auth/authPasswordReset";
 import "./PasswordResetRequestComponent.css";
 
 const PasswordResetRequestComponent: React.FC = () => {
-  const { requestPasswordReset } = useAuth();
+  const dispatch = useDispatch<AppDispatch>();
   const [message, setMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -19,10 +21,10 @@ const PasswordResetRequestComponent: React.FC = () => {
     }),
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        await requestPasswordReset(values.emailOrPhone);
-        localStorage.setItem("resetEmailOrPhone", values.emailOrPhone); // Stocker l'email dans le stockage local
+        await dispatch(performRequestPasswordReset(values.emailOrPhone));
+        localStorage.setItem("resetEmailOrPhone", values.emailOrPhone); // Store email in local storage
         setMessage("Password reset link sent to your email.");
-        navigate("/password-reset"); // Redirige vers la page de réinitialisation du mot de passe
+        navigate("/password-reset"); // Redirect to password reset page
       } catch (error) {
         console.error("Request password reset error:", error);
         setMessage("Error requesting password reset.");

@@ -1,19 +1,21 @@
-import React ,{ useEffect } from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import AppRoutes from "./routes/AppRoutes";
-import { useAuth } from "./contexts/AuthContext";
-
+import { useDispatch } from "react-redux";
+import { refreshToken } from "./redux/features/auth/authSlice";
+import { AppDispatch } from "./redux/store"; // Import AppDispatch
 
 const App: React.FC = () => {
-  const { refresh } = useAuth();
+  const dispatch = useDispatch<AppDispatch>(); // Use AppDispatch to type the dispatch function
 
   useEffect(() => {
     const interval = setInterval(() => {
-      refresh();
-    }, 55 * 60 * 1000); // Rafraîchit le token toutes les 55 minutes
+      dispatch(refreshToken());
+    }, 55 * 60 * 1000); // Refresh the token every 55 minutes
 
     return () => clearInterval(interval);
-  }, [refresh]);
+  }, [dispatch]);
+
   return (
     <div className="App">
       <AppRoutes />

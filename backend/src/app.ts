@@ -9,14 +9,15 @@ import applicationRoutes from "./routes/applicationRoutes";
 import authRoutes from "./routes/authRoutes";
 import imageRoutes from "./routes/imageRoutes";
 import authMiddleware from "./middlewares/authMiddleware";
-import { config } from "./config/config";
+import Company from "./models/Company";
 
 dotenv.config();
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Increase request body size limits
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(
@@ -29,6 +30,7 @@ app.use(cors({ origin: "http://localhost:3000" }));
 app.use(express.static("uploads"));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/companies", authMiddleware, userRoutes);
 app.use("/api/users", authMiddleware, userRoutes);
 app.use("/api/jobs", authMiddleware, jobRoutes);
 app.use("/api/applications", authMiddleware, applicationRoutes);

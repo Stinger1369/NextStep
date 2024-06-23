@@ -1,13 +1,40 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaTimes } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./AddressInfo.css";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../../../../../redux/store";
+import {
+  updateUser,
+  getUserById,
+} from "../../../../../redux/features/user/userSlice";
 
 const AddressInfo: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const userData = useSelector((state: RootState) => state.user.user);
+
+  useEffect(() => {
+    if (user?._id) {
+      dispatch(getUserById(user._id));
+    }
+  }, [dispatch, user]);
+
+  useEffect(() => {
+    if (userData && userData.address) {
+      formik.setValues({
+        street: userData.address.street || "",
+        city: userData.address.city || "",
+        state: userData.address.state || "",
+        zipCode: userData.address.zipCode || "",
+        country: userData.address.country || "",
+      });
+    }
+  }, [userData]);
 
   const formik = useFormik({
     initialValues: {
@@ -24,16 +51,28 @@ const AddressInfo: React.FC = () => {
       zipCode: Yup.string().required("Required"),
       country: Yup.string().required("Required"),
     }),
-    onSubmit: (values) => {
-      // Save and navigate to next step
-      console.log("Address Info:", values);
-      navigate("/profile-edit-user/profession-info");
+    onSubmit: async (values) => {
+      if (user?._id) {
+        const updatedValues = {
+          ...userData,
+          address: values,
+        };
+        console.log("Updating user with address:", updatedValues);
+        await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+        navigate("/profile-edit-user/profession-info");
+      }
     },
   });
 
-  const handleSave = () => {
+  const handleSave = async () => {
     console.log("Saved Address Info:", formik.values);
-    // Add any save logic here if necessary
+    if (user?._id) {
+      const updatedValues = {
+        ...userData,
+        address: formik.values,
+      };
+      await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+    }
   };
 
   return (

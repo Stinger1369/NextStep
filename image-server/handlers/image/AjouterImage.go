@@ -13,6 +13,7 @@ import (
 )
 
 const maxImagesPerUser = 5
+const serverBaseURL = "http://localhost:7000/"
 
 func getUserDir(userID string) string {
     return filepath.Join("public/images", userID)
@@ -36,6 +37,11 @@ func countUserImages(userID string) (int, error) {
         return 0, err
     }
     return len(files), nil
+}
+
+func generateImageURL(filePath string) string {
+    relativePath := filePath[len("public/"):]
+    return serverBaseURL + relativePath
 }
 
 func AjouterImage(c *gin.Context) {
@@ -116,5 +122,16 @@ func AjouterImage(c *gin.Context) {
     }
     log.Printf("Image compressed successfully: %s", compressedPath)
 
-    c.JSON(http.StatusOK, gin.H{"link": "http://localhost:7000/server-image/image/" + filepath.Base(compressedPath)})
+    // Supprimer l'image d'origine après compression
+    if err := os.Remove(filePath); err != nil {
+        log.Printf("Error removing original image: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    log.Printf("Original image removed: %s", filePath)
+
+    // Générer l'URL de l'image compressée
+    imageURL := generateImageURL(compressedPath)
+
+    c.JSON(http.StatusOK, gin.H{"link": imageURL})
 }

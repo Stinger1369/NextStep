@@ -142,3 +142,4 @@ go run main.go
 
 
 tree H:\recruteProject\image-server /F
+python .\utils\nsfw_detector.py .\public\images\1.jpge-server>
