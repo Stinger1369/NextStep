@@ -6,6 +6,7 @@ import (
     "net/http"
     "os"
     "path/filepath"
+    "strings"
     "image-server/utils"
     "github.com/gin-gonic/gin"
     "github.com/twinj/uuid"
@@ -40,7 +41,7 @@ func countUserImages(userID string) (int, error) {
 }
 
 func generateImageURL(filePath string) string {
-    relativePath := filePath[len("public/"):]
+    relativePath := strings.ReplaceAll(filePath[len("public/"):], "\\", "/")
     return serverBaseURL + relativePath
 }
 
@@ -132,6 +133,7 @@ func AjouterImage(c *gin.Context) {
 
     // Générer l'URL de l'image compressée
     imageURL := generateImageURL(compressedPath)
+    log.Printf("Generated image URL: %s", imageURL)
 
     c.JSON(http.StatusOK, gin.H{"link": imageURL})
 }

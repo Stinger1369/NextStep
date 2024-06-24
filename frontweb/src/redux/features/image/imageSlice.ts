@@ -13,20 +13,18 @@ const initialState: ImageState = {
   error: null,
 };
 
+// Thunks for async actions
 export const addImage = createAsyncThunk(
   "images/addImage",
-  async (
-    {
-      userId,
-      imageName,
-      imageBase64,
-    }: {
-      userId: string;
-      imageName: string;
-      imageBase64: string;
-    },
-    { rejectWithValue }
-  ) => {
+  async ({
+    userId,
+    imageName,
+    imageBase64,
+  }: {
+    userId: string;
+    imageName: string;
+    imageBase64: string;
+  }) => {
     try {
       const response = await axiosInstance.post(
         `/images/user/${userId}/image`,
@@ -35,21 +33,53 @@ export const addImage = createAsyncThunk(
           imageBase64,
         }
       );
-      if (response.status === 400 && response.data.message) {
-        return rejectWithValue(response.data.message);
+      if (response.status === 400 && response.data.error) {
+        throw new Error(response.data.error);
       }
-      return response.data.link;
+      return response.data.images[response.data.images.length - 1]; // return the last added image URL
     } catch (error: any) {
       if (
         error.response &&
         error.response.data &&
         error.response.data.message
       ) {
-        return rejectWithValue(error.response.data.message);
+        throw new Error(error.response.data.message);
       } else {
-        return rejectWithValue("Failed to upload image");
+        throw new Error("Failed to upload image");
       }
     }
+  }
+);
+
+export const deleteImage = createAsyncThunk(
+  "images/deleteImage",
+  async ({ userId, imageName }: { userId: string; imageName: string }) => {
+    const response = await axiosInstance.delete(
+      `/images/user/${userId}/image/${imageName}`
+    );
+    return { imageName };
+  }
+);
+
+export const updateImage = createAsyncThunk(
+  "images/updateImage",
+  async ({
+    userId,
+    imageName,
+    imageBase64,
+  }: {
+    userId: string;
+    imageName: string;
+    imageBase64: string;
+  }) => {
+    const response = await axiosInstance.put(
+      `/images/user/${userId}/image/${imageName}`,
+      { imageBase64 }
+    );
+    if (response.status === 400 && response.data.error) {
+      throw new Error(response.data.error);
+    }
+    return response.data.link;
   }
 );
 
@@ -69,7 +99,38 @@ const imageSlice = createSlice({
       })
       .addCase(addImage.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.error.message || "Failed to add image";
+      })
+      .addCase(deleteImage.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteImage.fulfilled, (state, action) => {
+        state.loading = false;
+        state.images = state.images.filter(
+          (image) => !image.includes(action.payload.imageName)
+        );
+      })
+      .addCase(deleteImage.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to delete image";
+      })
+      .addCase(updateImage.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateImage.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.images.findIndex((image) =>
+          image.includes(action.payload.oldImage)
+        );
+        if (index !== -1) {
+          state.images[index] = action.payload.newImage;
+        }
+      })
+      .addCase(updateImage.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to update image";
       });
   },
 });

@@ -61,9 +61,14 @@ const MediaInfo: React.FC = () => {
           })
         );
 
+        const uploadedImageUrls: string[] = [];
+
         for (const img of base64Images) {
           try {
-            await dispatch(addImage({ userId: user._id, ...img })).unwrap();
+            const imageUrl = await dispatch(
+              addImage({ userId: user._id, ...img })
+            ).unwrap();
+            uploadedImageUrls.push(imageUrl);
           } catch (error: any) {
             console.error("Error adding image:", error);
             return;
@@ -72,7 +77,7 @@ const MediaInfo: React.FC = () => {
 
         const updatedValues = {
           ...userData,
-          images: base64Images.map((img) => img.imageName),
+          images: uploadedImageUrls, // Use URLs instead of image names
         };
         console.log("Updating user with media info:", updatedValues);
         await dispatch(updateUser({ id: user._id, userData: updatedValues }));

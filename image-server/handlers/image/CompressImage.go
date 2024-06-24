@@ -44,10 +44,8 @@ func compressImage(filePath string) (string, error) {
     switch format {
     case "jpeg":
         err = jpeg.Encode(out, m, nil)
-        compressedPath += ".jpg"
     case "png":
         err = png.Encode(out, m)
-        compressedPath += ".png"
     default:
         err = errors.New("unsupported image format")
     }
@@ -56,6 +54,6 @@ func compressImage(filePath string) (string, error) {
         return "", err
     }
 
-    log.Printf("Compressed image created: %s", compressedPath)
-    return compressedPath, nil
+    log.Printf("Compressed image created: %s", compressedPath+ext)
+    return compressedPath + ext, nil
 }
