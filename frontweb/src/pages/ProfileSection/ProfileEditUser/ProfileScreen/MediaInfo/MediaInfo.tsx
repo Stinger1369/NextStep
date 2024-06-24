@@ -22,8 +22,8 @@ const MediaInfo: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const userData = useSelector((state: RootState) => state.user.user);
+  const imageError = useSelector((state: RootState) => state.images.error);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?._id) {
@@ -38,22 +38,17 @@ const MediaInfo: React.FC = () => {
         : [];
 
       setImagePreviews(userData.images || []);
-      formik.setValues({
-        images: imageFiles,
-      });
+      formik.setValues({ images: imageFiles });
     }
   }, [userData]);
 
   const formik = useFormik<FormValues>({
-    initialValues: {
-      images: [],
-    },
+    initialValues: { images: [] },
     validationSchema: Yup.object({
       images: Yup.array().max(5, "You can upload up to 5 images"),
     }),
     onSubmit: async (values) => {
       console.log("Submitting form with values:", values);
-      setErrorMessage(null);
 
       if (user?._id) {
         const base64Images = await Promise.all(
@@ -70,13 +65,7 @@ const MediaInfo: React.FC = () => {
           try {
             await dispatch(addImage({ userId: user._id, ...img })).unwrap();
           } catch (error: any) {
-            if (error.message.includes("inappropriate content")) {
-              setErrorMessage(
-                "Votre image contient du contenu inapproprié et a été rejetée."
-              );
-            } else {
-              setErrorMessage("Échec du téléchargement de l'image");
-            }
+            console.error("Error adding image:", error);
             return;
           }
         }
@@ -149,9 +138,9 @@ const MediaInfo: React.FC = () => {
           </div>
         </div>
 
-        {errorMessage && (
+        {imageError && (
           <div className="alert alert-danger" role="alert">
-            {errorMessage}
+            {imageError}
           </div>
         )}
 

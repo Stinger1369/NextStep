@@ -4,7 +4,7 @@ import User, { IUser } from "../models/User";
 
 const IMAGE_SERVER_URL = "http://localhost:7000/server-image";
 
-export const addImage = async (req: Request, res: Response): Promise<void> => {
+export const addImage = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { imageName, imageBase64 } = req.body;
 
@@ -18,19 +18,19 @@ export const addImage = async (req: Request, res: Response): Promise<void> => {
     });
 
     console.log(`Response from image server: ${JSON.stringify(response.data)}`);
+    console.log(`Response status from image server: ${response.status}`);
 
     if (response.data.error) {
       console.log(`Image rejected by image server: ${response.data.error}`);
-      return res
-        .status(400)
-        .json({
-          message:
-            "Your image contains inappropriate content and has been rejected.",
-        });
+      return res.status(400).json({
+        message: response.data.error,
+      });
     }
 
     const imageUrl = response.data.link;
-    const user: IUser | null = await User.findById(id);
+    console.log(`Image URL received from image server: ${imageUrl}`);
+
+    const user = await User.findById(id);
 
     if (!user) {
       console.log(`User ${id} not found`);
@@ -44,6 +44,11 @@ export const addImage = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json(user);
   } catch (error) {
     const err = error as AxiosError;
+    if (err.response && err.response.status === 400) {
+      console.error(`Error uploading image: ${err.message}`, err);
+      console.error(`Error response from image server: ${err.response.data}`);
+      return res.status(400).json({ message: err.response.data.error });
+    }
     console.error(`Error uploading image: ${err.message}`, err);
     res
       .status(500)
@@ -51,68 +56,64 @@ export const addImage = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const deleteImage = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const deleteImage = async (req: Request, res: Response) => {
   const { id, imageName } = req.params;
 
   try {
-    await axios.delete(`${IMAGE_SERVER_URL}/delete-image/${imageName}`);
+    const response = await axios.delete(`${IMAGE_SERVER_URL}/delete-image/${id}/${imageName}`);
+    console.log(`Response from image server: ${JSON.stringify(response.data)}`);
+    console.log(`Response status from image server: ${response.status}`);
 
     const user: IUser | null = await User.findById(id);
 
     if (!user) {
-      res.status(404).json({ message: "User not found" });
-      return;
+      console.log(`User ${id} not found`);
+      return res.status(404).json({ message: "User not found" });
     }
 
     user.images = user.images.filter((image) => !image.includes(imageName));
     await user.save();
 
+    console.log(`Image deleted successfully for user ${id}: ${imageName}`);
     res.status(200).json(user);
   } catch (error) {
     const err = error as AxiosError;
     console.error(`Error deleting image: ${err.message}`, err);
+    console.error(`Error response from image server: ${err.response?.data}`);
     res
       .status(500)
       .json({ message: "Error deleting image", error: err.message });
   }
 };
 
-export const updateImage = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const updateImage = async (req: Request, res: Response) => {
   const { id, imageName } = req.params;
   const { imageBase64 } = req.body;
 
   try {
-    const response = await axios.put(
-      `${IMAGE_SERVER_URL}/update-image/${imageName}`,
-      {
-        base64: imageBase64,
-      }
-    );
+    const response = await axios.put(`${IMAGE_SERVER_URL}/update-image/${id}/${imageName}`, {
+      base64: imageBase64,
+    });
 
-    // Vérifiez si l'image a été rejetée par le serveur d'images
-    if (response.status === 400 && response.data.error) {
+    console.log(`Response from image server: ${JSON.stringify(response.data)}`);
+    console.log(`Response status from image server: ${response.status}`);
+
+    if (response.data.error) {
       console.log(`Image rejected by image server: ${response.data.error}`);
-      res.status(400).json({ message: response.data.error });
-      return;
+      return res.status(400).json({ message: response.data.error });
     }
 
     const imageUrl = response.data.link;
+    console.log(`Image URL received from image server: ${imageUrl}`);
+
     const user: IUser | null = await User.findById(id);
 
     if (!user) {
-      res.status(404).json({ message: "User not found" });
-      return;
+      console.log(`User ${id} not found`);
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const imageIndex = user.images.findIndex((image) =>
-      image.includes(imageName)
-    );
+    const imageIndex = user.images.findIndex((image) => image.includes(imageName));
     if (imageIndex !== -1) {
       user.images[imageIndex] = imageUrl;
     } else {
@@ -121,10 +122,12 @@ export const updateImage = async (
 
     await user.save();
 
+    console.log(`Image updated successfully for user ${id}: ${imageUrl}`);
     res.status(200).json(user);
   } catch (error) {
     const err = error as AxiosError;
     console.error(`Error updating image: ${err.message}`, err);
+    console.error(`Error response from image server: ${err.response?.data}`);
     res
       .status(500)
       .json({ message: "Error updating image", error: err.message });
