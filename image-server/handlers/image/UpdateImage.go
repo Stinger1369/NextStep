@@ -12,6 +12,7 @@ import (
 )
 
 func UpdateImage(c *gin.Context) {
+    userID := c.Param("user_id")
     nom := c.Param("nom")
     var request struct {
         Base64 string `json:"base64"`
@@ -22,7 +23,14 @@ func UpdateImage(c *gin.Context) {
         return
     }
 
-    filePath := filepath.Join("public/images", nom)
+       userDir, err := checkAndCreateUserDir(userID)
+    if err != nil {
+        log.Printf("Error creating user directory: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    filePath := filepath.Join(userDir, nom)
     data, err := base64.StdEncoding.DecodeString(request.Base64)
     if err != nil {
         log.Printf("Error decoding base64: %v", err)
@@ -57,5 +65,17 @@ func UpdateImage(c *gin.Context) {
         return
     }
 
-    c.JSON(http.StatusOK, gin.H{"link": "http://localhost:7000/server-image/image/" + compressedPath})
+    // Supprimer l'image d'origine après compression
+    if err := os.Remove(filePath); err != nil {
+        log.Printf("Error removing original image: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    // Générer l'URL de l'image compressée
+    imageURL := generateImageURL(compressedPath)
+    log.Printf("Generated image URL: %s", imageURL)
+
+    c.JSON(http.StatusOK, gin.H{"link": imageURL})
 }
+

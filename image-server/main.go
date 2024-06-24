@@ -11,6 +11,9 @@ func main() {
     r := gin.Default()
     r.Use(middleware.CORSMiddleware())
 
+    // Serve static files from the "public/images" directory
+    r.Static("/images", "./public/images")
+
     // Routes pour les images
     r.POST("/server-image/ajouter-image", image.AjouterImage)
     r.GET("/server-image/image/:user_id/:nom", image.GetImage)

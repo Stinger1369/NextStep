@@ -52,3 +52,4 @@ if __name__ == "__main__":
     image_path = sys.argv[1]
     is_nsfw = main(image_path)
     print("NSFW Check Result:", is_nsfw)
+
