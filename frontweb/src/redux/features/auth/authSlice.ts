@@ -16,20 +16,21 @@ export interface User {
   firstName?: string;
   lastName?: string;
   emailOrPhone: string;
-  userType?: "employer" | "recruiter" | "jobSeeker";
+  userType: "employer" | "recruiter" | "jobSeeker";
   phone?: string;
   dateOfBirth?: Date;
-  address?: Address;
   age?: number;
+  showAge?: boolean;
+  address?: Address;
   profession?: string;
   bio?: string;
-  experience?: string;
-  education?: string;
+  experience?: string[];
+  education?: string[];
   skills?: string[];
   images?: string[];
   videos?: string[];
   sex?: string;
-  showAge?: boolean;
+  isVerified: boolean;
 }
 
 interface AuthState {

@@ -1,3 +1,4 @@
+// src/App.tsx
 import React, { useEffect } from "react";
 import "./App.css";
 import AppRoutes from "./routes/AppRoutes";

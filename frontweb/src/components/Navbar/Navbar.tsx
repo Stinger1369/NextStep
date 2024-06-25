@@ -1,5 +1,6 @@
+// src/components/Navbar/Navbar.tsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   FaHome,
@@ -10,16 +11,18 @@ import {
   FaBriefcase,
 } from "react-icons/fa";
 import logo from "../../assests/Images/nextstep.webp";
-import { RootState } from "../../redux/store"; // Import RootState
-import { logout } from "../../redux/features/auth/authSlice"; // Import the logout action
+import { RootState, AppDispatch } from "../../redux/store";
+import { performLogout } from "../../redux/features/auth/authLogout";
 import "./NavBar.css";
 
 const Navbar: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async () => {
+    await dispatch(performLogout());
+    navigate("/"); // Redirection vers la page d'accueil après la déconnexion
   };
 
   return (

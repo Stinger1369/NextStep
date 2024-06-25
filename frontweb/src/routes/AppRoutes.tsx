@@ -1,5 +1,11 @@
+// src/routes/AppRoutes.tsx
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Home from "../pages/Home/Home";
 import About from "../pages/About/About";
 import LoginComponent from "../pages/LoginPages/LoginComponent";
@@ -16,21 +22,31 @@ import ProfessionInfo from "../pages/ProfileSection/ProfileEditUser/ProfileScree
 import BioSkillsInfo from "../pages/ProfileSection/ProfileEditUser/ProfileScreen/BioSkillsInfo/BioSkillsInfo";
 import MediaInfo from "../pages/ProfileSection/ProfileEditUser/ProfileScreen/MediaInfo/MediaInfo";
 import RoleSelection from "../pages/ProfileSection/RoleSelection/RoleSelection";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 const AppRoutes: React.FC = () => {
+  const user = useSelector((state: RootState) => state.auth.user);
+
   return (
     <Router>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
-        <Route path="/login" element={<LoginComponent />} />
-        <Route path="/register" element={<RegisterComponent />} />
+        <Route
+          path="/login"
+          element={!user ? <LoginComponent /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/register"
+          element={!user ? <RegisterComponent /> : <Navigate to="/" />}
+        />
         <Route path="/password-reset" element={<PasswordResetComponent />} />
         <Route path="/job-offers" element={<JobOffers />} />
         <Route
           path="/profile-edit-recruiter"
-          element={<ProfileEditRecruiter />}
+          element={user ? <ProfileEditRecruiter /> : <Navigate to="/login" />}
         />
         <Route path="/verify-email" element={<VerifyEmailComponent />} />
         <Route
@@ -39,22 +55,28 @@ const AppRoutes: React.FC = () => {
         />
         <Route
           path="/profile-edit-user/personal-info"
-          element={<PersonalInfo />}
+          element={user ? <PersonalInfo /> : <Navigate to="/login" />}
         />
         <Route
           path="/profile-edit-user/address-info"
-          element={<AddressInfo />}
+          element={user ? <AddressInfo /> : <Navigate to="/login" />}
         />
         <Route
           path="/profile-edit-user/profession-info"
-          element={<ProfessionInfo />}
+          element={user ? <ProfessionInfo /> : <Navigate to="/login" />}
         />
         <Route
           path="/profile-edit-user/bio-skills-info"
-          element={<BioSkillsInfo />}
+          element={user ? <BioSkillsInfo /> : <Navigate to="/login" />}
         />
-        <Route path="/profile-edit-user/media-info" element={<MediaInfo />} />
-        <Route path="/role-selection" element={<RoleSelection />} />
+        <Route
+          path="/profile-edit-user/media-info"
+          element={user ? <MediaInfo /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/role-selection"
+          element={user ? <RoleSelection /> : <Navigate to="/login" />}
+        />
       </Routes>
     </Router>
   );
