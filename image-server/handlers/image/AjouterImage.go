@@ -6,14 +6,14 @@ import (
     "net/http"
     "os"
     "path/filepath"
-    "strings"
     "image-server/utils"
+    "log"
     "github.com/gin-gonic/gin"
     "github.com/twinj/uuid"
-    "log"
+    "strings"
 )
 
-const maxImagesPerUser = 5
+const maxImagesPerUser = 6
 const serverBaseURL = "http://localhost:7000/"
 
 func getUserDir(userID string) string {
@@ -92,6 +92,22 @@ func AjouterImage(c *gin.Context) {
         return
     }
 
+    imageHash := utils.CalculateHash(request.Base64)
+    log.Printf("Calculated image hash: %s", imageHash)
+
+    exists, err := utils.HashExists(userDir, imageHash)
+    if err != nil {
+        log.Printf("Error checking hash existence: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    if exists {
+        log.Printf("Image with the same content already exists for user %s", request.UserID)
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Image with the same content already exists"})
+        return
+    }
+
     filename := uuid.NewV4().String() + "_" + request.Nom
     filePath := filepath.Join(userDir, filename)
     log.Printf("Generated filename: %s", filename)
@@ -115,7 +131,7 @@ func AjouterImage(c *gin.Context) {
     isNSFW, err := utils.CheckImageForNSFW(filePath)
     if err != nil {
         log.Printf("Error checking image for NSFW: %v", err)
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        os.Remove(filePath)  // Supprimer le fichier si la vérification NSFW échoue
         return
     }
     log.Printf("NSFW check completed, result: %v", isNSFW)
@@ -131,18 +147,29 @@ func AjouterImage(c *gin.Context) {
     compressedPath, err := compressImage(filePath)
     if err != nil {
         log.Printf("Error compressing image: %v", err)
+        os.Remove(filePath)  // Supprimer le fichier si la compression échoue
+        log.Printf("Image has been removed due to compression error: %s", filePath)
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
     }
     log.Printf("Image compressed successfully: %s", compressedPath)
 
-    // Supprimer l'image d'origine après compression
-    if err := os.Remove(filePath); err != nil {
-        log.Printf("Error removing original image: %v", err)
+    // Supprimer l'image d'origine après compression seulement si elle a été convertie
+    if filePath != compressedPath {
+        if err := os.Remove(filePath); err != nil {
+            log.Printf("Error removing original image: %v", err)
+            c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+            return
+        }
+        log.Printf("Original image removed: %s", filePath)
+    }
+
+    // Ajouter le hachage de l'image
+    if err := utils.AddHash(userDir, imageHash); err != nil {
+        log.Printf("Error adding hash: %v", err)
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
     }
-    log.Printf("Original image removed: %s", filePath)
 
     // Générer l'URL de l'image compressée
     imageURL := generateImageURL(compressedPath)
