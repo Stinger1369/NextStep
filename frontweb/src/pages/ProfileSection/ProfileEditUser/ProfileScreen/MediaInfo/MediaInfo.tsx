@@ -11,7 +11,7 @@ import {
   updateUser,
   getUserById,
 } from "../../../../../redux/features/user/userSlice";
-import { addImage } from "../../../../../redux/features/image/imageSlice"; // Import addImage action
+import { addImages } from "../../../../../redux/features/image/imageSlice"; // Import addImages action
 
 interface FormValues {
   images: File[];
@@ -24,6 +24,7 @@ const MediaInfo: React.FC = () => {
   const userData = useSelector((state: RootState) => state.user.user);
   const imageError = useSelector((state: RootState) => state.images.error);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [maxImagesError, setMaxImagesError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?._id) {
@@ -32,12 +33,12 @@ const MediaInfo: React.FC = () => {
   }, [dispatch, user]);
 
   useEffect(() => {
-    if (userData) {
-      const imageFiles: File[] = userData.images
-        ? userData.images.map((image) => new File([], image))
-        : [];
+    if (userData?.images) {
+      const imageFiles: File[] = userData.images.map(
+        (image) => new File([], image)
+      );
 
-      setImagePreviews(userData.images || []);
+      setImagePreviews(userData.images);
       formik.setValues({ images: imageFiles });
     }
   }, [userData]);
@@ -50,7 +51,7 @@ const MediaInfo: React.FC = () => {
     onSubmit: async (values) => {
       console.log("Submitting form with values:", values);
 
-      if (user?._id) {
+      if (user?._id && userData?.images) {
         const base64Images = await Promise.all(
           values.images.map(async (image) => {
             const base64 = await encodeFileToBase64(image);
@@ -61,26 +62,29 @@ const MediaInfo: React.FC = () => {
           })
         );
 
-        const uploadedImageUrls: string[] = [];
+        const totalImages = userData.images.length + base64Images.length;
 
-        for (const img of base64Images) {
-          try {
-            const imageUrl = await dispatch(
-              addImage({ userId: user._id, ...img })
-            ).unwrap();
-            uploadedImageUrls.push(imageUrl);
-          } catch (error: any) {
-            console.error("Error adding image:", error);
-            return;
-          }
+        if (totalImages > 5) {
+          setMaxImagesError(
+            `You can only upload 5 images. Please delete some images before adding new ones.`
+          );
+          return;
         }
 
-        const updatedValues = {
-          ...userData,
-          images: uploadedImageUrls, // Use URLs instead of image names
-        };
-        console.log("Updating user with media info:", updatedValues);
-        await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+        try {
+          const uploadedImageUrls = await dispatch(
+            addImages({ userId: user._id, images: base64Images })
+          ).unwrap();
+
+          const updatedValues = {
+            ...userData,
+            images: [...(userData.images || []), ...uploadedImageUrls], // Add new images to existing images
+          };
+          console.log("Updating user with media info:", updatedValues);
+          await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+        } catch (error: any) {
+          console.error("Error adding images:", error);
+        }
       }
     },
   });
@@ -125,6 +129,10 @@ const MediaInfo: React.FC = () => {
             multiple
             onChange={handleImagesChange}
             className="form-control"
+            disabled={
+              userData?.images?.length !== undefined &&
+              userData.images.length >= 5
+            }
           />
           {formik.touched.images && formik.errors.images ? (
             <div className="text-danger">
@@ -148,9 +156,21 @@ const MediaInfo: React.FC = () => {
             {imageError}
           </div>
         )}
+        {maxImagesError && (
+          <div className="alert alert-danger" role="alert">
+            {maxImagesError}
+          </div>
+        )}
 
         <div className="button-container">
-          <button type="submit" className="btn btn-primary">
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={
+              userData?.images?.length !== undefined &&
+              userData.images.length >= 5
+            }
+          >
             Save
           </button>
         </div>

@@ -34,6 +34,7 @@ Installer les dépendances nécessaires :
 bash
 
 go get github.com/gin-gonic/gin
+
 Créer la structure des dossiers :
 
 bash
@@ -138,6 +139,7 @@ Lancer le serveur :
 
 bash
 
+<!-- run server -->
 go run main.go
 
 
