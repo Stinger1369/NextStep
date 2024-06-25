@@ -1,5 +1,8 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axiosInstance from "../../../axiosConfig";
+import { createSlice } from "@reduxjs/toolkit";
+import { addImage } from "./thunks/addImage";
+import { addImages } from "./thunks/addImages";
+import { deleteImage } from "./thunks/deleteImage";
+import { updateImage } from "./thunks/updateImage";
 
 interface ImageState {
   images: string[];
@@ -13,108 +16,6 @@ const initialState: ImageState = {
   error: null,
 };
 
-// Thunks for async actions
-export const addImage = createAsyncThunk(
-  "images/addImage",
-  async ({
-    userId,
-    imageName,
-    imageBase64,
-  }: {
-    userId: string;
-    imageName: string;
-    imageBase64: string;
-  }) => {
-    try {
-      const response = await axiosInstance.post(
-        `/images/user/${userId}/image`,
-        {
-          imageName,
-          imageBase64,
-        }
-      );
-      if (response.status === 400 && response.data.error) {
-        throw new Error(response.data.error);
-      }
-      return response.data.images[response.data.images.length - 1]; // return the last added image URL
-    } catch (error: any) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        throw new Error(error.response.data.message);
-      } else {
-        throw new Error("Failed to upload image");
-      }
-    }
-  }
-);
-
-export const addImages = createAsyncThunk(
-  "images/addImages",
-  async ({
-    userId,
-    images,
-  }: {
-    userId: string;
-    images: { imageName: string; imageBase64: string }[];
-  }) => {
-    try {
-      const response = await axiosInstance.post(
-        `/images/user/${userId}/images`,
-        { images }
-      );
-      if (response.status === 400 && response.data.error) {
-        throw new Error(response.data.error);
-      }
-      return response.data.images; // return all added image URLs
-    } catch (error: any) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        throw new Error(error.response.data.message);
-      } else {
-        throw new Error("Failed to upload images");
-      }
-    }
-  }
-);
-
-export const deleteImage = createAsyncThunk(
-  "images/deleteImage",
-  async ({ userId, imageName }: { userId: string; imageName: string }) => {
-    const response = await axiosInstance.delete(
-      `/images/user/${userId}/image/${imageName}`
-    );
-    return { imageName };
-  }
-);
-
-export const updateImage = createAsyncThunk(
-  "images/updateImage",
-  async ({
-    userId,
-    imageName,
-    imageBase64,
-  }: {
-    userId: string;
-    imageName: string;
-    imageBase64: string;
-  }) => {
-    const response = await axiosInstance.put(
-      `/images/user/${userId}/image/${imageName}`,
-      { imageBase64 }
-    );
-    if (response.status === 400 && response.data.error) {
-      throw new Error(response.data.error);
-    }
-    return response.data.link;
-  }
-);
-
 const imageSlice = createSlice({
   name: "images",
   initialState,
@@ -127,7 +28,7 @@ const imageSlice = createSlice({
       })
       .addCase(addImage.fulfilled, (state, action) => {
         state.loading = false;
-        state.images.push(action.payload);
+        state.images = [...new Set([...state.images, action.payload])]; // Éviter les duplicatas
       })
       .addCase(addImage.rejected, (state, action) => {
         state.loading = false;
@@ -139,7 +40,7 @@ const imageSlice = createSlice({
       })
       .addCase(addImages.fulfilled, (state, action) => {
         state.loading = false;
-        state.images = action.payload;
+        state.images = [...new Set([...state.images, ...action.payload])]; // Éviter les duplicatas
       })
       .addCase(addImages.rejected, (state, action) => {
         state.loading = false;
@@ -179,4 +80,5 @@ const imageSlice = createSlice({
   },
 });
 
+export { addImage, addImages, deleteImage, updateImage };
 export default imageSlice.reducer;

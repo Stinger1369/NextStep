@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import axios, { AxiosError } from "axios";
-import User, { IUser } from "../../models/User";
+import User from "../../models/User";
 
 const IMAGE_SERVER_URL = "http://localhost:7000/server-image";
 const MAX_IMAGES_PER_USER = 5;
 
 export const addImages = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { images } = req.body; // `images` is an array of { imageName, imageBase64 }
+  const { id } = req.params; // User ID
+  const { images } = req.body;
 
   console.log(`Received request to add images for user ${id}`);
   console.log(`Number of images: ${images.length}`);
@@ -20,7 +20,6 @@ export const addImages = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Clean the images array to remove null values
     user.images = user.images.filter(
       (img) => img !== null && img !== undefined
     );
@@ -33,9 +32,12 @@ export const addImages = async (req: Request, res: Response) => {
       });
     }
 
+    const uniqueImageUrls = new Set(user.images);
+
     for (const img of images) {
       try {
         const response = await axios.post(`${IMAGE_SERVER_URL}/ajouter-image`, {
+          user_id: id,
           nom: img.imageName,
           base64: img.imageBase64,
         });
@@ -47,26 +49,19 @@ export const addImages = async (req: Request, res: Response) => {
 
         if (response.data.error) {
           console.log(`Image rejected by image server: ${response.data.error}`);
-          continue; // Skip this image and continue with the next one
+          continue;
         }
 
         const imageUrl = response.data.link;
         console.log(`Image URL received from image server: ${imageUrl}`);
 
-        // Add the image URL to the user's images array
-        user.images.push(imageUrl);
+        uniqueImageUrls.add(imageUrl);
       } catch (error) {
         console.error(`Error uploading image: ${error}`);
-        // Continue with the next image
       }
     }
 
-    console.log(`Images array before saving: ${JSON.stringify(user.images)}`);
-
-    // Clean the images array again to ensure no null values
-    user.images = user.images.filter(
-      (img) => img !== null && img !== undefined
-    );
+    user.images = Array.from(uniqueImageUrls).slice(0, MAX_IMAGES_PER_USER);
 
     await user.save();
     console.log(`Images array after saving: ${JSON.stringify(user.images)}`);

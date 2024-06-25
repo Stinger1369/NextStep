@@ -27,6 +27,9 @@ func checkAndCreateUserDir(userID string) (string, error) {
         if err != nil {
             return "", err
         }
+        log.Printf("User directory created: %s", userDir)
+    } else {
+        log.Printf("User directory already exists: %s", userDir)
     }
     return userDir, nil
 }
@@ -61,12 +64,19 @@ func AjouterImage(c *gin.Context) {
     }
     log.Printf("Request JSON parsed: %+v", request)
 
+    if request.UserID == "" {
+        log.Println("UserID is empty")
+        c.JSON(http.StatusBadRequest, gin.H{"error": "UserID is required"})
+        return
+    }
+    log.Printf("Creating directory for user ID: %s", request.UserID)
     userDir, err := checkAndCreateUserDir(request.UserID)
     if err != nil {
         log.Printf("Error creating user directory: %v", err)
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
     }
+    log.Printf("User directory confirmed: %s", userDir)
 
     userImageCount, err := countUserImages(request.UserID)
     if err != nil {
@@ -74,6 +84,7 @@ func AjouterImage(c *gin.Context) {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
     }
+    log.Printf("User %s has %d images", request.UserID, userImageCount)
 
     if userImageCount >= maxImagesPerUser {
         log.Printf("User %s has reached the maximum number of images", request.UserID)
@@ -100,6 +111,7 @@ func AjouterImage(c *gin.Context) {
     }
     log.Printf("File written successfully: %s", filePath)
 
+    log.Printf("Checking NSFW content for file: %s", filePath)
     isNSFW, err := utils.CheckImageForNSFW(filePath)
     if err != nil {
         log.Printf("Error checking image for NSFW: %v", err)
@@ -115,6 +127,7 @@ func AjouterImage(c *gin.Context) {
         return
     }
 
+    log.Printf("Compressing image: %s", filePath)
     compressedPath, err := compressImage(filePath)
     if err != nil {
         log.Printf("Error compressing image: %v", err)

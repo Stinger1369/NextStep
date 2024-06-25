@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaTimes } from "react-icons/fa";
+import { FaArrowLeft, FaTimes, FaTrash } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./MediaInfo.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,7 +11,10 @@ import {
   updateUser,
   getUserById,
 } from "../../../../../redux/features/user/userSlice";
-import { addImages } from "../../../../../redux/features/image/imageSlice"; // Import addImages action
+import {
+  addImages,
+  deleteImage,
+} from "../../../../../redux/features/image/imageSlice";
 
 interface FormValues {
   images: File[];
@@ -78,7 +81,9 @@ const MediaInfo: React.FC = () => {
 
           const updatedValues = {
             ...userData,
-            images: [...(userData.images || []), ...uploadedImageUrls], // Add new images to existing images
+            images: Array.from(
+              new Set([...(userData.images || []), ...uploadedImageUrls])
+            ), // Add new images to existing images and remove duplicates
           };
           console.log("Updating user with media info:", updatedValues);
           await dispatch(updateUser({ id: user._id, userData: updatedValues }));
@@ -108,6 +113,22 @@ const MediaInfo: React.FC = () => {
     const previews = files.map((file) => URL.createObjectURL(file));
     setImagePreviews(previews);
     formik.setFieldValue("images", files);
+  };
+
+  const handleDeleteImage = async (imageUrl: string) => {
+    if (user?._id) {
+      try {
+        const imageName = imageUrl.split("/").pop(); // Extract the image name from the URL
+        if (!imageName) {
+          throw new Error("Invalid image URL");
+        }
+
+        await dispatch(deleteImage({ userId: user._id, imageName })).unwrap();
+        await dispatch(getUserById(user._id));
+      } catch (error: any) {
+        console.error("Error deleting image:", error);
+      }
+    }
   };
 
   return (
@@ -146,7 +167,13 @@ const MediaInfo: React.FC = () => {
           ) : null}
           <div className="image-previews">
             {imagePreviews.map((src, index) => (
-              <img key={index} src={src} alt={`Preview ${index}`} />
+              <div key={index} className="image-preview-container">
+                <img src={src} alt={`Preview ${index}`} />
+                <FaTrash
+                  className="delete-icon"
+                  onClick={() => handleDeleteImage(src)}
+                />
+              </div>
             ))}
           </div>
         </div>

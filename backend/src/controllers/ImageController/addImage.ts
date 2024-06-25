@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import axios, { AxiosError } from "axios";
-import User, { IUser } from "../../models/User";
+import User from "../../models/User";
 
 const IMAGE_SERVER_URL = "http://localhost:7000/server-image";
 const MAX_IMAGES_PER_USER = 5;
 
 export const addImage = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { id } = req.params; // User ID
   const { imageName, imageBase64 } = req.body;
 
   console.log(`Received request to add image for user ${id}`);
@@ -20,7 +20,6 @@ export const addImage = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Clean the images array to remove null values
     user.images = user.images.filter(
       (img) => img !== null && img !== undefined
     );
@@ -33,6 +32,7 @@ export const addImage = async (req: Request, res: Response) => {
     }
 
     const response = await axios.post(`${IMAGE_SERVER_URL}/ajouter-image`, {
+      user_id: id,
       nom: imageName,
       base64: imageBase64,
     });
@@ -48,20 +48,19 @@ export const addImage = async (req: Request, res: Response) => {
     const imageUrl = response.data.link;
     console.log(`Image URL received from image server: ${imageUrl}`);
 
-    // Add the image URL to the user's images array
-    user.images.push(imageUrl);
-    console.log(`Images array before saving: ${JSON.stringify(user.images)}`);
+    if (!user.images.includes(imageUrl)) {
+      user.images.push(imageUrl);
+      user.images = Array.from(new Set(user.images));
 
-    // Clean the images array again to ensure no null values
-    user.images = user.images.filter(
-      (img) => img !== null && img !== undefined
-    );
+      await user.save();
+      console.log(`Images array after saving: ${JSON.stringify(user.images)}`);
 
-    await user.save();
-    console.log(`Images array after saving: ${JSON.stringify(user.images)}`);
-
-    console.log(`Image added successfully for user ${id}: ${imageUrl}`);
-    res.status(200).json(user);
+      console.log(`Image added successfully for user ${id}: ${imageUrl}`);
+      res.status(200).json(user);
+    } else {
+      console.log(`Image already exists for user ${id}: ${imageUrl}`);
+      res.status(400).json({ message: "Image already exists" });
+    }
   } catch (error) {
     const err = error as AxiosError;
     if (err.response && err.response.status === 400) {
