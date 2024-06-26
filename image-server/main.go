@@ -16,6 +16,7 @@ func main() {
 
     // Routes pour les images
     r.POST("/server-image/ajouter-image", image.AjouterImage)
+    r.POST("/server-image/ajouter-images", image.AjouterImages)
     r.GET("/server-image/image/:user_id/:nom", image.GetImage)
     r.PUT("/server-image/update-image/:user_id/:nom", image.UpdateImage)
     r.DELETE("/server-image/delete-image/:user_id/:nom", image.DeleteImage)

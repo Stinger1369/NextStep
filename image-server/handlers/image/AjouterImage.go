@@ -13,9 +13,6 @@ import (
     "strings"
 )
 
-const maxImagesPerUser = 6
-const serverBaseURL = "http://localhost:7000/"
-
 func getUserDir(userID string) string {
     return filepath.Join("public/images", userID)
 }
@@ -40,12 +37,18 @@ func countUserImages(userID string) (int, error) {
     if err != nil {
         return 0, err
     }
-    return len(files), nil
+    imageCount := 0
+    for _, file := range files {
+        if !file.IsDir() && !strings.HasSuffix(file.Name(), "hashes.json") {
+            imageCount++
+        }
+    }
+    return imageCount, nil
 }
 
 func generateImageURL(filePath string) string {
     relativePath := strings.ReplaceAll(filePath[len("public/"):], "\\", "/")
-    return serverBaseURL + relativePath
+    return utils.ServerBaseURL + relativePath
 }
 
 func AjouterImage(c *gin.Context) {
@@ -58,37 +61,35 @@ func AjouterImage(c *gin.Context) {
     }
 
     if err := c.BindJSON(&request); err != nil {
-        log.Printf("Error binding JSON: %v", err)
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        log.Printf("[%s] Error binding JSON: %v", utils.ErrInvalidRequestFormat, err)
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request format", "code": utils.ErrInvalidRequestFormat})
         return
     }
-    log.Printf("Request JSON parsed: %+v", request)
+    //log.Printf("Request JSON parsed: %+v", request)
 
     if request.UserID == "" {
-        log.Println("UserID is empty")
-        c.JSON(http.StatusBadRequest, gin.H{"error": "UserID is required"})
+        log.Printf("[%s] UserID is empty", utils.ErrEmptyUserID)
+        c.JSON(http.StatusBadRequest, gin.H{"error": "UserID is required", "code": utils.ErrEmptyUserID})
         return
     }
-    log.Printf("Creating directory for user ID: %s", request.UserID)
+
     userDir, err := checkAndCreateUserDir(request.UserID)
     if err != nil {
-        log.Printf("Error creating user directory: %v", err)
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        log.Printf("[%s] Error creating user directory: %v", utils.ErrCreatingUserDirectory, err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user directory", "code": utils.ErrCreatingUserDirectory})
         return
     }
-    log.Printf("User directory confirmed: %s", userDir)
 
     userImageCount, err := countUserImages(request.UserID)
     if err != nil {
-        log.Printf("Error counting user images: %v", err)
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        log.Printf("[%s] Error counting user images: %v", utils.ErrCountingUserImages, err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count user images", "code": utils.ErrCountingUserImages})
         return
     }
-    log.Printf("User %s has %d images", request.UserID, userImageCount)
 
-    if userImageCount >= maxImagesPerUser {
-        log.Printf("User %s has reached the maximum number of images", request.UserID)
-        c.JSON(http.StatusBadRequest, gin.H{"error": "You have reached the maximum number of images"})
+    if userImageCount >= utils.MaxImagesPerUser {
+        log.Printf("[%s] User %s has reached the maximum number of images", utils.ErrMaxImagesReached, request.UserID)
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Maximum number of images reached", "code": utils.ErrMaxImagesReached})
         return
     }
 
@@ -97,14 +98,14 @@ func AjouterImage(c *gin.Context) {
 
     exists, err := utils.HashExists(userDir, imageHash)
     if err != nil {
-        log.Printf("Error checking hash existence: %v", err)
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        log.Printf("[%s] Error checking hash existence: %v", utils.ErrAddingImageHash, err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check image hash", "code": utils.ErrAddingImageHash})
         return
     }
 
     if exists {
-        log.Printf("Image with the same content already exists for user %s", request.UserID)
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Image with the same content already exists"})
+        log.Printf("[%s] Image with the same content already exists for user %s", utils.ErrImageAlreadyExists, request.UserID)
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Image with the same content already exists", "code": utils.ErrImageAlreadyExists})
         return
     }
 
@@ -114,51 +115,45 @@ func AjouterImage(c *gin.Context) {
 
     data, err := base64.StdEncoding.DecodeString(request.Base64)
     if err != nil {
-        log.Printf("Error decoding base64: %v", err)
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        log.Printf("[%s] Error decoding base64: %v", utils.ErrDecodingBase64, err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode image", "code": utils.ErrDecodingBase64})
         return
     }
-    log.Printf("Base64 decoded successfully, length: %d", len(data))
 
     if err := ioutil.WriteFile(filePath, data, 0644); err != nil {
-        log.Printf("Error writing file: %v", err)
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        log.Printf("[%s] Error writing file: %v", utils.ErrWritingFile, err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to write image", "code": utils.ErrWritingFile})
         return
     }
-    log.Printf("File written successfully: %s", filePath)
 
-    log.Printf("Checking NSFW content for file: %s", filePath)
     isNSFW, err := utils.CheckImageForNSFW(filePath)
     if err != nil {
-        log.Printf("Error checking image for NSFW: %v", err)
+        log.Printf("[%s] Error checking image for NSFW: %v", utils.ErrNSFWCheck, err)
         os.Remove(filePath)  // Supprimer le fichier si la vérification NSFW échoue
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check NSFW content", "code": utils.ErrNSFWCheck})
         return
     }
-    log.Printf("NSFW check completed, result: %v", isNSFW)
 
     if isNSFW {
         os.Remove(filePath)
-        log.Printf("Image is NSFW and has been removed: %s", filePath)
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Image contains inappropriate content and has been rejected."})
+        log.Printf("[%s] Image is inappropriate (NSFW) and has been removed: %s", utils.ErrImageNSFW, filePath)
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Image contains inappropriate content and has been rejected.", "code": utils.ErrImageNSFW})
         return
     }
 
-    log.Printf("Compressing image: %s", filePath)
     compressedPath, err := compressImage(filePath)
     if err != nil {
-        log.Printf("Error compressing image: %v", err)
+        log.Printf("[%s] Error compressing image: %v", utils.ErrImageCompression, err)
         os.Remove(filePath)  // Supprimer le fichier si la compression échoue
-        log.Printf("Image has been removed due to compression error: %s", filePath)
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to compress image", "code": utils.ErrImageCompression})
         return
     }
-    log.Printf("Image compressed successfully: %s", compressedPath)
 
     // Supprimer l'image d'origine après compression seulement si elle a été convertie
     if filePath != compressedPath {
         if err := os.Remove(filePath); err != nil {
-            log.Printf("Error removing original image: %v", err)
-            c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+            log.Printf("[%s] Error removing original image: %v", utils.ErrRemovingOriginalImage, err)
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove original image", "code": utils.ErrRemovingOriginalImage})
             return
         }
         log.Printf("Original image removed: %s", filePath)
@@ -166,8 +161,8 @@ func AjouterImage(c *gin.Context) {
 
     // Ajouter le hachage de l'image
     if err := utils.AddHash(userDir, imageHash); err != nil {
-        log.Printf("Error adding hash: %v", err)
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        log.Printf("[%s] Error adding hash: %v", utils.ErrAddingImageHash, err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add image hash", "code": utils.ErrAddingImageHash})
         return
     }
 

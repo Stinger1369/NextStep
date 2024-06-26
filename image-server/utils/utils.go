@@ -6,7 +6,24 @@ import (
     "os"
     "strings"
 )
+const (
+    MaxImagesPerUser = 6
+    ServerBaseURL = "http://localhost:7000/"
 
+    ErrInvalidRequestFormat       = "ERR001"
+    ErrEmptyUserID                = "ERR002"
+    ErrCreatingUserDirectory      = "ERR003"
+    ErrCountingUserImages         = "ERR004"
+    ErrMaxImagesReached           = "ERR005"
+    ErrDecodingBase64             = "ERR006"
+    ErrWritingFile                = "ERR007"
+    ErrNSFWCheck                  = "ERR008"
+    ErrImageNSFW                  = "ERR009"
+    ErrImageCompression           = "ERR010"
+    ErrRemovingOriginalImage      = "ERR011"
+    ErrAddingImageHash            = "ERR012"
+    ErrImageAlreadyExists         = "ERR013"
+)
 // CheckImageForNSFW vérifie si une image contient du contenu NSFW en appelant un script Python via un script batch.
 func CheckImageForNSFW(filePath string) (bool, error) {
     log.Printf("Checking image for NSFW: %s", filePath)

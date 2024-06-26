@@ -3,7 +3,7 @@ package utils
 import (
     "crypto/sha256"
     "encoding/hex"
-	"os"
+    "os"
     "encoding/json"
     "io/ioutil"
     "path/filepath"
@@ -16,7 +16,7 @@ func CalculateHash(base64String string) string {
     return hex.EncodeToString(hasher.Sum(nil))
 }
 
-// hashExists vérifie si un hachage existe déjà pour un utilisateur donné
+// HashExists vérifie si un hachage existe déjà pour un utilisateur donné
 func HashExists(userDir string, hash string) (bool, error) {
     hashFilePath := filepath.Join(userDir, "hashes.json")
     if _, err := os.Stat(hashFilePath); os.IsNotExist(err) {
@@ -36,7 +36,7 @@ func HashExists(userDir string, hash string) (bool, error) {
     return hashes[hash], nil
 }
 
-// addHash ajoute un hachage au fichier hashes.json pour un utilisateur donné
+// AddHash ajoute un hachage au fichier hashes.json pour un utilisateur donné
 func AddHash(userDir string, hash string) error {
     hashFilePath := filepath.Join(userDir, "hashes.json")
     var hashes map[string]bool
