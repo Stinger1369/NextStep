@@ -11,5 +11,5 @@
     "typeRoots": ["./node_modules/@types"],
     "types": ["node", "express"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "src/constants/errorCodes.ts"]
 }

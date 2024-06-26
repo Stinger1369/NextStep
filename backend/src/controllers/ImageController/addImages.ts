@@ -1,9 +1,19 @@
 import { Request, Response } from "express";
 import axios, { AxiosError } from "axios";
 import User from "../../models/User";
+import { ERROR_CODES } from "../../constants/errorCodes";
 
 const IMAGE_SERVER_URL = "http://localhost:7000/server-image";
 const MAX_IMAGES_PER_USER = 5;
+
+function isAxiosError(error: any): error is AxiosError {
+  return error.isAxiosError === true;
+}
+
+interface AxiosErrorData {
+  error: string;
+  code: string;
+}
 
 export const addImages = async (req: Request, res: Response) => {
   const { id } = req.params; // User ID
@@ -28,11 +38,13 @@ export const addImages = async (req: Request, res: Response) => {
     if (totalImages > MAX_IMAGES_PER_USER) {
       console.log(`User ${id} has reached the maximum number of images`);
       return res.status(400).json({
-        message: `You can only upload ${MAX_IMAGES_PER_USER} images. Please delete some images before adding new ones.`,
+        message: ERROR_CODES.ErrMaxImagesReached,
+        code: ERROR_CODES.ErrMaxImagesReached,
       });
     }
 
     const uniqueImageUrls = new Set(user.images);
+    const results = [];
 
     for (const img of images) {
       try {
@@ -49,6 +61,12 @@ export const addImages = async (req: Request, res: Response) => {
 
         if (response.data.error) {
           console.log(`Image rejected by image server: ${response.data.error}`);
+          results.push({
+            imageName: img.imageName,
+            status: "failed",
+            message: response.data.error,
+            code: response.data.code,
+          });
           continue;
         }
 
@@ -56,8 +74,32 @@ export const addImages = async (req: Request, res: Response) => {
         console.log(`Image URL received from image server: ${imageUrl}`);
 
         uniqueImageUrls.add(imageUrl);
+        results.push({
+          imageName: img.imageName,
+          status: "success",
+          url: imageUrl,
+        });
       } catch (error) {
-        console.error(`Error uploading image: ${error}`);
+        const err = error as AxiosError;
+        if (isAxiosError(err) && err.response && err.response.status === 400) {
+          const errorData = err.response.data as AxiosErrorData;
+          const errorMessage = errorData.error || "Error uploading image";
+          console.error(`Error uploading image: ${errorMessage}`);
+          results.push({
+            imageName: img.imageName,
+            status: "failed",
+            message: errorMessage,
+            code: errorData.code,
+          });
+          continue;
+        }
+        console.error(`Error uploading image: ${err.message}`);
+        results.push({
+          imageName: img.imageName,
+          status: "failed",
+          message: err.message,
+          code: "UNKNOWN_ERROR",
+        });
       }
     }
 
@@ -67,19 +109,23 @@ export const addImages = async (req: Request, res: Response) => {
     console.log(`Images array after saving: ${JSON.stringify(user.images)}`);
 
     console.log(`Images added successfully for user ${id}`);
-    res.status(200).json(user);
+    res.status(200).json({ user, results });
   } catch (error) {
     const err = error as AxiosError;
-    if (err.response && err.response.status === 400) {
-      console.error(`Error uploading images: ${err.message}`, err);
-      console.error(`Error response from image server: ${err.response.data}`);
-      return res
-        .status(400)
-        .json({ message: (err.response.data as any).error });
+    if (isAxiosError(err) && err.response && err.response.status === 400) {
+      const errorData = err.response.data as AxiosErrorData;
+      const errorMessage = errorData.error || "Error uploading images";
+      console.error(`Error uploading images: ${errorMessage}`);
+      return res.status(400).json({
+        message: errorMessage,
+        code: errorData.code,
+      });
     }
-    console.error(`Error uploading images: ${err.message}`, err);
-    res
-      .status(500)
-      .json({ message: "Error uploading images", error: err.message });
+    console.error(`Error uploading images: ${err.message}`);
+    res.status(500).json({
+      message: "Error uploading images",
+      error: err.message,
+      code: "UNKNOWN_ERROR",
+    });
   }
 };

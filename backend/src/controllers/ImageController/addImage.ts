@@ -1,9 +1,19 @@
 import { Request, Response } from "express";
 import axios, { AxiosError } from "axios";
 import User from "../../models/User";
+import { ERROR_CODES } from "../../constants/errorCodes";
 
 const IMAGE_SERVER_URL = "http://localhost:7000/server-image";
 const MAX_IMAGES_PER_USER = 5;
+
+function isAxiosError(error: any): error is AxiosError {
+  return error.isAxiosError === true;
+}
+
+interface AxiosErrorData {
+  error: string;
+  code: string;
+}
 
 export const addImage = async (req: Request, res: Response) => {
   const { id } = req.params; // User ID
@@ -24,25 +34,29 @@ export const addImage = async (req: Request, res: Response) => {
       (img) => img !== null && img !== undefined
     );
 
+    console.log(`User ${id} currently has ${user.images.length} images`);
+
     if (user.images.length >= MAX_IMAGES_PER_USER) {
       console.log(`User ${id} has reached the maximum number of images`);
-      return res
-        .status(400)
-        .json({ message: "You have reached the maximum number of images" });
+      return res.status(400).json({
+        message: ERROR_CODES.ErrMaxImagesReached,
+        code: ERROR_CODES.ErrMaxImagesReached,
+      });
     }
 
+    console.log(`Sending image to image server for processing`);
     const response = await axios.post(`${IMAGE_SERVER_URL}/ajouter-image`, {
       user_id: id,
       nom: imageName,
       base64: imageBase64,
     });
 
-    console.log(`Response from image server: ${JSON.stringify(response.data)}`);
-    console.log(`Response status from image server: ${response.status}`);
-
     if (response.data.error) {
       console.log(`Image rejected by image server: ${response.data.error}`);
-      return res.status(400).json({ message: response.data.error });
+      return res.status(400).json({
+        message: response.data.error,
+        code: response.data.code,
+      });
     }
 
     const imageUrl = response.data.link;
@@ -59,20 +73,32 @@ export const addImage = async (req: Request, res: Response) => {
       res.status(200).json(user);
     } else {
       console.log(`Image already exists for user ${id}: ${imageUrl}`);
-      res.status(400).json({ message: "Image already exists" });
+      return res.status(400).json({
+        message: ERROR_CODES.ErrImageAlreadyExists,
+        code: ERROR_CODES.ErrImageAlreadyExists,
+      });
     }
   } catch (error) {
-    const err = error as AxiosError;
-    if (err.response && err.response.status === 400) {
-      console.error(`Error uploading image: ${err.message}`, err);
-      console.error(`Error response from image server: ${err.response.data}`);
-      return res
-        .status(400)
-        .json({ message: (err.response.data as any).error });
+    console.error(`Caught an error: ${error}`);
+
+    if (
+      isAxiosError(error) &&
+      error.response &&
+      error.response.status === 400
+    ) {
+      const errorData = error.response.data as AxiosErrorData;
+      const errorMessage = errorData.error || "Error uploading image";
+      console.error(`Error uploading image: ${errorMessage}`);
+      return res.status(400).json({
+        message: errorMessage,
+        code: errorData.code,
+      });
     }
-    console.error(`Error uploading image: ${err.message}`, err);
-    res
-      .status(500)
-      .json({ message: "Error uploading image", error: err.message });
+    console.error(`Unhandled error: ${(error as Error).message}`);
+    res.status(500).json({
+      message: "UNKNOWN_ERROR",
+      error: (error as Error).message,
+      code: "UNKNOWN_ERROR",
+    });
   }
 };

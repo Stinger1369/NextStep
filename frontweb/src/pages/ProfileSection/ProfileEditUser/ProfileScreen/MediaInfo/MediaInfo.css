@@ -29,13 +29,24 @@
   margin-right: 10px;
 }
 
+.image-preview-container {
+  position: relative;
+  display: inline-block;
+}
+
+.delete-icon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+  color: red;
+}
+
 .button-container {
   display: flex;
   justify-content: flex-end;
 }
 
-.loading-indicator {
-  margin-top: 20px;
-  font-size: 18px;
-  color: #007bff;
+.alert-danger {
+  color: red;
 }

@@ -12,9 +12,11 @@ import {
   getUserById,
 } from "../../../../../redux/features/user/userSlice";
 import {
+  addImage,
   addImages,
   deleteImage,
 } from "../../../../../redux/features/image/imageSlice";
+import { userFriendlyMessages } from "../../../../../utils/errorMessages";
 
 interface FormValues {
   images: File[];
@@ -26,6 +28,9 @@ const MediaInfo: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const userData = useSelector((state: RootState) => state.user.user);
   const imageError = useSelector((state: RootState) => state.images.error);
+  const imageErrors = useSelector(
+    (state: RootState) => state.images.imageErrors
+  );
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [maxImagesError, setMaxImagesError] = useState<string | null>(null);
 
@@ -58,9 +63,7 @@ const MediaInfo: React.FC = () => {
         const base64Images = await Promise.all(
           values.images.map(async (image) => {
             const base64 = await encodeFileToBase64(image);
-            console.log(
-              `Encoded base64 for ${image.name}: ${base64.slice(0, 100)}...`
-            );
+            console.log(`Encoded base64 for ${image.name}`);
             return { imageName: image.name, imageBase64: base64 };
           })
         );
@@ -75,18 +78,45 @@ const MediaInfo: React.FC = () => {
         }
 
         try {
-          const uploadedImageUrls = await dispatch(
-            addImages({ userId: user._id, images: base64Images })
-          ).unwrap();
+          if (base64Images.length === 1) {
+            // Ajouter une seule image
+            const image = base64Images[0];
+            const imageUrl = await dispatch(
+              addImage({ userId: user._id, ...image })
+            ).unwrap();
+            console.log("Uploaded image URL:", imageUrl);
+            const updatedValues = {
+              ...userData,
+              images: Array.from(
+                new Set([...(userData.images || []), imageUrl])
+              ),
+            };
+            console.log("Updating user with media info:", updatedValues);
+            await dispatch(
+              updateUser({ id: user._id, userData: updatedValues })
+            );
+          } else {
+            // Ajouter plusieurs images
+            const results = await dispatch(
+              addImages({ userId: user._id, images: base64Images })
+            ).unwrap();
+            console.log("Uploaded images results:", results);
 
-          const updatedValues = {
-            ...userData,
-            images: Array.from(
-              new Set([...(userData.images || []), ...uploadedImageUrls])
-            ), // Add new images to existing images and remove duplicates
-          };
-          console.log("Updating user with media info:", updatedValues);
-          await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+            const successfulImages = results
+              .filter((result) => result.status === "success")
+              .map((result) => result.url as string);
+
+            const updatedValues = {
+              ...userData,
+              images: Array.from(
+                new Set([...(userData.images || []), ...successfulImages])
+              ),
+            };
+            console.log("Updating user with media info:", updatedValues);
+            await dispatch(
+              updateUser({ id: user._id, userData: updatedValues })
+            );
+          }
         } catch (error: any) {
           console.error("Error adding images:", error);
         }
@@ -118,7 +148,7 @@ const MediaInfo: React.FC = () => {
   const handleDeleteImage = async (imageUrl: string) => {
     if (user?._id) {
       try {
-        const imageName = imageUrl.split("/").pop(); // Extract the image name from the URL
+        const imageName = imageUrl.split("/").pop();
         if (!imageName) {
           throw new Error("Invalid image URL");
         }
@@ -180,7 +210,9 @@ const MediaInfo: React.FC = () => {
 
         {imageError && (
           <div className="alert alert-danger" role="alert">
-            {imageError}
+            {userFriendlyMessages[
+              imageError.code as keyof typeof userFriendlyMessages
+            ] || imageError.message.split(":")[0]}
           </div>
         )}
         {maxImagesError && (
@@ -188,6 +220,16 @@ const MediaInfo: React.FC = () => {
             {maxImagesError}
           </div>
         )}
+        {imageErrors.length > 0 &&
+          imageErrors.map((error, index) => (
+            <div className="alert alert-danger" role="alert" key={index}>
+              {`Error with image "${error.imageName}": ${
+                userFriendlyMessages[
+                  error.code as keyof typeof userFriendlyMessages
+                ] || error.message.split(":")[0]
+              }`}
+            </div>
+          ))}
 
         <div className="button-container">
           <button
