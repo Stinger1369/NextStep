@@ -17,6 +17,11 @@ import {
   deleteImage,
 } from "../../../../../redux/features/image/imageSlice";
 import { userFriendlyMessages } from "../../../../../utils/errorMessages";
+import { encodeFileToBase64 } from "../../../../../utils/fileUtils";
+import {
+  handleImageErrors,
+  ImageError,
+} from "../../../../../utils/errorHandler";
 
 interface FormValues {
   images: File[];
@@ -74,52 +79,9 @@ const MediaInfo: React.FC = () => {
 
         try {
           if (base64Images.length === 1) {
-            const image = base64Images[0];
-            const imageUrl = await dispatch(
-              addImage({ userId: user._id, ...image })
-            ).unwrap();
-            console.log("Uploaded image URL:", imageUrl);
-            const updatedValues = {
-              ...userData,
-              images: Array.from(
-                new Set([...(userData.images || []), imageUrl])
-              ),
-            };
-            console.log("Updating user with media info:", updatedValues);
-            await dispatch(
-              updateUser({ id: user._id, userData: updatedValues })
-            );
+            await handleSingleImageUpload(base64Images[0]);
           } else {
-            const results = await dispatch(
-              addImages({ userId: user._id, images: base64Images })
-            ).unwrap();
-            console.log("Uploaded images results:", results);
-
-            const successfulImages = results
-              .filter((result) => result.status === "success")
-              .map((result) => result.url as string);
-
-            const updatedValues = {
-              ...userData,
-              images: Array.from(
-                new Set([...(userData.images || []), ...successfulImages])
-              ),
-            };
-            console.log("Updating user with media info:", updatedValues);
-            await dispatch(
-              updateUser({ id: user._id, userData: updatedValues })
-            );
-
-            const failedImages = results.filter(
-              (result) => result.status === "failed"
-            );
-            if (failedImages.length > 0) {
-              failedImages.forEach((failedImage) => {
-                console.error(
-                  `Error with image "${failedImage.imageName}": ${failedImage.message}`
-                );
-              });
-            }
+            await handleMultipleImagesUpload(base64Images);
           }
         } catch (error: any) {
           console.error("Error adding images:", error);
@@ -128,16 +90,62 @@ const MediaInfo: React.FC = () => {
     },
   });
 
-  const encodeFileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const base64String = (reader.result as string).split(",")[1];
-        resolve(base64String);
-      };
-      reader.onerror = (error) => reject(error);
-    });
+  const handleSingleImageUpload = async (image: {
+    imageName: string;
+    imageBase64: string;
+  }) => {
+    if (user?._id && userData) {
+      try {
+        const imageUrl = await dispatch(
+          addImage({ userId: user._id, ...image })
+        ).unwrap();
+        console.log("Uploaded image URL:", imageUrl);
+        const updatedValues = {
+          ...userData,
+          images: Array.from(new Set([...(userData.images || []), imageUrl])),
+        };
+        console.log("Updating user with media info:", updatedValues);
+        await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+      } catch (error: any) {
+        console.error("Error adding image:", error);
+      }
+    }
+  };
+
+  const handleMultipleImagesUpload = async (
+    images: { imageName: string; imageBase64: string }[]
+  ) => {
+    if (user?._id && userData) {
+      try {
+        const results = await dispatch(
+          addImages({ userId: user._id, images })
+        ).unwrap();
+        console.log("Uploaded images results:", results);
+
+        const successfulImages = results
+          .filter((result) => result.status === "success")
+          .map((result) => result.url as string);
+
+        const updatedValues = {
+          ...userData,
+          images: Array.from(
+            new Set([...(userData.images || []), ...successfulImages])
+          ),
+        };
+        console.log("Updating user with media info:", updatedValues);
+        await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+
+        const fixedResults: ImageError[] = results.map((result) => ({
+          ...result,
+          message: result.message || "Unknown error occurred",
+          code: result.code || null, // Assurez-vous que 'code' est soit une chaîne, soit null
+        }));
+
+        handleImageErrors(fixedResults);
+      } catch (error: any) {
+        console.error("Error adding images:", error);
+      }
+    }
   };
 
   const handleImagesChange = (event: React.ChangeEvent<HTMLInputElement>) => {

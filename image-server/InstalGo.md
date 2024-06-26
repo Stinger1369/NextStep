@@ -1,153 +1,92 @@
-Installation de Go
-Téléchargez Go :
 
-Allez sur la page de téléchargement de Go : https://golang.org/dl/.
-Téléchargez l'installateur correspondant à votre système d'exploitation (Windows dans votre cas).
-Installez Go :
+## Configuration de l'environnement Go
 
-Exécutez l'installateur téléchargé et suivez les instructions pour installer Go.
-Configurez le chemin d'accès :
+Assurez-vous que Go est installé sur votre système et que vous avez configuré correctement votre GOPATH et GOROOT si nécessaire.
 
-Après l'installation, ajoutez le répertoire d'installation de Go (C:\Go\bin par défaut) à votre variable d'environnement PATH.
-Pour ce faire :
-Ouvrez les paramètres système avancés (vous pouvez chercher "variables d'environnement" dans le menu Démarrer).
-Cliquez sur "Variables d'environnement".
-Dans la section "Variables système", trouvez et sélectionnez la variable Path, puis cliquez sur "Modifier".
-Ajoutez le chemin C:\Go\bin à la liste.
-Cliquez sur "OK" pour fermer toutes les fenêtres.
-Vérifiez l'installation :
+Naviguez vers le répertoire image-server :
 
-Ouvrez une nouvelle fenêtre de terminal et exécutez la commande suivante pour vérifier que Go est correctement installé :
-bash
-
-go version
-Création du serveur d'images
-Initialiser le projet Go :
-
-bash
-
-mkdir image-server
+```bash
 cd image-server
-go mod init image-server
-Installer les dépendances nécessaires :
+```
 
-bash
+### Installez les dépendances Go définies dans go.mod :
 
-go get github.com/gin-gonic/gin
+```bash
+go mod tidy
+```
 
-Créer la structure des dossiers :
+### Compiler et démarrer le serveur
 
-bash
+Compilez le projet Go :
 
-mkdir -p public/images
-mkdir -p public/videos
-Créer le serveur avec Go (main.go) :
+```bash
+go build
+```
 
-Créez un fichier main.go avec le contenu suivant :
-go
+Démarrez le serveur Go :
 
-package main
+```bash
+./image-server
+```
 
-import (
-    "encoding/base64"
-    "io/ioutil"
-    "net/http"
-    "path/filepath"
-    "time"
+Le serveur d'images Go devrait maintenant être opérationnel sur votre machine locale.
 
-    "github.com/gin-gonic/gin"
-)
+## Configuration de l'environnement Python pour les dépendances
 
-func main() {
-    r := gin.Default()
+Si votre projet utilise des dépendances Python comme TensorFlow, OpenCV, Pytesseract et Pillow, vous devez configurer un environnement Python virtuel pour les gérer séparément.
 
-    r.Use(corsMiddleware())
+### Créer et activer un environnement virtuel Python
 
-    r.POST("/server-image/ajouter-image", ajouterImage)
-    r.GET("/server-image/image/:nom", getImage)
+Ouvrez un nouveau terminal (ou utilisez votre terminal actuel si vous ne l'avez pas fermé depuis l'étape précédente) et exécutez les commandes suivantes :
 
-    r.POST("/server-video/ajouter-video", ajouterVideo)
-    r.GET("/server-video/video/:nom", getVideo)
+Installez virtualenv si ce n'est pas déjà fait :
 
-    r.Run(":7000")
-}
+```bash
+pip install virtualenv
+```
 
-func corsMiddleware() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-        c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE")
-        c.Writer.Header().Set("Access-Control-Allow-Headers", "x-access-token, Origin, X-Requested-With, Content-Type, Accept")
-        if c.Request.Method == "OPTIONS" {
-            c.AbortWithStatus(204)
-            return
-        }
-        c.Next()
-    }
-}
+Créez un nouvel environnement virtuel dans le répertoire image-server (ou utilisez un chemin spécifique si vous préférez) :
 
-func ajouterImage(c *gin.Context) {
-    var request struct {
-        Nom   string `json:"nom"`
-        Base64 string `json:"base64"`
-    }
-    if err := c.BindJSON(&request); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
+```bash
+python -m venv venv
+```
 
-    filename := time.Now().Format("20060102150405") + "_" + request.Nom
-    filePath := filepath.Join("public/images", filename)
-    data, err := base64.StdEncoding.DecodeString(request.Base64)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
+Activez l'environnement virtuel (Windows) :
 
-    if err := ioutil.WriteFile(filePath, data, 0644); err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
+```bash
+venv\Scripts\activate
+```
 
-    c.JSON(http.StatusOK, gin.H{"link": "http://localhost:7000/server-image/image/" + filename})
-}
+Pour Linux/macOS :
 
-func getImage(c *gin.Context) {
-    nom := c.Param("nom")
-    filePath := filepath.Join("public/images", nom)
-    c.File(filePath)
-}
+```bash
+source venv/bin/activate
+```
 
-func ajouterVideo(c *gin.Context) {
-    file, _ := c.FormFile("video")
-    filename := time.Now().Format("20060102150405") + "_" + file.Filename
-    filePath := filepath.Join("public/videos", filename)
+### Installer les dépendances Python
 
-    if err := c.SaveUploadedFile(file, filePath); err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
+Avec l'environnement virtuel activé, installez les dépendances à partir de requirements.txt :
 
-    c.JSON(http.StatusOK, gin.H{"link": "http://localhost:7000/server-video/video/" + filename})
-}
+```bash
+pip install -r requirements.txt
+```
 
-func getVideo(c *gin.Context) {
-    nom := c.Param("nom")
-    filePath := filepath.Join("public/videos", nom)
-    c.File(filePath)
-}
-Lancer le serveur :
+Cela installera TensorFlow, OpenCV, Pytesseract, Pillow et d'autres dépendances spécifiées dans requirements.txt.
 
-bash
+### Exécuter le serveur
 
-<!-- run server -->
+```bash
 go run main.go
+```
 
+### Afficher l'arborescence du répertoire
 
+```bash
 tree H:\recruteProject\image-server /F
-python .\utils\nsfw_detector.py .\public\images\1.jpge-server>
+```
 
+### Exécuter le script Python de détection NSFW
 
-
-
-pour le tree  go build tree.go
-./treecd
+```bash
+python .\utils\nsfw_detector.py .\public\images\1.jpg
+```

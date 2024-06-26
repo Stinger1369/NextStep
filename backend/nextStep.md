@@ -1,4 +1,20 @@
- Performance
+## Backend Node.js avec TypeScript
+
+### Installation du Serveur
+
+Pour installer les dépendances et démarrer le serveur en mode développement :
+
+```bash
+# Installation des dépendances
+yarn install
+
+# Démarrage du serveur en mode développement
+yarn run dev
+
+Assurez-vous d'avoir Yarn installé localement. Vous pouvez l'installer via npm si nécessaire :
+npm install -g yarn
+
+1.Performance
 Caching : Implémentez des mécanismes de mise en cache pour les réponses fréquemment demandées. Utilisez des solutions comme Redis ou Memcached.
 Indexation de la base de données : Assurez-vous que vos bases de données sont correctement indexées pour améliorer les temps de requête.
 Chargement paresseux (Lazy Loading) : Chargez les données uniquement lorsque nécessaire, particulièrement pour les relations entre modèles.
