@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaTimes, FaTrash } from "react-icons/fa";
+import { FaArrowLeft, FaTimes, FaTrash, FaPlus } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./MediaInfo.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -42,12 +42,7 @@ const MediaInfo: React.FC = () => {
 
   useEffect(() => {
     if (userData?.images) {
-      const imageFiles: File[] = userData.images.map(
-        (image) => new File([], image)
-      );
-
       setImagePreviews(userData.images);
-      formik.setValues({ images: imageFiles });
     }
   }, [userData]);
 
@@ -79,7 +74,6 @@ const MediaInfo: React.FC = () => {
 
         try {
           if (base64Images.length === 1) {
-            // Ajouter une seule image
             const image = base64Images[0];
             const imageUrl = await dispatch(
               addImage({ userId: user._id, ...image })
@@ -96,7 +90,6 @@ const MediaInfo: React.FC = () => {
               updateUser({ id: user._id, userData: updatedValues })
             );
           } else {
-            // Ajouter plusieurs images
             const results = await dispatch(
               addImages({ userId: user._id, images: base64Images })
             ).unwrap();
@@ -116,6 +109,17 @@ const MediaInfo: React.FC = () => {
             await dispatch(
               updateUser({ id: user._id, userData: updatedValues })
             );
+
+            const failedImages = results.filter(
+              (result) => result.status === "failed"
+            );
+            if (failedImages.length > 0) {
+              failedImages.forEach((failedImage) => {
+                console.error(
+                  `Error with image "${failedImage.imageName}": ${failedImage.message}`
+                );
+              });
+            }
           }
         } catch (error: any) {
           console.error("Error adding images:", error);
@@ -141,7 +145,7 @@ const MediaInfo: React.FC = () => {
     console.log("Selected image files:", files);
 
     const previews = files.map((file) => URL.createObjectURL(file));
-    setImagePreviews(previews);
+    setImagePreviews((prevPreviews) => [...prevPreviews, ...previews]);
     formik.setFieldValue("images", files);
   };
 
@@ -173,18 +177,21 @@ const MediaInfo: React.FC = () => {
       <form onSubmit={formik.handleSubmit} className="media-info-form">
         <div className="form-group">
           <label htmlFor="images">Upload Images (up to 5)</label>
-          <input
-            type="file"
-            id="images"
-            accept="image/*"
-            multiple
-            onChange={handleImagesChange}
-            className="form-control"
-            disabled={
-              userData?.images?.length !== undefined &&
-              userData.images.length >= 5
-            }
-          />
+          <div className="upload-icon-container">
+            <FaPlus className="upload-icon" />
+            <input
+              type="file"
+              id="images"
+              accept="image/*"
+              multiple
+              onChange={handleImagesChange}
+              className="form-control"
+              disabled={
+                userData?.images?.length !== undefined &&
+                userData.images.length >= 5
+              }
+            />
+          </div>
           {formik.touched.images && formik.errors.images ? (
             <div className="text-danger">
               {Array.isArray(formik.errors.images) &&
@@ -203,6 +210,20 @@ const MediaInfo: React.FC = () => {
                   className="delete-icon"
                   onClick={() => handleDeleteImage(src)}
                 />
+                {imageErrors
+                  .filter((error) => error.imageName === src.split("/").pop())
+                  .map((error, i) => (
+                    <div
+                      key={i}
+                      className="text-danger"
+                      style={{ fontSize: "0.8em" }}
+                    >
+                      Error:{" "}
+                      {userFriendlyMessages[
+                        error.code as keyof typeof userFriendlyMessages
+                      ] || error.message.split(":")[0]}
+                    </div>
+                  ))}
               </div>
             ))}
           </div>
@@ -220,16 +241,6 @@ const MediaInfo: React.FC = () => {
             {maxImagesError}
           </div>
         )}
-        {imageErrors.length > 0 &&
-          imageErrors.map((error, index) => (
-            <div className="alert alert-danger" role="alert" key={index}>
-              {`Error with image "${error.imageName}": ${
-                userFriendlyMessages[
-                  error.code as keyof typeof userFriendlyMessages
-                ] || error.message.split(":")[0]
-              }`}
-            </div>
-          ))}
 
         <div className="button-container">
           <button
