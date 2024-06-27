@@ -10,6 +10,14 @@ interface Address {
   country?: string;
 }
 
+interface SocialLinks {
+  github?: string;
+  twitter?: string;
+  instagram?: string;
+  facebook?: string;
+  discord?: string;
+}
+
 interface User {
   _id: string;
   firstName?: string;
@@ -27,11 +35,13 @@ interface User {
   skills?: string[];
   images?: string[];
   videos?: string[];
+  hobbies?: string[]; // Ajouté pour les hobbies
   sex?: string;
   showAge?: boolean;
   company?: string; // Pour les utilisateurs travaillant dans une seule entreprise
   companyId?: string; // Pour les utilisateurs travaillant dans une seule entreprise
   companies?: string[]; // Pour les utilisateurs gérant plusieurs entreprises
+  socialLinks?: SocialLinks; // Liens de réseaux sociaux
 }
 
 interface UserState {

@@ -2,16 +2,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
-  color: white;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+  background: transparent; /* Rendre le fond transparent */
+  color: black; /* Changer le texte en noir */
 }
 
 .navbar-logo {
-  height: 40px;
+  height: 30px; /* Ajuster la hauteur du logo */
 }
 
 .navbar-links {
@@ -27,14 +23,14 @@
 }
 
 .navbar-links a {
-  color: white;
+  color: black; /* Changer le texte en noir */
   text-decoration: none;
   font-weight: bold;
   transition: color 0.3s;
 }
 
 .navbar-links a:hover {
-  color: #ffdd57;
+  color: #0071e3; /* Changer la couleur au survol */
 }
 
 .navbar-user {
@@ -77,28 +73,28 @@
 }
 
 .navbar-search input {
-  padding: 5px 10px;
+  padding: 2px 5px; /* Diminuer le padding pour rendre la barre de recherche plus fine */
   border: none;
   border-radius: 5px;
 }
 
 .navbar-search button {
-  padding: 5px 10px;
+  padding: 2px 5px; /* Diminuer le padding pour rendre le bouton de recherche plus fin */
   border: none;
   border-radius: 5px;
-  background-color: #ffdd57;
-  color: black;
+  background-color: #0071e3;
+  color: white;
   cursor: pointer;
 }
 
 .navbar-search button:hover {
-  background-color: #ffd700;
+  background-color: #005bb5;
 }
 
 .navbar-separator {
   width: 1px;
-  height: 40px;
-  background-color: white;
+  height: 30px; /* Ajuster la hauteur de la séparation pour correspondre à la nouvelle hauteur de la navbar */
+  background-color: black; /* Changer la couleur en noir */
   margin: 0 20px;
 }
 
@@ -106,4 +102,11 @@
   display: flex;
   list-style: none;
   gap: 20px;
+}
+
+.navbar-profile-btn {
+  background: none;
+  border: none;
+  color: black; /* Changer le texte en noir */
+  cursor: pointer;
 }

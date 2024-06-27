@@ -11,6 +11,14 @@ export interface Address {
   country?: string;
 }
 
+export interface SocialLinks {
+  github?: string;
+  twitter?: string;
+  instagram?: string;
+  facebook?: string;
+  discord?: string;
+}
+
 export interface User {
   _id: string;
   firstName?: string;
@@ -29,11 +37,13 @@ export interface User {
   skills?: string[];
   images?: string[];
   videos?: string[];
+  hobbies?: string[]; // Ajouté pour les hobbies
   sex?: string;
   isVerified: boolean;
   company?: string; // Pour les utilisateurs travaillant dans une seule entreprise
   companyId?: string; // Pour les utilisateurs travaillant dans une seule entreprise
   companies?: string[]; // Pour les utilisateurs gérant plusieurs entreprises
+  socialLinks?: SocialLinks; // Liens de réseaux sociaux
 }
 
 interface AuthState {

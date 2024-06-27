@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './UserProfile.css';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import ModalUserProfile from '../../../components/ModalUserProfile/ModalUserProfile';
 
 const UserProfile: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -13,6 +14,8 @@ const UserProfile: React.FC = () => {
   const authUser = useSelector((state: RootState) => state.auth.user);
   const user = useSelector((state: RootState) => state.user.user);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImageIndex, setModalImageIndex] = useState(0);
 
   useEffect(() => {
     if (authUser?._id) {
@@ -42,13 +45,34 @@ const UserProfile: React.FC = () => {
     }
   };
 
+  const openModal = (index: number) => {
+    setModalImageIndex(index);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleNextModalImage = () => {
+    if (user?.images && user.images.length > 0) {
+      setModalImageIndex((prevIndex) => (prevIndex + 1) % user.images!.length);
+    }
+  };
+
+  const handlePrevModalImage = () => {
+    if (user?.images && user.images.length > 0) {
+      setModalImageIndex((prevIndex) => (prevIndex - 1 + user.images!.length) % user.images!.length);
+    }
+  };
+
   if (!user) {
     return <div>Loading...</div>;
   }
 
   return (
     <div className="user-profile-container container mt-5">
-      <div className="profile-header text-center mb-4 position-relative">
+      <div className="profile-header position-relative">
         <button className="btn btn-outline-primary edit-profile-btn" onClick={handleEditProfile} style={{ position: 'absolute', right: '10px', top: '10px' }}>
           Edit My Profile
         </button>
@@ -61,7 +85,21 @@ const UserProfile: React.FC = () => {
             )}
             <div className="carousel-image-container">
               {user.images.map((image, index) => (
-                <img key={index} src={image} alt={`User ${index + 1}`} className={`carousel-image ${index === currentImageIndex ? 'active' : ''}`} />
+                <img
+                  key={index}
+                  src={image}
+                  alt={`User ${index + 1}`}
+                  className={`carousel-image ${index === currentImageIndex ? 'active' : ''}`}
+                  onClick={() => openModal(index)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      openModal(index);
+                    }
+                  }}
+                  aria-label={`Image ${index + 1}`}
+                />
               ))}
             </div>
             {user.images.length > 1 && (
@@ -88,25 +126,30 @@ const UserProfile: React.FC = () => {
           <strong>Address:</strong> {user.address?.street}, {user.address?.city}, {user.address?.state}, {user.address?.zipCode}, {user.address?.country}
         </p>
       </div>
-      <div className="profile-section mt-4">
-        <h3 className="text-secondary">Professional Information</h3>
-        <p>
-          <strong>Profession:</strong> {user.profession}
-        </p>
-        <p>
-          <strong>Bio:</strong> {user.bio}
-        </p>
-        <div>
-          <strong>Experience:</strong>
-          <ul>{user.experience?.map((exp, index) => <li key={index}>{exp}</li>)}</ul>
+      <div className="row profile-section mt-4">
+        <div className="col-md-6">
+          <h3 className="text-secondary">Professional Information</h3>
+          <p>
+            <strong>Profession:</strong> {user.profession}
+          </p>
+          <p>
+            <strong>Bio:</strong> {user.bio}
+          </p>
+          <div>
+            <strong>Education:</strong>
+            <ul>{user.education?.map((edu, index) => <li key={index}>{edu}</li>)}</ul>
+          </div>
         </div>
-        <div>
-          <strong>Education:</strong>
-          <ul>{user.education?.map((edu, index) => <li key={index}>{edu}</li>)}</ul>
-        </div>
-        <div>
-          <strong>Skills:</strong>
-          <ul>{user.skills?.map((skill, index) => <li key={index}>{skill}</li>)}</ul>
+        <div className="col-md-6 vertical-line">
+          <h3 className="text-secondary">Experience</h3>
+          <div>
+            <strong>Experience:</strong>
+            <ul>{user.experience?.map((exp, index) => <li key={index}>{exp}</li>)}</ul>
+          </div>
+          <div>
+            <strong>Skills:</strong>
+            <ul>{user.skills?.map((skill, index) => <li key={index}>{skill}</li>)}</ul>
+          </div>
         </div>
       </div>
       <div className="profile-section mt-4">
@@ -123,6 +166,7 @@ const UserProfile: React.FC = () => {
           <p>No videos available</p>
         )}
       </div>
+      {user.images && <ModalUserProfile images={user.images} currentIndex={modalImageIndex} isOpen={isModalOpen} onClose={closeModal} onNext={handleNextModalImage} onPrev={handlePrevModalImage} />}
     </div>
   );
 };

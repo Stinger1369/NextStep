@@ -8,6 +8,14 @@ interface Address {
   country?: string;
 }
 
+interface SocialMediaLinks {
+  github?: string;
+  twitter?: string;
+  instagram?: string;
+  facebook?: string;
+  discord?: string;
+}
+
 export interface IUser extends Document {
   firstName?: string;
   lastName?: string;
@@ -24,6 +32,7 @@ export interface IUser extends Document {
   experience?: string[];
   education?: string[];
   skills?: string[];
+  hobbies?: string[];
   images: string[];
   videos: string[];
   verificationCode?: string;
@@ -35,6 +44,7 @@ export interface IUser extends Document {
   company?: string; // Pour les utilisateurs travaillant dans une seule entreprise
   companyId?: string; // Pour les utilisateurs travaillant dans une seule entreprise
   companies?: mongoose.Types.ObjectId[]; // Pour les utilisateurs gérant plusieurs entreprises
+  socialMediaLinks?: SocialMediaLinks;
 }
 
 const UserSchema: Schema = new Schema({
@@ -62,6 +72,7 @@ const UserSchema: Schema = new Schema({
   experience: { type: [String], default: [] },
   education: { type: [String], default: [] },
   skills: { type: [String], default: [] },
+  hobbies: { type: [String], default: [] },
   images: { type: [String], default: [] },
   videos: { type: [String], default: [] },
   verificationCode: { type: String },
@@ -73,6 +84,13 @@ const UserSchema: Schema = new Schema({
   company: { type: String }, // Pour les utilisateurs travaillant dans une seule entreprise
   companyId: { type: String }, // Pour les utilisateurs travaillant dans une seule entreprise
   companies: [{ type: Schema.Types.ObjectId, ref: "Company" }], // Pour les utilisateurs gérant plusieurs entreprises
+  socialMediaLinks: {
+    github: { type: String },
+    twitter: { type: String },
+    instagram: { type: String },
+    facebook: { type: String },
+    discord: { type: String },
+  },
 });
 
 UserSchema.pre<IUser>("save", function (next) {

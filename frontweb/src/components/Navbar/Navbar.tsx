@@ -17,6 +17,14 @@ const Navbar: React.FC = () => {
     navigate('/'); // Redirection vers la page d'accueil après la déconnexion
   };
 
+  const handleProfileClick = () => {
+    if (user && (!user.firstName || !user.lastName)) {
+      navigate('/profile-edit-user/personal-info');
+    } else {
+      navigate('/user-profile');
+    }
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-brand">
@@ -67,9 +75,9 @@ const Navbar: React.FC = () => {
               </div>
             </li>
             <li>
-              <Link to="/user-profile">
+              <button onClick={handleProfileClick} className="navbar-profile-btn">
                 <FaUserCircle /> Profile
-              </Link>
+              </button>
             </li>
           </>
         )}

@@ -53,11 +53,13 @@ export const updateUser = async (req: Request, res: Response) => {
     experience,
     education,
     skills,
+    hobbies, // Ajouté pour les hobbies
     images,
     videos,
     sex,
     dateOfBirth,
     showAge,
+    socialMediaLinks, // Ajouté pour les liens de réseaux sociaux
   } = req.body;
 
   try {
@@ -96,12 +98,14 @@ export const updateUser = async (req: Request, res: Response) => {
           : education.split(",").map((edu: string) => edu.trim()),
       }),
       ...(skills && { skills }),
+      ...(hobbies && { hobbies }), // Ajouté pour les hobbies
       ...(images && { images }),
       ...(videos && { videos }),
       ...(sex && { sex }),
       ...(dateOfBirth && { dateOfBirth }),
       ...(age !== undefined && { age }),
       ...(showAge !== undefined && { showAge }),
+      ...(socialMediaLinks && { socialMediaLinks }), // Ajouté pour les liens de réseaux sociaux
     };
 
     const user = await User.findByIdAndUpdate(id, updateData, {

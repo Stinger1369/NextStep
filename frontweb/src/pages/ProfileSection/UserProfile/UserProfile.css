@@ -11,12 +11,23 @@
   font-size: 2rem;
   color: #000;
   cursor: pointer;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.carousel-control-prev {
+  left: -90px; /* Adjust distance from left */
+}
+
+.carousel-control-next {
+  right: 50%; /* Adjust distance from right */
 }
 
 .carousel-image-container {
   position: relative;
-  width: 80%;
-  height: 500px; /* Adjust height as needed */
+  width: 40%;
+  height: 150px; /* Adjust height as needed */
   overflow: hidden;
 }
 
@@ -49,4 +60,19 @@
 .video-gallery {
   display: flex;
   overflow-x: auto;
+}
+
+.vertical-line {
+  border-left: 1px solid #ccc;
+  padding-left: 15px;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.profile-section h3,
+.profile-section p,
+.profile-section ul {
+  text-align: left;
 }
