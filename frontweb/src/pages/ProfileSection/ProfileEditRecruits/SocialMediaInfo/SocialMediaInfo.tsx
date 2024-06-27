@@ -3,6 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../redux/store';
 import { updateCompany, getCompanyById, createCompany } from '../../../../redux/features/company/companySlice';
 import { useParams, useNavigate } from 'react-router-dom';
+import { FaArrowLeft, FaTimes } from 'react-icons/fa';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './SocialMediaInfo.css';
 
 const SocialMediaInfo: React.FC = () => {
   const { companyId } = useParams<{ companyId: string }>();
@@ -50,27 +53,43 @@ const SocialMediaInfo: React.FC = () => {
     navigate('/profile-edit-recruiter');
   };
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const handleClose = () => {
+    navigate('/');
+  };
+
   return (
-    <div>
+    <div className="social-media-info-container">
+      <div className="header-icons">
+        <FaArrowLeft className="icon" onClick={handleBack} />
+        <FaTimes className="icon" onClick={handleClose} />
+      </div>
       <h2>Social Media Links</h2>
       <form onSubmit={handleSubmit}>
-        <div>
+        <div className="form-group">
           <label htmlFor="linkedin">LinkedIn:</label>
-          <input id="linkedin" name="linkedin" value={socialMediaLinks.linkedin} onChange={handleChange} />
+          <input id="linkedin" name="linkedin" value={socialMediaLinks.linkedin} onChange={handleChange} className="form-control" />
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="facebook">Facebook:</label>
-          <input id="facebook" name="facebook" value={socialMediaLinks.facebook} onChange={handleChange} />
+          <input id="facebook" name="facebook" value={socialMediaLinks.facebook} onChange={handleChange} className="form-control" />
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="twitter">Twitter:</label>
-          <input id="twitter" name="twitter" value={socialMediaLinks.twitter} onChange={handleChange} />
+          <input id="twitter" name="twitter" value={socialMediaLinks.twitter} onChange={handleChange} className="form-control" />
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="instagram">Instagram:</label>
-          <input id="instagram" name="instagram" value={socialMediaLinks.instagram} onChange={handleChange} />
+          <input id="instagram" name="instagram" value={socialMediaLinks.instagram} onChange={handleChange} className="form-control" />
         </div>
-        <button type="submit">Save</button>
+        <div className="button-container">
+          <button type="submit" className="btn btn-primary">
+            Save
+          </button>
+        </div>
       </form>
     </div>
   );

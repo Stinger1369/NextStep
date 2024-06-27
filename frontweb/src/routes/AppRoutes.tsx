@@ -21,11 +21,12 @@ import RecruitCompanyInfo from '../pages/ProfileSection/ProfileEditRecruits/Comp
 import RecruitContactInfo from '../pages/ProfileSection/ProfileEditRecruits/ContactInfo/ContactInfo';
 import RecruitOtherInfo from '../pages/ProfileSection/ProfileEditRecruits/OtherInfo/OtherInfo';
 import RecruitSocialMediaInfo from '../pages/ProfileSection/ProfileEditRecruits/SocialMediaInfo/SocialMediaInfo';
+import UserProfile from '../pages/ProfileSection/UserProfile/UserProfile';
+import PublicUserProfile from '../pages/ProfileSection/PublicUserProfile/PublicUserProfile';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../redux/store';
 import { getCompanies } from '../redux/features/company/companySlice';
 import { useEffect } from 'react';
-
 const AppRoutes: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const status = useSelector((state: RootState) => state.company.status);
@@ -62,6 +63,8 @@ const AppRoutes: React.FC = () => {
         <Route path="/edit-recruit/:companyId/other-info" element={<RecruitOtherInfo />} />
         <Route path="/edit-recruit/:companyId/social-media-info" element={<RecruitSocialMediaInfo />} />
         <Route path="/profile-edit-recruiter" element={user ? <ProfileEditRecruits /> : <Navigate to="/login" />} />
+        <Route path="/user-profile" element={user ? <UserProfile /> : <Navigate to="/login" />} />
+        <Route path="/public-profile/:userId" element={<PublicUserProfile />} />
       </Routes>
     </Router>
   );

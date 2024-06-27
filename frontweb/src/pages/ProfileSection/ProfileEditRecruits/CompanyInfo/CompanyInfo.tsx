@@ -15,6 +15,7 @@ const RecruitCompanyInfo: React.FC<CompanyInfoProps> = ({ isNew }) => {
   const { companyId } = useParams<{ companyId: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const company = useSelector((state: RootState) => state.company.company);
+  const companies = useSelector((state: RootState) => state.company.companies);
   const [companyInfo, setCompanyInfo] = useState({
     companyName: '',
     companyRegistrationNumber: '',
@@ -67,10 +68,18 @@ const RecruitCompanyInfo: React.FC<CompanyInfoProps> = ({ isNew }) => {
     navigate(`/edit-recruit/${companyId}/address-info`);
   };
 
+  const handleBack = () => {
+    if (companies.length === 0) {
+      navigate('/role-selection');
+    } else {
+      navigate('/profile-edit-recruiter');
+    }
+  };
+
   return (
     <div className="company-info-container">
       <div className="header-icons">
-        <FaArrowLeft className="icon" onClick={() => navigate('/role-selection')} />
+        <FaArrowLeft className="icon" onClick={handleBack} />
         <FaTimes className="icon" onClick={() => navigate('/')} />
       </div>
       <h2>Company Information</h2>

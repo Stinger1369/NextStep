@@ -1,8 +1,7 @@
-// src/components/Navbar/Navbar.tsx
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { FaHome, FaInfoCircle, FaUser, FaUserPlus, FaSignOutAlt, FaBriefcase } from 'react-icons/fa';
+import { FaHome, FaInfoCircle, FaUser, FaUserPlus, FaSignOutAlt, FaBriefcase, FaUserCircle } from 'react-icons/fa';
 import logo from '../../assests/Images/nextstep.webp';
 import { RootState, AppDispatch } from '../../redux/store';
 import { performLogout } from '../../redux/features/auth/authLogout';
@@ -58,14 +57,21 @@ const Navbar: React.FC = () => {
             </li>
           </>
         ) : (
-          <li className="navbar-user">
-            <span>Welcome, {user.firstName ? user.firstName : user.emailOrPhone}!</span>
-            <div className="navbar-dropdown">
-              <button onClick={handleLogout}>
-                <FaSignOutAlt /> Logout
-              </button>
-            </div>
-          </li>
+          <>
+            <li className="navbar-user">
+              <span>Welcome, {user.firstName ? user.firstName : user.emailOrPhone}!</span>
+              <div className="navbar-dropdown">
+                <button onClick={handleLogout}>
+                  <FaSignOutAlt /> Logout
+                </button>
+              </div>
+            </li>
+            <li>
+              <Link to="/user-profile">
+                <FaUserCircle /> Profile
+              </Link>
+            </li>
+          </>
         )}
       </ul>
       <div className="navbar-search">
