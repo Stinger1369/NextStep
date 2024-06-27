@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../redux/store';
-import { updateCompany, getCompanyById } from '../../../../redux/features/company/companySlice';
-import { useNavigate } from 'react-router-dom';
+import { updateCompany, getCompanyById, createCompany } from '../../../../redux/features/company/companySlice';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FaArrowLeft, FaTimes } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AddressInfo.css';
 
-interface AddressInfoProps {
-  companyId: string;
-}
-
-const AddressInfo: React.FC<AddressInfoProps> = ({ companyId }) => {
+const AddressInfo: React.FC = () => {
+  const { companyId } = useParams<{ companyId: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const company = useSelector((state: RootState) => state.company.company);
   const [address, setAddress] = useState({
@@ -51,12 +48,22 @@ const AddressInfo: React.FC<AddressInfoProps> = ({ companyId }) => {
   };
 
   const handleSave = () => {
-    dispatch(updateCompany({ id: companyId, companyData: { address } }));
+    if (companyId) {
+      dispatch(updateCompany({ id: companyId, companyData: { address } }));
+    } else {
+      // Assuming you have the company info in the state to create a new company
+      dispatch(createCompany({ address }));
+    }
   };
 
   const handleContinue = () => {
     handleSave();
-    navigate(`/edit-recruit/${companyId}/contact-info`);
+    if (companyId) {
+      navigate(`/edit-recruit/${companyId}/contact-info`);
+    } else {
+      // Navigate to contact info for new company creation
+      navigate(`/edit-recruit/new/contact-info`);
+    }
   };
 
   return (

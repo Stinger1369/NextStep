@@ -1,5 +1,3 @@
-// src/controllers/CompanyController.ts
-
 import { Request, Response } from "express";
 import Company from "../models/Company";
 import User from "../models/User";
@@ -124,26 +122,36 @@ export const updateCompany = async (req: Request, res: Response) => {
 
 export const getCompanies = async (req: Request, res: Response) => {
   const userId = (req as any).user.id;
+  console.log(`Fetching companies for user ID: ${userId}`); // Ajout du log
+
   try {
     const user = await User.findById(userId).populate("companies");
     if (!user) {
+      console.log(`User not found for ID: ${userId}`); // Ajout du log
       return res.status(404).json({ message: "User not found" });
     }
+    console.log(`Companies fetched for user ID: ${userId}`, user.companies); // Ajout du log
     res.status(200).json(user.companies);
   } catch (error) {
+    console.log(`Error fetching companies for user ID: ${userId}`, error); // Ajout du log
     res.status(500).json({ message: "Error fetching companies", error });
   }
 };
 
 export const getCompanyById = async (req: Request, res: Response) => {
   const { id } = req.params;
+  console.log(`Fetching company with ID: ${id}`); // Ajout du log
+
   try {
     const company = await Company.findById(id);
     if (!company) {
+      console.log(`Company not found for ID: ${id}`); // Ajout du log
       return res.status(404).json({ message: "Company not found" });
     }
+    console.log(`Company fetched with ID: ${id}`, company); // Ajout du log
     res.status(200).json(company);
   } catch (error) {
+    console.log(`Error fetching company with ID: ${id}`, error); // Ajout du log
     res.status(500).json({ message: "Error fetching company", error });
   }
 };

@@ -55,11 +55,12 @@ const AppRoutes: React.FC = () => {
         <Route path="/profile-edit-user/bio-skills-info" element={user ? <BioSkillsInfo /> : <Navigate to="/login" />} />
         <Route path="/profile-edit-user/media-info" element={user ? <MediaInfo /> : <Navigate to="/login" />} />
         <Route path="/role-selection" element={user ? <RoleSelection /> : <Navigate to="/login" />} />
-        <Route path="/edit-recruit/:companyId/company-info" element={user ? <RecruitCompanyInfo companyId={user.companyId!} /> : <Navigate to="/login" />} />
-        <Route path="/edit-recruit/:companyId/address-info" element={user ? <RecruitAddressInfo companyId={user.companyId!} /> : <Navigate to="/login" />} />
-        <Route path="/edit-recruit/:companyId/contact-info" element={user ? <RecruitContactInfo companyId={user.companyId!} /> : <Navigate to="/login" />} />
-        <Route path="/edit-recruit/:companyId/other-info" element={user ? <RecruitOtherInfo companyId={user.companyId!} /> : <Navigate to="/login" />} />
-        <Route path="/edit-recruit/:companyId/social-media-info" element={user ? <RecruitSocialMediaInfo companyId={user.companyId!} /> : <Navigate to="/login" />} />
+        <Route path="/edit-recruit/new/company-info" element={<RecruitCompanyInfo isNew />} />
+        <Route path="/edit-recruit/:companyId/company-info" element={<RecruitCompanyInfo />} />
+        <Route path="/edit-recruit/:companyId/address-info" element={<RecruitAddressInfo />} />
+        <Route path="/edit-recruit/:companyId/contact-info" element={<RecruitContactInfo />} />
+        <Route path="/edit-recruit/:companyId/other-info" element={<RecruitOtherInfo />} />
+        <Route path="/edit-recruit/:companyId/social-media-info" element={<RecruitSocialMediaInfo />} />
         <Route path="/profile-edit-recruiter" element={user ? <ProfileEditRecruits /> : <Navigate to="/login" />} />
       </Routes>
     </Router>

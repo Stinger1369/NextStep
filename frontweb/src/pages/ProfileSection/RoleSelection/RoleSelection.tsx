@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
 import { getUserById } from '../../../redux/features/user/userSlice';
-import { getCompanies } from '../../../redux/features/company/companySlice';
+import { getCompanies, initNewCompany } from '../../../redux/features/company/companySlice';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './RoleSelection.css';
 
@@ -25,18 +25,13 @@ const RoleSelection: React.FC = () => {
     fetchUserAndCompanies();
   }, [dispatch, user?._id]);
 
-  useEffect(() => {
-    if (!loading && user?._id && companies.length === 0) {
-      navigate('/edit-recruit/new/company-info');
-    }
-  }, [loading, user, companies.length, navigate]);
-
   const handleRoleSelection = (role: string) => {
     if (user?._id) {
       if (role === 'user') {
         navigate('/profile-edit-user/personal-info');
       } else if (role === 'recruiter') {
         if (companies.length === 0) {
+          dispatch(initNewCompany());
           navigate('/edit-recruit/new/company-info');
         } else {
           navigate('/profile-edit-recruiter');

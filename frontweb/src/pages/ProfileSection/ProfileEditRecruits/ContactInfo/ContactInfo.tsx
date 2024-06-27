@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../redux/store';
-import { updateCompany, getCompanyById } from '../../../../redux/features/company/companySlice';
-import { useNavigate } from 'react-router-dom';
+import { updateCompany, getCompanyById, createCompany } from '../../../../redux/features/company/companySlice';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FaArrowLeft, FaTimes } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ContactInfo.css';
 
-interface ContactInfoProps {
-  companyId: string;
-}
-
-const ContactInfo: React.FC<ContactInfoProps> = ({ companyId }) => {
+const ContactInfo: React.FC = () => {
+  const { companyId } = useParams<{ companyId: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const company = useSelector((state: RootState) => state.company.company);
   const [contactInfo, setContactInfo] = useState({
@@ -29,8 +26,8 @@ const ContactInfo: React.FC<ContactInfoProps> = ({ companyId }) => {
   useEffect(() => {
     if (company) {
       setContactInfo({
-        contactEmail: company.contactEmail,
-        contactPhone: company.contactPhone
+        contactEmail: company.contactEmail || '',
+        contactPhone: company.contactPhone || ''
       });
     }
   }, [company]);
@@ -43,12 +40,22 @@ const ContactInfo: React.FC<ContactInfoProps> = ({ companyId }) => {
   };
 
   const handleSave = () => {
-    dispatch(updateCompany({ id: companyId, companyData: contactInfo }));
+    if (companyId) {
+      dispatch(updateCompany({ id: companyId, companyData: contactInfo }));
+    } else {
+      // Assuming you have the company info in the state to create a new company
+      dispatch(createCompany({ contactEmail: contactInfo.contactEmail, contactPhone: contactInfo.contactPhone }));
+    }
   };
 
   const handleContinue = () => {
     handleSave();
-    navigate(`/edit-recruit/${companyId}/other-info`);
+    if (companyId) {
+      navigate(`/edit-recruit/${companyId}/other-info`);
+    } else {
+      // Navigate to other info for new company creation
+      navigate(`/edit-recruit/new/other-info`);
+    }
   };
 
   return (

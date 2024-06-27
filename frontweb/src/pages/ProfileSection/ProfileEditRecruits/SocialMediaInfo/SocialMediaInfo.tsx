@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../redux/store';
-import { updateCompany, getCompanyById } from '../../../../redux/features/company/companySlice';
+import { updateCompany, getCompanyById, createCompany } from '../../../../redux/features/company/companySlice';
+import { useParams, useNavigate } from 'react-router-dom';
 
-interface SocialMediaInfoProps {
-  companyId: string;
-}
-
-const SocialMediaInfo: React.FC<SocialMediaInfoProps> = ({ companyId }) => {
+const SocialMediaInfo: React.FC = () => {
+  const { companyId } = useParams<{ companyId: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const company = useSelector((state: RootState) => state.company.company);
   const [socialMediaLinks, setSocialMediaLinks] = useState({
@@ -16,6 +14,7 @@ const SocialMediaInfo: React.FC<SocialMediaInfoProps> = ({ companyId }) => {
     twitter: '',
     instagram: ''
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (companyId) {
@@ -43,7 +42,12 @@ const SocialMediaInfo: React.FC<SocialMediaInfoProps> = ({ companyId }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await dispatch(updateCompany({ id: companyId, companyData: { socialMediaLinks } }));
+    if (companyId) {
+      await dispatch(updateCompany({ id: companyId, companyData: { socialMediaLinks } }));
+    } else {
+      await dispatch(createCompany({ socialMediaLinks }));
+    }
+    navigate('/profile-edit-recruiter');
   };
 
   return (

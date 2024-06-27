@@ -3,17 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { RootState, AppDispatch } from '../../../../redux/store';
-import { updateCompany, getCompanyById } from '../../../../redux/features/company/companySlice';
-import { useNavigate } from 'react-router-dom';
+import { updateCompany, getCompanyById, createCompany } from '../../../../redux/features/company/companySlice';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FaArrowLeft, FaTimes } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './OtherInfo.css';
 
-interface OtherInfoProps {
-  companyId: string;
-}
-
-const OtherInfo: React.FC<OtherInfoProps> = ({ companyId }) => {
+const OtherInfo: React.FC = () => {
+  const { companyId } = useParams<{ companyId: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const company = useSelector((state: RootState) => state.company.company);
   const navigate = useNavigate();
@@ -65,7 +62,11 @@ const OtherInfo: React.FC<OtherInfoProps> = ({ companyId }) => {
         subsidiaries: values.subsidiaries.split(',').map((item) => item.trim()),
         certifications: values.certifications.split(',').map((item) => item.trim())
       };
-      await dispatch(updateCompany({ id: companyId, companyData }));
+      if (companyId) {
+        await dispatch(updateCompany({ id: companyId, companyData }));
+      } else {
+        await dispatch(createCompany(companyData));
+      }
     }
   });
 
@@ -75,7 +76,11 @@ const OtherInfo: React.FC<OtherInfoProps> = ({ companyId }) => {
 
   const handleContinue = () => {
     formik.submitForm();
-    navigate(`/edit-recruit/${companyId}/social-media-info`);
+    if (companyId) {
+      navigate(`/edit-recruit/${companyId}/social-media-info`);
+    } else {
+      navigate(`/edit-recruit/new/social-media-info`);
+    }
   };
 
   return (

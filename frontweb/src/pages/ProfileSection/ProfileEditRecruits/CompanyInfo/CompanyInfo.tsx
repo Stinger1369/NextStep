@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../redux/store';
-import { updateCompany, getCompanyById } from '../../../../redux/features/company/companySlice';
-import { useNavigate } from 'react-router-dom';
+import { getCompanyById, updateCompany, createCompany } from '../../../../redux/features/company/companySlice';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FaArrowLeft, FaTimes } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './CompanyInfo.css';
 
 interface CompanyInfoProps {
-  companyId: string;
+  isNew?: boolean;
 }
 
-const CompanyInfo: React.FC<CompanyInfoProps> = ({ companyId }) => {
+const RecruitCompanyInfo: React.FC<CompanyInfoProps> = ({ isNew }) => {
+  const { companyId } = useParams<{ companyId: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const company = useSelector((state: RootState) => state.company.company);
   const [companyInfo, setCompanyInfo] = useState({
@@ -23,10 +24,17 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({ companyId }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (companyId) {
+    if (companyId && !isNew) {
       dispatch(getCompanyById(companyId));
+    } else {
+      setCompanyInfo({
+        companyName: '',
+        companyRegistrationNumber: '',
+        numberOfEmployees: 0,
+        industryType: ''
+      });
     }
-  }, [companyId, dispatch]);
+  }, [companyId, dispatch, isNew]);
 
   useEffect(() => {
     if (company) {
@@ -47,7 +55,11 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({ companyId }) => {
   };
 
   const handleSave = () => {
-    dispatch(updateCompany({ id: companyId, companyData: companyInfo }));
+    if (isNew) {
+      dispatch(createCompany(companyInfo));
+    } else if (companyId) {
+      dispatch(updateCompany({ id: companyId, companyData: companyInfo }));
+    }
   };
 
   const handleContinue = () => {
@@ -92,4 +104,4 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({ companyId }) => {
   );
 };
 
-export default CompanyInfo;
+export default RecruitCompanyInfo;

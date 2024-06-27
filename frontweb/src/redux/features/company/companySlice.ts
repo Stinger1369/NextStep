@@ -1,3 +1,5 @@
+// src/redux/features/company/companySlice.ts
+
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '../../../axiosConfig';
 
@@ -64,10 +66,6 @@ export const createCompany = createAsyncThunk('company/createCompany', async (co
 });
 
 export const updateCompany = createAsyncThunk('company/updateCompany', async ({ id, companyData }: { id: string; companyData: Partial<Company> }) => {
-  // Transform date to correct format before sending
-  if (companyData.foundedDate && typeof companyData.foundedDate === 'string') {
-    companyData.foundedDate = new Date(companyData.foundedDate);
-  }
   const response = await axiosInstance.put(`/companies/${id}`, companyData);
   return response.data;
 });
@@ -80,7 +78,35 @@ export const deleteCompany = createAsyncThunk('company/deleteCompany', async (id
 const companySlice = createSlice({
   name: 'company',
   initialState,
-  reducers: {},
+  reducers: {
+    initNewCompany(state) {
+      state.company = {
+        _id: '',
+        companyName: '',
+        companyRegistrationNumber: '',
+        address: {
+          street: '',
+          city: '',
+          state: '',
+          zipCode: '',
+          country: ''
+        },
+        numberOfEmployees: 0,
+        industryType: '',
+        contactEmail: '',
+        contactPhone: '',
+        website: '',
+        description: '',
+        foundedDate: null,
+        logo: '',
+        socialMediaLinks: {},
+        companySize: 'small',
+        headquarterLocation: '',
+        subsidiaries: [],
+        certifications: []
+      };
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getCompanies.pending, (state) => {
@@ -146,4 +172,5 @@ const companySlice = createSlice({
   }
 });
 
+export const { initNewCompany } = companySlice.actions;
 export default companySlice.reducer;
