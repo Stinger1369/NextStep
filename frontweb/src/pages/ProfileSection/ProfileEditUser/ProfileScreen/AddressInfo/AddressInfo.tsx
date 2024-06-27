@@ -1,16 +1,13 @@
-import React, { useEffect } from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaTimes } from "react-icons/fa";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./AddressInfo.css";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../../../../redux/store";
-import {
-  updateUser,
-  getUserById,
-} from "../../../../../redux/features/user/userSlice";
+import React, { useEffect } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft, FaTimes } from 'react-icons/fa';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './AddressInfo.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../../../../../redux/store';
+import { updateUser, getUserById } from '../../../../../redux/features/user/userSlice';
 
 const AddressInfo: React.FC = () => {
   const navigate = useNavigate();
@@ -27,49 +24,49 @@ const AddressInfo: React.FC = () => {
   useEffect(() => {
     if (userData && userData.address) {
       formik.setValues({
-        street: userData.address.street || "",
-        city: userData.address.city || "",
-        state: userData.address.state || "",
-        zipCode: userData.address.zipCode || "",
-        country: userData.address.country || "",
+        street: userData.address.street || '',
+        city: userData.address.city || '',
+        state: userData.address.state || '',
+        zipCode: userData.address.zipCode || '',
+        country: userData.address.country || ''
       });
     }
   }, [userData]);
 
   const formik = useFormik({
     initialValues: {
-      street: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      country: "",
+      street: '',
+      city: '',
+      state: '',
+      zipCode: '',
+      country: ''
     },
     validationSchema: Yup.object({
-      street: Yup.string().required("Required"),
-      city: Yup.string().required("Required"),
-      state: Yup.string().required("Required"),
-      zipCode: Yup.string().required("Required"),
-      country: Yup.string().required("Required"),
+      street: Yup.string().required('Required'),
+      city: Yup.string().required('Required'),
+      state: Yup.string().required('Required'),
+      zipCode: Yup.string().required('Required'),
+      country: Yup.string().required('Required')
     }),
     onSubmit: async (values) => {
       if (user?._id) {
         const updatedValues = {
           ...userData,
-          address: values,
+          address: values
         };
-        console.log("Updating user with address:", updatedValues);
+        console.log('Updating user with address:', updatedValues);
         await dispatch(updateUser({ id: user._id, userData: updatedValues }));
-        navigate("/profile-edit-user/profession-info");
+        navigate('/profile-edit-user/profession-info');
       }
-    },
+    }
   });
 
   const handleSave = async () => {
-    console.log("Saved Address Info:", formik.values);
+    console.log('Saved Address Info:', formik.values);
     if (user?._id) {
       const updatedValues = {
         ...userData,
-        address: formik.values,
+        address: formik.values
       };
       await dispatch(updateUser({ id: user._id, userData: updatedValues }));
     }
@@ -80,9 +77,9 @@ const AddressInfo: React.FC = () => {
       <div className="header-icons">
         <FaArrowLeft
           className="icon"
-          onClick={() => navigate("/profile-edit-user/personal-info")}
+          onClick={() => navigate('/profile-edit-user/personal-info')}
         />
-        <FaTimes className="icon" onClick={() => navigate("/")} />
+        <FaTimes className="icon" onClick={() => navigate('/')} />
       </div>
       <form onSubmit={formik.handleSubmit} className="address-info-form">
         <div className="mb-3">
@@ -92,7 +89,7 @@ const AddressInfo: React.FC = () => {
           <input
             type="text"
             id="street"
-            {...formik.getFieldProps("street")}
+            {...formik.getFieldProps('street')}
             className="form-control"
           />
           {formik.touched.street && formik.errors.street ? (
@@ -104,12 +101,7 @@ const AddressInfo: React.FC = () => {
           <label htmlFor="city" className="form-label">
             City
           </label>
-          <input
-            type="text"
-            id="city"
-            {...formik.getFieldProps("city")}
-            className="form-control"
-          />
+          <input type="text" id="city" {...formik.getFieldProps('city')} className="form-control" />
           {formik.touched.city && formik.errors.city ? (
             <div className="text-danger">{formik.errors.city}</div>
           ) : null}
@@ -122,7 +114,7 @@ const AddressInfo: React.FC = () => {
           <input
             type="text"
             id="state"
-            {...formik.getFieldProps("state")}
+            {...formik.getFieldProps('state')}
             className="form-control"
           />
           {formik.touched.state && formik.errors.state ? (
@@ -137,7 +129,7 @@ const AddressInfo: React.FC = () => {
           <input
             type="text"
             id="zipCode"
-            {...formik.getFieldProps("zipCode")}
+            {...formik.getFieldProps('zipCode')}
             className="form-control"
           />
           {formik.touched.zipCode && formik.errors.zipCode ? (
@@ -152,7 +144,7 @@ const AddressInfo: React.FC = () => {
           <input
             type="text"
             id="country"
-            {...formik.getFieldProps("country")}
+            {...formik.getFieldProps('country')}
             className="form-control"
           />
           {formik.touched.country && formik.errors.country ? (
@@ -161,11 +153,7 @@ const AddressInfo: React.FC = () => {
         </div>
 
         <div className="button-container mt-3">
-          <button
-            type="button"
-            className="btn btn-secondary me-2"
-            onClick={handleSave}
-          >
+          <button type="button" className="btn btn-secondary me-2" onClick={handleSave}>
             Save
           </button>
           <button type="submit" className="btn btn-primary">

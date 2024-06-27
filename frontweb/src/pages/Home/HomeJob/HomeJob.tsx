@@ -1,5 +1,5 @@
-import React from "react";
-import "./HomeJob.css";
+import React from 'react';
+import './HomeJob.css';
 
 const HomeJob: React.FC = () => {
   return (
@@ -18,7 +18,7 @@ const HomeJob: React.FC = () => {
         <li>Marketing</li>
         <li>Ressources humaines</li>
         <li>
-          <a href="#">Voir plus</a>
+          <a href="http://example.com">Voir plus</a>
         </li>
       </ul>
     </div>

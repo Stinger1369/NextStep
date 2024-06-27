@@ -1,12 +1,12 @@
 // src/index.tsx
-import React from "react";
-import { createRoot } from "react-dom/client";
-import { Provider } from "react-redux";
-import store from "./redux/store";
-import App from "./App";
-import "./index.css";
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
+import store from './redux/store';
+import App from './App';
+import './index.css';
 
-const container = document.getElementById("root");
+const container = document.getElementById('root');
 
 if (container) {
   const root = createRoot(container);
@@ -18,5 +18,5 @@ if (container) {
     </React.StrictMode>
   );
 } else {
-  console.error("Root container missing in index.html");
+  console.error('Root container missing in index.html');
 }

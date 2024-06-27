@@ -1,16 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaTimes } from "react-icons/fa";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./PersonalInfo.css";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../../../../redux/store";
-import {
-  updateUser,
-  getUserById,
-} from "../../../../../redux/features/user/userSlice";
+import React, { useEffect, useState } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft, FaTimes } from 'react-icons/fa';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './PersonalInfo.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../../../../../redux/store';
+import { updateUser, getUserById } from '../../../../../redux/features/user/userSlice';
 
 const PersonalInfo: React.FC = () => {
   const navigate = useNavigate();
@@ -29,14 +26,14 @@ const PersonalInfo: React.FC = () => {
   useEffect(() => {
     if (userData) {
       formik.setValues({
-        firstName: userData.firstName || "",
-        lastName: userData.lastName || "",
-        phone: userData.phone || "",
+        firstName: userData.firstName || '',
+        lastName: userData.lastName || '',
+        phone: userData.phone || '',
         dateOfBirth: userData.dateOfBirth
           ? new Date(userData.dateOfBirth).toISOString().substring(0, 10)
-          : "",
-        sex: userData.sex || "",
-        showAge: userData.showAge || false,
+          : '',
+        sex: userData.sex || '',
+        showAge: userData.showAge || false
       });
       if (userData.dateOfBirth) {
         calculateAge(userData.dateOfBirth);
@@ -49,10 +46,7 @@ const PersonalInfo: React.FC = () => {
     const now = new Date();
     let calculatedAge = now.getFullYear() - birthDate.getFullYear();
     const monthDiff = now.getMonth() - birthDate.getMonth();
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && now.getDate() < birthDate.getDate())
-    ) {
+    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birthDate.getDate())) {
       calculatedAge--;
     }
     setAge(calculatedAge);
@@ -60,12 +54,12 @@ const PersonalInfo: React.FC = () => {
 
   const formik = useFormik({
     initialValues: {
-      firstName: "",
-      lastName: "",
-      phone: "",
-      dateOfBirth: "",
-      sex: "",
-      showAge: false,
+      firstName: '',
+      lastName: '',
+      phone: '',
+      dateOfBirth: '',
+      sex: '',
+      showAge: false
     },
     validationSchema: Yup.object({
       firstName: Yup.string(),
@@ -73,21 +67,19 @@ const PersonalInfo: React.FC = () => {
       phone: Yup.string(),
       dateOfBirth: Yup.date().nullable(),
       sex: Yup.string(),
-      showAge: Yup.boolean(),
+      showAge: Yup.boolean()
     }),
     onSubmit: async (values) => {
       if (user?._id) {
         const updatedValues = {
           ...values,
-          dateOfBirth: values.dateOfBirth
-            ? new Date(values.dateOfBirth)
-            : undefined,
+          dateOfBirth: values.dateOfBirth ? new Date(values.dateOfBirth) : undefined
         };
-        console.log("Updating user with values:", updatedValues);
+        console.log('Updating user with values:', updatedValues);
         await dispatch(updateUser({ id: user._id, userData: updatedValues }));
-        navigate("/profile-edit-user/address-info");
+        navigate('/profile-edit-user/address-info');
       }
-    },
+    }
   });
 
   return (
@@ -95,13 +87,10 @@ const PersonalInfo: React.FC = () => {
       {!userData ? (
         <div>Loading user data...</div>
       ) : (
-        <form
-          onSubmit={formik.handleSubmit}
-          className="personal-info-form container"
-        >
+        <form onSubmit={formik.handleSubmit} className="personal-info-form container">
           <div className="header-icons">
             <FaArrowLeft className="icon" onClick={() => navigate(-1)} />
-            <FaTimes className="icon" onClick={() => navigate("/")} />
+            <FaTimes className="icon" onClick={() => navigate('/')} />
           </div>
           <div className="row">
             <div className="col-md-6 form-field">
@@ -112,7 +101,7 @@ const PersonalInfo: React.FC = () => {
                 type="text"
                 id="firstName"
                 className="form-control"
-                {...formik.getFieldProps("firstName")}
+                {...formik.getFieldProps('firstName')}
               />
               {formik.touched.firstName && formik.errors.firstName ? (
                 <div className="text-danger">{formik.errors.firstName}</div>
@@ -126,7 +115,7 @@ const PersonalInfo: React.FC = () => {
                 type="text"
                 id="lastName"
                 className="form-control"
-                {...formik.getFieldProps("lastName")}
+                {...formik.getFieldProps('lastName')}
               />
               {formik.touched.lastName && formik.errors.lastName ? (
                 <div className="text-danger">{formik.errors.lastName}</div>
@@ -140,7 +129,7 @@ const PersonalInfo: React.FC = () => {
                 type="text"
                 id="phone"
                 className="form-control"
-                {...formik.getFieldProps("phone")}
+                {...formik.getFieldProps('phone')}
               />
               {formik.touched.phone && formik.errors.phone ? (
                 <div className="text-danger">{formik.errors.phone}</div>
@@ -154,7 +143,7 @@ const PersonalInfo: React.FC = () => {
                 type="date"
                 id="dateOfBirth"
                 className="form-control"
-                {...formik.getFieldProps("dateOfBirth")}
+                {...formik.getFieldProps('dateOfBirth')}
               />
               {formik.touched.dateOfBirth && formik.errors.dateOfBirth ? (
                 <div className="text-danger">{formik.errors.dateOfBirth}</div>
@@ -164,11 +153,7 @@ const PersonalInfo: React.FC = () => {
               <label htmlFor="sex" className="form-label">
                 Sex
               </label>
-              <select
-                id="sex"
-                className="form-control"
-                {...formik.getFieldProps("sex")}
-              >
+              <select id="sex" className="form-control" {...formik.getFieldProps('sex')}>
                 <option value="" label="Select sex" />
                 <option value="male" label="Male" />
                 <option value="female" label="Female" />
@@ -186,26 +171,17 @@ const PersonalInfo: React.FC = () => {
                 type="text"
                 id="age"
                 className="form-control"
-                value={age !== null ? age : ""}
+                value={age !== null ? age : ''}
                 readOnly
               />
-                <label htmlFor="showAge" className="form-label">
+              <label htmlFor="showAge" className="form-label">
                 Show Age
               </label>
-              <input
-                type="checkbox"
-                id="showAge"
-                {...formik.getFieldProps("showAge")}
-              />
+              <input type="checkbox" id="showAge" {...formik.getFieldProps('showAge')} />
             </div>
-
           </div>
           <div className="button-container mt-3">
-            <button
-              type="button"
-              className="btn btn-secondary me-2"
-              onClick={formik.submitForm}
-            >
+            <button type="button" className="btn btn-secondary me-2" onClick={formik.submitForm}>
               Save
             </button>
             <button type="submit" className="btn btn-primary">

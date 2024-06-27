@@ -1,5 +1,5 @@
-import React from "react";
-import "./EventsActivities.css";
+import React from 'react';
+import './EventsActivities.css';
 
 const EventsActivities: React.FC = () => {
   return (

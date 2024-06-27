@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from "react";
-import Cropper from "react-easy-crop";
-import ReactCrop, { Crop, PixelCrop } from "react-image-crop";
-import { Area } from "react-easy-crop/types";
-import { FiCheck, FiX } from "react-icons/fi";
-import "react-image-crop/dist/ReactCrop.css";
-import "./FileUploadCrop.css";
+import React, { useState, useCallback } from 'react';
+import Cropper from 'react-easy-crop';
+import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
+import { Area } from 'react-easy-crop/types';
+import { FiCheck, FiX } from 'react-icons/fi';
+import 'react-image-crop/dist/ReactCrop.css';
+import './FileUploadCrop.css';
 
 interface FileUploadCropProps {
   imageSrc: string;
@@ -12,11 +12,7 @@ interface FileUploadCropProps {
   onClose: () => void;
 }
 
-const FileUploadCrop: React.FC<FileUploadCropProps> = ({
-  imageSrc,
-  onCropComplete,
-  onClose,
-}) => {
+const FileUploadCrop: React.FC<FileUploadCropProps> = ({ imageSrc, onCropComplete, onClose }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
@@ -32,26 +28,23 @@ const FileUploadCrop: React.FC<FileUploadCropProps> = ({
     setZoom(zoom);
   };
 
-  const onCropCompleteInternal = useCallback(
-    (croppedArea: Area, croppedAreaPixels: Area) => {
-      setCroppedAreaPixels(croppedAreaPixels);
-    },
-    []
-  );
+  const onCropCompleteInternal = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
 
   const createImage = (url: string) =>
     new Promise<HTMLImageElement>((resolve, reject) => {
       const image = new Image();
-      image.addEventListener("load", () => resolve(image));
-      image.addEventListener("error", (error) => reject(error));
-      image.setAttribute("crossOrigin", "anonymous");
+      image.addEventListener('load', () => resolve(image));
+      image.addEventListener('error', (error) => reject(error));
+      image.setAttribute('crossOrigin', 'anonymous');
       image.src = url;
     });
 
   const getCroppedImg = async (imageSrc: string, crop: Area | PixelCrop) => {
     const image = await createImage(imageSrc);
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
 
     if (!ctx) {
       return null;
@@ -79,9 +72,9 @@ const FileUploadCrop: React.FC<FileUploadCropProps> = ({
         if (blob) {
           resolve(blob);
         } else {
-          reject(new Error("Canvas is empty"));
+          reject(new Error('Canvas is empty'));
         }
-      }, "image/jpeg");
+      }, 'image/jpeg');
     });
   };
 
@@ -155,7 +148,7 @@ const FileUploadCrop: React.FC<FileUploadCropProps> = ({
           onClick={() => {
             setAspect(undefined);
             setUseEasyCrop(false);
-            setFreeCrop({ unit: "px", x: 0, y: 0, width: 100, height: 100 });
+            setFreeCrop({ unit: 'px', x: 0, y: 0, width: 100, height: 100 });
           }}
         >
           Libre

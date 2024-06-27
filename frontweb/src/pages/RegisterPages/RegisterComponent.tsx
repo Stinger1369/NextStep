@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { AppDispatch } from "../../redux/store";
-import { registerUser } from "../../redux/features/auth/authRegister";
-import "./RegisterComponent.css";
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { AppDispatch } from '../../redux/store';
+import { registerUser } from '../../redux/features/auth/authRegister';
+import './RegisterComponent.css';
 
 const RegisterComponent: React.FC = () => {
-  const [emailOrPhone, setEmailOrPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [emailOrPhone, setEmailOrPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const [error, setError] = useState<string | null>(null);
@@ -17,19 +17,19 @@ const RegisterComponent: React.FC = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError('Passwords do not match.');
       return;
     }
 
     const formData = new FormData();
-    formData.append("emailOrPhone", emailOrPhone);
-    formData.append("password", password);
+    formData.append('emailOrPhone', emailOrPhone);
+    formData.append('password', password);
 
     try {
       await registerUser(formData, dispatch);
-      navigate("/verify-email", { state: { emailOrPhone } });
+      navigate('/verify-email', { state: { emailOrPhone } });
     } catch (error) {
-      setError("Error registering user. Please check the form and try again.");
+      setError('Error registering user. Please check the form and try again.');
     }
   };
 

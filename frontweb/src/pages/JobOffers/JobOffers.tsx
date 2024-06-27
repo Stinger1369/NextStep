@@ -1,5 +1,5 @@
 // pages/JobOffers/JobOffers.tsx
-import React from "react";
+import React from 'react';
 
 const JobOffers: React.FC = () => {
   return (

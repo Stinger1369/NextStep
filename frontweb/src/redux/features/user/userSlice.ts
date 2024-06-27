@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axiosInstance from "../../../axiosConfig";
-import { RootState } from "../../store";
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import axiosInstance from '../../../axiosConfig';
+import { RootState } from '../../store';
 
 interface Address {
   street?: string;
@@ -35,113 +35,104 @@ interface User {
 interface UserState {
   users: User[];
   user: User | null;
-  status: "idle" | "loading" | "succeeded" | "failed";
+  status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
 
 const initialState: UserState = {
   users: [],
   user: null,
-  status: "idle",
-  error: null,
+  status: 'idle',
+  error: null
 };
 
-export const getUsers = createAsyncThunk("user/getUsers", async () => {
-  const response = await axiosInstance.get("/users");
+export const getUsers = createAsyncThunk('user/getUsers', async () => {
+  const response = await axiosInstance.get('/users');
   return response.data;
 });
 
-export const getUserById = createAsyncThunk(
-  "user/getUserById",
-  async (id: string) => {
-    const response = await axiosInstance.get(`/users/${id}`);
-    return response.data;
-  }
-);
+export const getUserById = createAsyncThunk('user/getUserById', async (id: string) => {
+  const response = await axiosInstance.get(`/users/${id}`);
+  return response.data;
+});
 
 export const updateUser = createAsyncThunk(
-  "user/updateUser",
-  async (
-    { id, userData }: { id: string; userData: Partial<User> },
-    { getState }
-  ) => {
+  'user/updateUser',
+  async ({ id, userData }: { id: string; userData: Partial<User> }, { getState }) => {
     const state = getState() as RootState;
     const token = state.auth.token;
 
     try {
       const response = await axiosInstance.put(`/users/${id}`, userData, {
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
+          Authorization: `Bearer ${token}`
+        }
       });
-      console.log("User updated successfully:", response.data);
+      console.log('User updated successfully:', response.data);
       return response.data;
     } catch (error) {
-      console.error("Error updating user:", error);
+      console.error('Error updating user:', error);
       throw error;
     }
   }
 );
 
-export const deleteUser = createAsyncThunk(
-  "user/deleteUser",
-  async (id: string) => {
-    await axiosInstance.delete(`/users/${id}`);
-    return id;
-  }
-);
+export const deleteUser = createAsyncThunk('user/deleteUser', async (id: string) => {
+  await axiosInstance.delete(`/users/${id}`);
+  return id;
+});
 
 const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(getUsers.pending, (state) => {
-        state.status = "loading";
+        state.status = 'loading';
       })
       .addCase(getUsers.fulfilled, (state, action: PayloadAction<User[]>) => {
-        state.status = "succeeded";
+        state.status = 'succeeded';
         state.users = action.payload;
       })
       .addCase(getUsers.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message || "Failed to fetch users";
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to fetch users';
       })
       .addCase(getUserById.pending, (state) => {
-        state.status = "loading";
+        state.status = 'loading';
       })
       .addCase(getUserById.fulfilled, (state, action: PayloadAction<User>) => {
-        state.status = "succeeded";
+        state.status = 'succeeded';
         state.user = action.payload;
       })
       .addCase(getUserById.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message || "Failed to fetch user";
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to fetch user';
       })
       .addCase(updateUser.pending, (state) => {
-        state.status = "loading";
+        state.status = 'loading';
       })
       .addCase(updateUser.fulfilled, (state, action: PayloadAction<User>) => {
-        state.status = "succeeded";
+        state.status = 'succeeded';
         state.user = action.payload;
       })
       .addCase(updateUser.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message || "Failed to update user";
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to update user';
       })
       .addCase(deleteUser.pending, (state) => {
-        state.status = "loading";
+        state.status = 'loading';
       })
       .addCase(deleteUser.fulfilled, (state, action: PayloadAction<string>) => {
-        state.status = "succeeded";
+        state.status = 'succeeded';
         state.users = state.users.filter((user) => user._id !== action.payload);
       })
       .addCase(deleteUser.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message || "Failed to delete user";
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to delete user';
       });
-  },
+  }
 });
 
 export default userSlice.reducer;

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import FileUploadCrop from "../CropImage/FileUploadCrop";
-import "./FileUpload.css";
-import { Area } from "react-easy-crop/types";
+import React, { useState } from 'react';
+import FileUploadCrop from '../CropImage/FileUploadCrop';
+import './FileUpload.css';
+import { Area } from 'react-easy-crop/types';
 
 interface FileUploadProps {
   onImagesChange: (files: File[]) => void;
@@ -22,7 +22,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   imagePreviews,
   videoPreview,
   uploadProgress,
-  videoProgress,
+  videoProgress
 }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [croppingImage, setCroppingImage] = useState<string | null>(null);
@@ -47,8 +47,8 @@ const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   const handleCropComplete = (croppedImage: Blob) => {
-    const newFile = new File([croppedImage], "cropped.jpg", {
-      type: "image/jpeg",
+    const newFile = new File([croppedImage], 'cropped.jpg', {
+      type: 'image/jpeg'
     });
     onImagesChange([newFile]);
     setCroppingImage(null);
@@ -69,15 +69,8 @@ const FileUpload: React.FC<FileUploadProps> = ({
         <div className="previews">
           {imagePreviews.map((src, index) => (
             <div key={index} className="preview">
-              <img
-                src={src}
-                alt={`Preview ${index}`}
-                onClick={() => openCropModal(src)}
-              />
-              <button
-                className="remove-button"
-                onClick={() => onRemoveImage(index)}
-              >
+              <img src={src} alt={`Preview ${index}`} onClick={() => openCropModal(src)} />
+              <button className="remove-button" onClick={() => onRemoveImage(index)}>
                 X
               </button>
               <progress value={uploadProgress[index]} max="100" />

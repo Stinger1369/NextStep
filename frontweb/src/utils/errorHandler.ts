@@ -1,6 +1,6 @@
 // src/utils/errorHandler.ts
 
-import { userFriendlyMessages } from "./errorMessages";
+import { userFriendlyMessages } from './errorMessages';
 
 export interface ImageError {
   // Ajoutez 'export' ici
@@ -11,15 +11,14 @@ export interface ImageError {
 }
 
 export const handleImageErrors = (results: ImageError[]) => {
-  const failedImages = results.filter((result) => result.status === "failed");
+  const failedImages = results.filter((result) => result.status === 'failed');
   if (failedImages.length > 0) {
     failedImages.forEach((failedImage) => {
-      const errorMessage = failedImage.message || "Unknown error occurred";
+      const errorMessage = failedImage.message || 'Unknown error occurred';
       console.error(
         `Error with image "${failedImage.imageName}": ${
-          userFriendlyMessages[
-            failedImage.code as keyof typeof userFriendlyMessages
-          ] || errorMessage
+          userFriendlyMessages[failedImage.code as keyof typeof userFriendlyMessages] ||
+          errorMessage
         }`
       );
     });

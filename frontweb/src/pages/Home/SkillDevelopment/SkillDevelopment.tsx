@@ -1,5 +1,5 @@
-import React from "react";
-import "./SkillDevelopment.css";
+import React from 'react';
+import './SkillDevelopment.css';
 
 const SkillDevelopment: React.FC = () => {
   return (

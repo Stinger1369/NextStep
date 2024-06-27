@@ -1,5 +1,5 @@
-import React from "react";
-import "./PostJob.css";
+import React from 'react';
+import './PostJob.css';
 
 const PostJob: React.FC = () => {
   return (

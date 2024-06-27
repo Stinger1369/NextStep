@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate, useLocation } from "react-router-dom";
-import { AppDispatch } from "../../redux/store";
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { AppDispatch } from '../../redux/store';
 import {
   performVerifyEmail,
-  performResendVerificationCode,
-} from "../../redux/features/auth/authVerifyEmail";
+  performResendVerificationCode
+} from '../../redux/features/auth/authVerifyEmail';
 //import "./VerifyEmailComponent.css";
 
 const VerifyEmailComponent: React.FC = () => {
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [canResend, setCanResend] = useState<boolean>(true);
   const [resendTimeout, setResendTimeout] = useState<number>(0);
@@ -19,7 +19,7 @@ const VerifyEmailComponent: React.FC = () => {
   const emailOrPhone = location.state?.emailOrPhone;
 
   useEffect(() => {
-    const resendTimestamp = localStorage.getItem("resendTimestamp");
+    const resendTimestamp = localStorage.getItem('resendTimestamp');
     if (resendTimestamp) {
       const timePassed = Date.now() - parseInt(resendTimestamp);
       if (timePassed < 5 * 60 * 1000) {
@@ -36,7 +36,7 @@ const VerifyEmailComponent: React.FC = () => {
           if (prev <= 1) {
             clearInterval(interval);
             setCanResend(true);
-            localStorage.removeItem("resendTimestamp");
+            localStorage.removeItem('resendTimestamp');
             return 0;
           }
           return prev - 1;
@@ -50,12 +50,12 @@ const VerifyEmailComponent: React.FC = () => {
     if (canResend) {
       try {
         await dispatch(performResendVerificationCode(emailOrPhone));
-        localStorage.setItem("resendTimestamp", Date.now().toString());
+        localStorage.setItem('resendTimestamp', Date.now().toString());
         setCanResend(false);
         setResendTimeout(5 * 60); // 5 minutes
       } catch (err) {
-        console.error("Error resending verification code:", err);
-        setError("Error resending verification code. Please try again later.");
+        console.error('Error resending verification code:', err);
+        setError('Error resending verification code. Please try again later.');
       }
     }
   };
@@ -63,21 +63,16 @@ const VerifyEmailComponent: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!emailOrPhone) {
-      setError("No email or phone found for verification.");
+      setError('No email or phone found for verification.');
       return;
     }
     try {
-      console.log(
-        "Submitting verification with emailOrPhone:",
-        emailOrPhone,
-        "and code:",
-        code
-      );
+      console.log('Submitting verification with emailOrPhone:', emailOrPhone, 'and code:', code);
       await dispatch(performVerifyEmail(emailOrPhone, code));
-      navigate("/login");
+      navigate('/login');
     } catch (err) {
-      console.error("Verification failed:", err);
-      setError("Invalid or expired code.");
+      console.error('Verification failed:', err);
+      setError('Invalid or expired code.');
     }
   };
 
@@ -96,7 +91,7 @@ const VerifyEmailComponent: React.FC = () => {
       </form>
       <div className="resend-container">
         <button onClick={handleResendCode} disabled={!canResend}>
-          {canResend ? "Resend Code" : `Resend in ${resendTimeout}s`}
+          {canResend ? 'Resend Code' : `Resend in ${resendTimeout}s`}
         </button>
       </div>
     </div>
