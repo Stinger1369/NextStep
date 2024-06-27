@@ -1,4 +1,4 @@
-.contact-info-container {
+.other-info-container {
   position: relative;
   max-width: 800px;
   margin: 0 auto;
@@ -32,6 +32,10 @@
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
+}
+
+.text-danger {
+  margin-top: 5px;
 }
 
 .button-container {

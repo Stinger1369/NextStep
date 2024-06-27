@@ -46,8 +46,9 @@ export const updateUser = async (req: Request, res: Response) => {
     phone,
     address,
     profession,
-    company, // Ajout de company
-    companyId, // Ajout de companyId
+    company,
+    companyId,
+    companies,
     bio,
     experience,
     education,
@@ -82,6 +83,7 @@ export const updateUser = async (req: Request, res: Response) => {
       ...(profession && { profession }),
       ...(company && { company }), // Ajout de company
       ...(companyId && { companyId }), // Ajout de companyId
+      ...(companies && { companies }), // Ajout de la propriété companies
       ...(bio && { bio }),
       ...(experience && {
         experience: Array.isArray(experience)
@@ -119,7 +121,6 @@ export const updateUser = async (req: Request, res: Response) => {
     });
   }
 };
-
 
 export const deleteUser = async (req: Request, res: Response) => {
   const { id } = req.params;

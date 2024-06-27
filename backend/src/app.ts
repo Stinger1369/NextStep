@@ -1,3 +1,5 @@
+// src/app.ts
+
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
@@ -8,7 +10,7 @@ import jobRoutes from "./routes/jobRoutes";
 import applicationRoutes from "./routes/applicationRoutes";
 import authRoutes from "./routes/authRoutes";
 import imageRoutes from "./routes/imageRoutes";
-import companyRoutes from "./routes/companyRoutes"; // Assurez-vous d'importer les routes de company
+import companyRoutes from "./routes/companyRoutes";
 import authMiddleware from "./middlewares/authMiddleware";
 
 dotenv.config();

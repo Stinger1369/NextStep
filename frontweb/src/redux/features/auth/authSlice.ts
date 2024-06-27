@@ -31,8 +31,9 @@ export interface User {
   videos?: string[];
   sex?: string;
   isVerified: boolean;
-  company?: string; // Ajout de la propriété company
-  companyId?: string; // Ajout de la propriété companyId
+  company?: string; // Pour les utilisateurs travaillant dans une seule entreprise
+  companyId?: string; // Pour les utilisateurs travaillant dans une seule entreprise
+  companies?: string[]; // Pour les utilisateurs gérant plusieurs entreprises
 }
 
 interface AuthState {

@@ -21,11 +21,21 @@ import RecruitCompanyInfo from '../pages/ProfileSection/ProfileEditRecruits/Comp
 import RecruitContactInfo from '../pages/ProfileSection/ProfileEditRecruits/ContactInfo/ContactInfo';
 import RecruitOtherInfo from '../pages/ProfileSection/ProfileEditRecruits/OtherInfo/OtherInfo';
 import RecruitSocialMediaInfo from '../pages/ProfileSection/ProfileEditRecruits/SocialMediaInfo/SocialMediaInfo';
-import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../redux/store';
+import { getCompanies } from '../redux/features/company/companySlice';
+import { useEffect } from 'react';
 
 const AppRoutes: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
+  const status = useSelector((state: RootState) => state.company.status);
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(getCompanies());
+    }
+  }, [dispatch, status]);
 
   return (
     <Router>
@@ -45,12 +55,12 @@ const AppRoutes: React.FC = () => {
         <Route path="/profile-edit-user/bio-skills-info" element={user ? <BioSkillsInfo /> : <Navigate to="/login" />} />
         <Route path="/profile-edit-user/media-info" element={user ? <MediaInfo /> : <Navigate to="/login" />} />
         <Route path="/role-selection" element={user ? <RoleSelection /> : <Navigate to="/login" />} />
-        <Route path="/edit-recruit/:companyId/*" element={user && user.companyId ? <ProfileEditRecruits companyId={user.companyId} /> : <Navigate to="/login" />} />
-        <Route path="/edit-recruit/:companyId/address-info" element={user && user.companyId ? <RecruitAddressInfo companyId={user.companyId} /> : <Navigate to="/login" />} />
-        <Route path="/edit-recruit/:companyId/company-info" element={user && user.companyId ? <RecruitCompanyInfo companyId={user.companyId} /> : <Navigate to="/login" />} />
-        <Route path="/edit-recruit/:companyId/contact-info" element={user && user.companyId ? <RecruitContactInfo companyId={user.companyId} /> : <Navigate to="/login" />} />
-        <Route path="/edit-recruit/:companyId/other-info" element={user && user.companyId ? <RecruitOtherInfo companyId={user.companyId} /> : <Navigate to="/login" />} />
-        <Route path="/edit-recruit/:companyId/social-media-info" element={user && user.companyId ? <RecruitSocialMediaInfo companyId={user.companyId} /> : <Navigate to="/login" />} />
+        <Route path="/edit-recruit/:companyId/company-info" element={user ? <RecruitCompanyInfo companyId={user.companyId!} /> : <Navigate to="/login" />} />
+        <Route path="/edit-recruit/:companyId/address-info" element={user ? <RecruitAddressInfo companyId={user.companyId!} /> : <Navigate to="/login" />} />
+        <Route path="/edit-recruit/:companyId/contact-info" element={user ? <RecruitContactInfo companyId={user.companyId!} /> : <Navigate to="/login" />} />
+        <Route path="/edit-recruit/:companyId/other-info" element={user ? <RecruitOtherInfo companyId={user.companyId!} /> : <Navigate to="/login" />} />
+        <Route path="/edit-recruit/:companyId/social-media-info" element={user ? <RecruitSocialMediaInfo companyId={user.companyId!} /> : <Navigate to="/login" />} />
+        <Route path="/profile-edit-recruiter" element={user ? <ProfileEditRecruits /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );

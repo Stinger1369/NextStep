@@ -1,23 +1,36 @@
-import React from 'react';
-import AddressInfo from './AddressInfo/AddressInfo';
-import CompanyInfo from './CompanyInfo/CompanyInfo';
-import ContactInfo from './ContactInfo/ContactInfo';
-import OtherInfo from './OtherInfo/OtherInfo';
-import SocialMediaInfo from './SocialMediaInfo/SocialMediaInfo';
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { RootState } from '../../../redux/store';
 
-interface ProfileEditRecruitsProps {
-  companyId: string;
-}
+const ProfileEditRecruits: React.FC = () => {
+  const companies = useSelector((state: RootState) => state.company.companies);
+  const user = useSelector((state: RootState) => state.auth.user);
+  const navigate = useNavigate();
 
-const ProfileEditRecruits: React.FC<ProfileEditRecruitsProps> = ({ companyId }) => {
+  useEffect(() => {
+    if (companies.length === 0) {
+      navigate('/edit-recruit/new/company-info');
+    }
+  }, [companies.length, navigate]);
+
+  const handleCreateNewCompany = () => {
+    navigate(`/edit-recruit/new/company-info`);
+  };
+
   return (
-    <div>
-      <h1>Edit Company Profile</h1>
-      <CompanyInfo companyId={companyId} />
-      <AddressInfo companyId={companyId} />
-      <ContactInfo companyId={companyId} />
-      <OtherInfo companyId={companyId} />
-      <SocialMediaInfo companyId={companyId} />
+    <div className="profile-edit-recruits">
+      <h1>Select a Company to Edit</h1>
+      <ul>
+        {companies.map((company) => (
+          <li key={company._id}>
+            <Link to={`/edit-recruit/${company._id}/company-info`}>{company.companyName}</Link>
+          </li>
+        ))}
+      </ul>
+      <button className="btn btn-primary" onClick={handleCreateNewCompany}>
+        Create New Company
+      </button>
     </div>
   );
 };

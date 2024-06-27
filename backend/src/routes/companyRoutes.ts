@@ -1,18 +1,21 @@
+// src/routes/companyRoutes.ts
+
 import { Router } from "express";
 import {
   createCompany,
+  updateCompany,
   getCompanies,
   getCompanyById,
-  updateCompany,
   deleteCompany,
 } from "../controllers/CompanyController";
+import authMiddleware from "../middlewares/authMiddleware";
 
 const router = Router();
 
-router.post("/", createCompany);
-router.get("/", getCompanies);
-router.get("/:id", getCompanyById);
-router.put("/:id", updateCompany);
-router.delete("/:id", deleteCompany);
+router.get("/", authMiddleware, getCompanies);
+router.get("/:id", authMiddleware, getCompanyById);
+router.post("/", authMiddleware, createCompany);
+router.put("/:id", authMiddleware, updateCompany);
+router.delete("/:id", authMiddleware, deleteCompany);
 
 export default router;

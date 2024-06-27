@@ -21,8 +21,6 @@ interface User {
   address?: Address;
   age?: number;
   profession?: string;
-  company?: string; // Ajout de la propriété company
-  companyId?: string; // Ajout de la propriété companyId
   bio?: string;
   experience?: string[];
   education?: string[];
@@ -31,6 +29,9 @@ interface User {
   videos?: string[];
   sex?: string;
   showAge?: boolean;
+  company?: string; // Pour les utilisateurs travaillant dans une seule entreprise
+  companyId?: string; // Pour les utilisateurs travaillant dans une seule entreprise
+  companies?: string[]; // Pour les utilisateurs gérant plusieurs entreprises
 }
 
 interface UserState {

@@ -1,21 +1,21 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 interface Address {
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
+  street?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
 }
 
 export interface ICompany extends Document {
-  companyName: string;
-  companyRegistrationNumber: string;
-  address: Address;
-  numberOfEmployees: number;
-  industryType: string;
-  contactEmail: string;
-  contactPhone: string;
+  companyName?: string;
+  companyRegistrationNumber?: string;
+  address?: Address;
+  numberOfEmployees?: number;
+  industryType?: string;
+  contactEmail?: string;
+  contactPhone?: string;
   website?: string;
   description?: string;
   foundedDate?: Date;
@@ -33,19 +33,19 @@ export interface ICompany extends Document {
 }
 
 const CompanySchema: Schema = new Schema({
-  companyName: { type: String, required: true },
-  companyRegistrationNumber: { type: String, required: true, unique: true },
+  companyName: { type: String },
+  companyRegistrationNumber: { type: String, unique: true },
   address: {
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    zipCode: { type: String, required: true },
-    country: { type: String, required: true },
+    street: { type: String },
+    city: { type: String },
+    state: { type: String },
+    zipCode: { type: String },
+    country: { type: String },
   },
-  numberOfEmployees: { type: Number, required: true },
-  industryType: { type: String, required: true },
-  contactEmail: { type: String, required: true },
-  contactPhone: { type: String, required: true },
+  numberOfEmployees: { type: Number },
+  industryType: { type: String },
+  contactEmail: { type: String },
+  contactPhone: { type: String },
   website: { type: String },
   description: { type: String },
   foundedDate: { type: Date },

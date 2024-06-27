@@ -32,8 +32,9 @@ export interface IUser extends Document {
   resetPasswordCode?: string;
   resetPasswordExpiresAt?: Date;
   sex?: string; // 'male', 'female', or 'other'
-  company?: string; // Ajout de la propriété company
-  companyId?: string; // Ajout de la propriété companyId
+  company?: string; // Pour les utilisateurs travaillant dans une seule entreprise
+  companyId?: string; // Pour les utilisateurs travaillant dans une seule entreprise
+  companies?: mongoose.Types.ObjectId[]; // Pour les utilisateurs gérant plusieurs entreprises
 }
 
 const UserSchema: Schema = new Schema({
@@ -69,8 +70,9 @@ const UserSchema: Schema = new Schema({
   resetPasswordCode: { type: String },
   resetPasswordExpiresAt: { type: Date },
   sex: { type: String },
-  company: { type: String }, // Ajout de la propriété company
-  companyId: { type: String }, // Ajout de la propriété companyId
+  company: { type: String }, // Pour les utilisateurs travaillant dans une seule entreprise
+  companyId: { type: String }, // Pour les utilisateurs travaillant dans une seule entreprise
+  companies: [{ type: Schema.Types.ObjectId, ref: "Company" }], // Pour les utilisateurs gérant plusieurs entreprises
 });
 
 UserSchema.pre<IUser>("save", function (next) {

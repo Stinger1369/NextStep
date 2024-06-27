@@ -123,6 +123,10 @@ const companySlice = createSlice({
       .addCase(updateCompany.fulfilled, (state, action: PayloadAction<Company>) => {
         state.status = 'succeeded';
         state.company = action.payload;
+        const index = state.companies.findIndex((company) => company._id === action.payload._id);
+        if (index !== -1) {
+          state.companies[index] = action.payload;
+        }
       })
       .addCase(updateCompany.rejected, (state, action) => {
         state.status = 'failed';
