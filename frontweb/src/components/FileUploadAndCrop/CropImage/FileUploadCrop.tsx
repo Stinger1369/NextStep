@@ -55,17 +55,7 @@ const FileUploadCrop: React.FC<FileUploadCropProps> = ({ imageSrc, onCropComplet
     canvas.width = crop.width!;
     canvas.height = crop.height!;
 
-    ctx.drawImage(
-      image,
-      crop.x! * scaleX,
-      crop.y! * scaleY,
-      crop.width! * scaleX,
-      crop.height! * scaleY,
-      0,
-      0,
-      crop.width!,
-      crop.height!
-    );
+    ctx.drawImage(image, crop.x! * scaleX, crop.y! * scaleY, crop.width! * scaleX, crop.height! * scaleY, 0, 0, crop.width!, crop.height!);
 
     return new Promise<Blob>((resolve, reject) => {
       canvas.toBlob((blob) => {
@@ -99,21 +89,9 @@ const FileUploadCrop: React.FC<FileUploadCropProps> = ({ imageSrc, onCropComplet
   return (
     <div className="crop-container">
       {useEasyCrop ? (
-        <Cropper
-          image={imageSrc}
-          crop={crop}
-          zoom={zoom}
-          aspect={aspect ?? undefined}
-          onCropChange={onCropChange}
-          onZoomChange={onZoomChange}
-          onCropComplete={onCropCompleteInternal}
-        />
+        <Cropper image={imageSrc} crop={crop} zoom={zoom} aspect={aspect ?? undefined} onCropChange={onCropChange} onZoomChange={onZoomChange} onCropComplete={onCropCompleteInternal} />
       ) : (
-        <ReactCrop
-          crop={freeCrop}
-          onChange={(newCrop) => setFreeCrop(newCrop)}
-          onComplete={(c) => setFreeCrop(c)}
-        >
+        <ReactCrop crop={freeCrop} onChange={(newCrop) => setFreeCrop(newCrop)} onComplete={(c) => setFreeCrop(c)}>
           <img src={imageSrc} alt="Crop" />
         </ReactCrop>
       )}

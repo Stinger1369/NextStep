@@ -42,11 +42,7 @@ const LoginComponent: React.FC = () => {
             setErrors({
               password: 'Incorrect password. Forgot your password?'
             });
-          } else if (
-            error.message === 'Request failed with status code 401' &&
-            isErrorWithResponseData(error) &&
-            error.response!.data.message === 'Email not verified'
-          ) {
+          } else if (error.message === 'Request failed with status code 401' && isErrorWithResponseData(error) && error.response!.data.message === 'Email not verified') {
             setErrors({
               emailOrPhone: 'Your account is not verified. Please verify your account to continue.'
             });
@@ -93,19 +89,13 @@ const LoginComponent: React.FC = () => {
               id="emailOrPhone"
               {...formik.getFieldProps('emailOrPhone')}
               placeholder="Email or Phone"
-              className={`login-input ${
-                formik.touched.emailOrPhone && formik.errors.emailOrPhone ? 'error-input' : ''
-              }`}
+              className={`login-input ${formik.touched.emailOrPhone && formik.errors.emailOrPhone ? 'error-input' : ''}`}
             />
             {formik.touched.emailOrPhone && formik.errors.emailOrPhone ? (
               <div className="error">
                 {formik.errors.emailOrPhone}
                 {formik.errors.emailOrPhone.includes('Email or phone does not exist.') && (
-                  <button
-                    type="button"
-                    className="register-button"
-                    onClick={() => navigate('/register')}
-                  >
+                  <button type="button" className="register-button" onClick={() => navigate('/register')}>
                     Register
                   </button>
                 )}
@@ -131,13 +121,9 @@ const LoginComponent: React.FC = () => {
               id="password"
               {...formik.getFieldProps('password')}
               placeholder="Password"
-              className={`login-input ${
-                formik.touched.password && formik.errors.password ? 'error-input' : ''
-              }`}
+              className={`login-input ${formik.touched.password && formik.errors.password ? 'error-input' : ''}`}
             />
-            {formik.touched.password && formik.errors.password ? (
-              <div className="error">{formik.errors.password}</div>
-            ) : null}
+            {formik.touched.password && formik.errors.password ? <div className="error">{formik.errors.password}</div> : null}
           </div>
           <button type="submit" className="login-button" disabled={formik.isSubmitting}>
             {formik.isSubmitting ? 'Logging in...' : 'Login'}

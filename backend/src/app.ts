@@ -8,8 +8,8 @@ import jobRoutes from "./routes/jobRoutes";
 import applicationRoutes from "./routes/applicationRoutes";
 import authRoutes from "./routes/authRoutes";
 import imageRoutes from "./routes/imageRoutes";
+import companyRoutes from "./routes/companyRoutes"; // Assurez-vous d'importer les routes de company
 import authMiddleware from "./middlewares/authMiddleware";
-import Company from "./models/Company";
 
 dotenv.config();
 
@@ -29,11 +29,22 @@ app.use(
 app.use(cors({ origin: "http://localhost:3000" }));
 app.use(express.static("uploads"));
 
+// Log the request method and URL
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
 app.use("/api/auth", authRoutes);
-app.use("/api/companies", authMiddleware, userRoutes);
+app.use("/api/companies", authMiddleware, companyRoutes);
 app.use("/api/users", authMiddleware, userRoutes);
 app.use("/api/jobs", authMiddleware, jobRoutes);
 app.use("/api/applications", authMiddleware, applicationRoutes);
 app.use("/api/images", authMiddleware, imageRoutes);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 export default app;

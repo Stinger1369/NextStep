@@ -46,7 +46,8 @@ export const updateUser = async (req: Request, res: Response) => {
     phone,
     address,
     profession,
-    company,
+    company, // Ajout de company
+    companyId, // Ajout de companyId
     bio,
     experience,
     education,
@@ -79,7 +80,8 @@ export const updateUser = async (req: Request, res: Response) => {
       ...(phone && { phone }),
       ...(address && { address }),
       ...(profession && { profession }),
-      ...(company && { company }),
+      ...(company && { company }), // Ajout de company
+      ...(companyId && { companyId }), // Ajout de companyId
       ...(bio && { bio }),
       ...(experience && {
         experience: Array.isArray(experience)

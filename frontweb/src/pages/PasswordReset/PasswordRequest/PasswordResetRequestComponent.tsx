@@ -45,13 +45,9 @@ const PasswordResetRequestComponent: React.FC = () => {
             id="emailOrPhone"
             {...formik.getFieldProps('emailOrPhone')}
             placeholder="Email or Phone"
-            className={`input ${
-              formik.touched.emailOrPhone && formik.errors.emailOrPhone ? 'error-input' : ''
-            }`}
+            className={`input ${formik.touched.emailOrPhone && formik.errors.emailOrPhone ? 'error-input' : ''}`}
           />
-          {formik.touched.emailOrPhone && formik.errors.emailOrPhone ? (
-            <div className="error">{formik.errors.emailOrPhone}</div>
-          ) : null}
+          {formik.touched.emailOrPhone && formik.errors.emailOrPhone ? <div className="error">{formik.errors.emailOrPhone}</div> : null}
         </div>
         <button type="submit" className="submit-button" disabled={formik.isSubmitting}>
           {formik.isSubmitting ? 'Submitting...' : 'Submit'}

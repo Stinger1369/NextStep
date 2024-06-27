@@ -14,16 +14,7 @@ interface FileUploadProps {
   videoProgress: number;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({
-  onImagesChange,
-  onVideoChange,
-  onRemoveImage,
-  onRemoveVideo,
-  imagePreviews,
-  videoPreview,
-  uploadProgress,
-  videoProgress
-}) => {
+const FileUpload: React.FC<FileUploadProps> = ({ onImagesChange, onVideoChange, onRemoveImage, onRemoveVideo, imagePreviews, videoPreview, uploadProgress, videoProgress }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [croppingImage, setCroppingImage] = useState<string | null>(null);
 
@@ -57,15 +48,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   return (
     <div>
       <div className="form-field">
-        <input
-          type="file"
-          id="images"
-          name="images"
-          accept="image/*"
-          multiple
-          onChange={handleImageChange}
-          className="profile-input"
-        />
+        <input type="file" id="images" name="images" accept="image/*" multiple onChange={handleImageChange} className="profile-input" />
         <div className="previews">
           {imagePreviews.map((src, index) => (
             <div key={index} className="preview">
@@ -79,14 +62,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         </div>
       </div>
       <div className="form-field">
-        <input
-          type="file"
-          id="video"
-          name="video"
-          accept="video/*"
-          onChange={handleVideoChange}
-          className="profile-input"
-        />
+        <input type="file" id="video" name="video" accept="video/*" onChange={handleVideoChange} className="profile-input" />
         {videoPreview && (
           <div className="preview">
             <video src={videoPreview} controls width="300">
@@ -100,13 +76,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         )}
       </div>
 
-      {croppingImage && (
-        <FileUploadCrop
-          imageSrc={croppingImage}
-          onCropComplete={handleCropComplete}
-          onClose={() => setCroppingImage(null)}
-        />
-      )}
+      {croppingImage && <FileUploadCrop imageSrc={croppingImage} onCropComplete={handleCropComplete} onClose={() => setCroppingImage(null)} />}
     </div>
   );
 };

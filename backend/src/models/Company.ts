@@ -10,7 +10,7 @@ interface Address {
 
 export interface ICompany extends Document {
   companyName: string;
-  companyRegistrationNumber: string; // Numéro d'enregistrement de l'entreprise (SIRET, Kbis, etc.)
+  companyRegistrationNumber: string;
   address: Address;
   numberOfEmployees: number;
   industryType: string;
@@ -19,17 +19,17 @@ export interface ICompany extends Document {
   website?: string;
   description?: string;
   foundedDate?: Date;
-  logo?: string; // URL du logo de l'entreprise
+  logo?: string;
   socialMediaLinks?: {
     linkedin?: string;
     facebook?: string;
     twitter?: string;
     instagram?: string;
   };
-  companySize?: "small" | "medium" | "large"; // Taille de l'entreprise
-  headquarterLocation?: string; // Siège de l'entreprise
-  subsidiaries?: string[]; // Filiales de l'entreprise
-  certifications?: string[]; // Certifications détenues par l'entreprise
+  companySize?: "small" | "medium" | "large";
+  headquarterLocation?: string;
+  subsidiaries?: string[];
+  certifications?: string[];
 }
 
 const CompanySchema: Schema = new Schema({

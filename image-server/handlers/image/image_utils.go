@@ -31,7 +31,10 @@ func checkAndCreateUserDir(userID string) (string, error) {
 }
 
 func countUserImages(userID string) (int, error) {
-    userDir := getUserDir(userID)
+    userDir, err := checkAndCreateUserDir(userID)
+    if err != nil {
+        return 0, err
+    }
     files, err := ioutil.ReadDir(userDir)
     if err != nil {
         return 0, err
@@ -56,7 +59,11 @@ func processImage(userID, imageName, base64Data string) (string, error) {
         return "", err
     }
 
+    log.Printf("Processing image for user: %s", userID)
+
     imageHash := utils.CalculateHash(base64Data)
+    log.Printf("Calculated hash: %s", imageHash)
+
     exists, err := utils.HashExists(userDir, imageHash)
     if err != nil {
         return "", err
@@ -100,7 +107,7 @@ func processImage(userID, imageName, base64Data string) (string, error) {
         }
     }
 
-    if err := utils.AddHash(userDir, imageHash); err != nil {
+    if err := utils.AddHash(userDir, imageHash, filename); err != nil {
         return "", fmt.Errorf("[%s] Error adding hash: %v", utils.ErrAddingImageHash, err)
     }
 

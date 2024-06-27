@@ -29,9 +29,7 @@ const PersonalInfo: React.FC = () => {
         firstName: userData.firstName || '',
         lastName: userData.lastName || '',
         phone: userData.phone || '',
-        dateOfBirth: userData.dateOfBirth
-          ? new Date(userData.dateOfBirth).toISOString().substring(0, 10)
-          : '',
+        dateOfBirth: userData.dateOfBirth ? new Date(userData.dateOfBirth).toISOString().substring(0, 10) : '',
         sex: userData.sex || '',
         showAge: userData.showAge || false
       });
@@ -97,57 +95,29 @@ const PersonalInfo: React.FC = () => {
               <label htmlFor="firstName" className="form-label">
                 First Name
               </label>
-              <input
-                type="text"
-                id="firstName"
-                className="form-control"
-                {...formik.getFieldProps('firstName')}
-              />
-              {formik.touched.firstName && formik.errors.firstName ? (
-                <div className="text-danger">{formik.errors.firstName}</div>
-              ) : null}
+              <input type="text" id="firstName" className="form-control" {...formik.getFieldProps('firstName')} />
+              {formik.touched.firstName && formik.errors.firstName ? <div className="text-danger">{formik.errors.firstName}</div> : null}
             </div>
             <div className="col-md-6 form-field">
               <label htmlFor="lastName" className="form-label">
                 Last Name
               </label>
-              <input
-                type="text"
-                id="lastName"
-                className="form-control"
-                {...formik.getFieldProps('lastName')}
-              />
-              {formik.touched.lastName && formik.errors.lastName ? (
-                <div className="text-danger">{formik.errors.lastName}</div>
-              ) : null}
+              <input type="text" id="lastName" className="form-control" {...formik.getFieldProps('lastName')} />
+              {formik.touched.lastName && formik.errors.lastName ? <div className="text-danger">{formik.errors.lastName}</div> : null}
             </div>
             <div className="col-md-6 form-field">
               <label htmlFor="phone" className="form-label">
                 Phone
               </label>
-              <input
-                type="text"
-                id="phone"
-                className="form-control"
-                {...formik.getFieldProps('phone')}
-              />
-              {formik.touched.phone && formik.errors.phone ? (
-                <div className="text-danger">{formik.errors.phone}</div>
-              ) : null}
+              <input type="text" id="phone" className="form-control" {...formik.getFieldProps('phone')} />
+              {formik.touched.phone && formik.errors.phone ? <div className="text-danger">{formik.errors.phone}</div> : null}
             </div>
             <div className="col-md-6 form-field">
               <label htmlFor="dateOfBirth" className="form-label">
                 Date of Birth
               </label>
-              <input
-                type="date"
-                id="dateOfBirth"
-                className="form-control"
-                {...formik.getFieldProps('dateOfBirth')}
-              />
-              {formik.touched.dateOfBirth && formik.errors.dateOfBirth ? (
-                <div className="text-danger">{formik.errors.dateOfBirth}</div>
-              ) : null}
+              <input type="date" id="dateOfBirth" className="form-control" {...formik.getFieldProps('dateOfBirth')} />
+              {formik.touched.dateOfBirth && formik.errors.dateOfBirth ? <div className="text-danger">{formik.errors.dateOfBirth}</div> : null}
             </div>
             <div className="col-md-6 form-field">
               <label htmlFor="sex" className="form-label">
@@ -159,21 +129,13 @@ const PersonalInfo: React.FC = () => {
                 <option value="female" label="Female" />
                 <option value="other" label="Other" />
               </select>
-              {formik.touched.sex && formik.errors.sex ? (
-                <div className="text-danger">{formik.errors.sex}</div>
-              ) : null}
+              {formik.touched.sex && formik.errors.sex ? <div className="text-danger">{formik.errors.sex}</div> : null}
             </div>
             <div className="col-md-6 form-field">
               <label htmlFor="age" className="form-label">
                 Your Have
               </label>
-              <input
-                type="text"
-                id="age"
-                className="form-control"
-                value={age !== null ? age : ''}
-                readOnly
-              />
+              <input type="text" id="age" className="form-control" value={age !== null ? age : ''} readOnly />
               <label htmlFor="showAge" className="form-label">
                 Show Age
               </label>

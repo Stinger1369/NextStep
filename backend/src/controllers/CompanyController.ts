@@ -3,10 +3,16 @@ import Company from "../models/Company";
 
 export const createCompany = async (req: Request, res: Response) => {
   try {
+    console.log("Received request to create company:", req.body);
+
     const company = new Company(req.body);
     await company.save();
+
+    console.log("Company created successfully:", company);
+
     res.status(201).json(company);
   } catch (error) {
+    console.error("Error creating company:", error);
     res.status(500).json({ message: "Error creating company", error });
   }
 };

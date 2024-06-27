@@ -1,4 +1,3 @@
-// src/redux/features/company/companySlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '../../../axiosConfig';
 
@@ -21,7 +20,7 @@ interface Company {
   contactPhone: string;
   website?: string;
   description?: string;
-  foundedDate?: Date;
+  foundedDate?: Date | null;
   logo?: string;
   socialMediaLinks?: {
     linkedin?: string;
@@ -59,13 +58,19 @@ export const getCompanyById = createAsyncThunk('company/getCompanyById', async (
   return response.data;
 });
 
-export const updateCompany = createAsyncThunk(
-  'company/updateCompany',
-  async ({ id, companyData }: { id: string; companyData: Partial<Company> }) => {
-    const response = await axiosInstance.put(`/companies/${id}`, companyData);
-    return response.data;
+export const createCompany = createAsyncThunk('company/createCompany', async (companyData: Partial<Company>) => {
+  const response = await axiosInstance.post('/companies', companyData);
+  return response.data;
+});
+
+export const updateCompany = createAsyncThunk('company/updateCompany', async ({ id, companyData }: { id: string; companyData: Partial<Company> }) => {
+  // Transform date to correct format before sending
+  if (companyData.foundedDate && typeof companyData.foundedDate === 'string') {
+    companyData.foundedDate = new Date(companyData.foundedDate);
   }
-);
+  const response = await axiosInstance.put(`/companies/${id}`, companyData);
+  return response.data;
+});
 
 export const deleteCompany = createAsyncThunk('company/deleteCompany', async (id: string) => {
   await axiosInstance.delete(`/companies/${id}`);
@@ -99,6 +104,18 @@ const companySlice = createSlice({
       .addCase(getCompanyById.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to fetch company';
+      })
+      .addCase(createCompany.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(createCompany.fulfilled, (state, action: PayloadAction<Company>) => {
+        state.status = 'succeeded';
+        state.company = action.payload;
+        state.companies.push(action.payload);
+      })
+      .addCase(createCompany.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to create company';
       })
       .addCase(updateCompany.pending, (state) => {
         state.status = 'loading';

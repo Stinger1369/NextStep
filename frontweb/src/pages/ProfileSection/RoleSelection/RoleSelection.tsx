@@ -1,9 +1,9 @@
-// src/pages/ProfileSection/RoleSelection/RoleSelection.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
-import { getUserById } from '../../../redux/features/user/userSlice';
+import { getUserById, updateUser } from '../../../redux/features/user/userSlice';
+import { createCompany } from '../../../redux/features/company/companySlice';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './RoleSelection.css';
 
@@ -18,6 +18,30 @@ const RoleSelection: React.FC = () => {
       if (role === 'user') {
         navigate('/profile-edit-user/personal-info');
       } else if (role === 'recruiter') {
+        // Créer une nouvelle entreprise
+        const newCompany = await dispatch(
+          createCompany({
+            companyName: 'New Company',
+            companyRegistrationNumber: '123456',
+            address: { street: '', city: '', state: '', zipCode: '', country: '' },
+            numberOfEmployees: 0,
+            industryType: '',
+            contactEmail: '',
+            contactPhone: '',
+            website: '',
+            description: '',
+            foundedDate: new Date(),
+            logo: '',
+            socialMediaLinks: {},
+            companySize: 'small',
+            headquarterLocation: '',
+            subsidiaries: [],
+            certifications: []
+          })
+        ).unwrap();
+
+        // Mettre à jour l'utilisateur avec l'ID et le nom de l'entreprise
+        await dispatch(updateUser({ id: user._id, userData: { company: newCompany.companyName, companyId: newCompany._id } }));
         navigate('/profile-edit-recruiter/personal-info');
       }
     } else {

@@ -62,9 +62,7 @@ const imageSlice = createSlice({
         if (payload && typeof payload.message === 'string') {
           const errorCode = extractErrorCode(payload.message);
           state.error = {
-            message: errorCode
-              ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
-              : payload.message.split(':')[0],
+            message: errorCode ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages] : payload.message.split(':')[0],
             code: errorCode
           };
         } else {
@@ -82,9 +80,7 @@ const imageSlice = createSlice({
       })
       .addCase(addImages.fulfilled, (state, action: PayloadAction<AddImagesPayload[]>) => {
         state.loading = false;
-        const successfulImages = action.payload
-          .filter((img) => img.status === 'success' && img.url !== undefined)
-          .map((img) => img.url as string);
+        const successfulImages = action.payload.filter((img) => img.status === 'success' && img.url !== undefined).map((img) => img.url as string);
         state.images = [...new Set([...state.images, ...successfulImages])]; // Éviter les duplicatas
         console.log('addImages.fulfilled:', action.payload);
         const failedImages = action.payload.filter((img) => img.status === 'failed');
@@ -101,9 +97,7 @@ const imageSlice = createSlice({
         if (payload && typeof payload.message === 'string') {
           const errorCode = extractErrorCode(payload.message);
           state.error = {
-            message: errorCode
-              ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
-              : payload.message.split(':')[0],
+            message: errorCode ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages] : payload.message.split(':')[0],
             code: errorCode
           };
         } else {
@@ -130,9 +124,7 @@ const imageSlice = createSlice({
         if (payload && typeof payload.message === 'string') {
           const errorCode = extractErrorCode(payload.message);
           state.error = {
-            message: errorCode
-              ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
-              : payload.message.split(':')[0],
+            message: errorCode ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages] : payload.message.split(':')[0],
             code: errorCode
           };
         } else {
@@ -162,9 +154,7 @@ const imageSlice = createSlice({
         if (payload && typeof payload.message === 'string') {
           const errorCode = extractErrorCode(payload.message);
           state.error = {
-            message: errorCode
-              ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
-              : payload.message.split(':')[0],
+            message: errorCode ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages] : payload.message.split(':')[0],
             code: errorCode
           };
         } else {

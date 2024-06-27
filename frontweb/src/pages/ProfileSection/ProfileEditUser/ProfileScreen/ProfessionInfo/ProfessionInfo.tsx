@@ -74,28 +74,14 @@ const ProfessionInfo: React.FC = () => {
       <form onSubmit={formik.handleSubmit} className="profession-info-form">
         <div className="form-group">
           <label htmlFor="profession">Profession</label>
-          <input
-            type="text"
-            id="profession"
-            {...formik.getFieldProps('profession')}
-            className="form-control"
-          />
-          {formik.touched.profession && formik.errors.profession ? (
-            <div className="text-danger">{formik.errors.profession}</div>
-          ) : null}
+          <input type="text" id="profession" {...formik.getFieldProps('profession')} className="form-control" />
+          {formik.touched.profession && formik.errors.profession ? <div className="text-danger">{formik.errors.profession}</div> : null}
         </div>
 
         <div className="form-group">
           <label htmlFor="company">Company</label>
-          <input
-            type="text"
-            id="company"
-            {...formik.getFieldProps('company')}
-            className="form-control"
-          />
-          {formik.touched.company && formik.errors.company ? (
-            <div className="text-danger">{formik.errors.company}</div>
-          ) : null}
+          <input type="text" id="company" {...formik.getFieldProps('company')} className="form-control" />
+          {formik.touched.company && formik.errors.company ? <div className="text-danger">{formik.errors.company}</div> : null}
         </div>
 
         <div className="button-container">

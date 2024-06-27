@@ -31,6 +31,8 @@ export interface User {
   videos?: string[];
   sex?: string;
   isVerified: boolean;
+  company?: string; // Ajout de la propriété company
+  companyId?: string; // Ajout de la propriété companyId
 }
 
 interface AuthState {
@@ -95,47 +97,27 @@ export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, { ge
   throw new Error('No refresh token available');
 });
 
-export const requestPasswordReset = createAsyncThunk(
-  'auth/requestPasswordReset',
-  async (emailOrPhone: string) => {
-    await axiosInstance.post('/auth/request-password-reset', { emailOrPhone });
-  }
-);
+export const requestPasswordReset = createAsyncThunk('auth/requestPasswordReset', async (emailOrPhone: string) => {
+  await axiosInstance.post('/auth/request-password-reset', { emailOrPhone });
+});
 
-export const resendVerificationCode = createAsyncThunk(
-  'auth/resendVerificationCode',
-  async (emailOrPhone: string) => {
-    await axiosInstance.post('/auth/resend-verification-code', {
-      emailOrPhone
-    });
-  }
-);
+export const resendVerificationCode = createAsyncThunk('auth/resendVerificationCode', async (emailOrPhone: string) => {
+  await axiosInstance.post('/auth/resend-verification-code', {
+    emailOrPhone
+  });
+});
 
-export const resetPassword = createAsyncThunk(
-  'auth/resetPassword',
-  async ({
+export const resetPassword = createAsyncThunk('auth/resetPassword', async ({ emailOrPhone, code, newPassword }: { emailOrPhone: string; code: string; newPassword: string }) => {
+  await axiosInstance.post('/auth/reset-password', {
     emailOrPhone,
     code,
     newPassword
-  }: {
-    emailOrPhone: string;
-    code: string;
-    newPassword: string;
-  }) => {
-    await axiosInstance.post('/auth/reset-password', {
-      emailOrPhone,
-      code,
-      newPassword
-    });
-  }
-);
+  });
+});
 
-export const verifyEmail = createAsyncThunk(
-  'auth/verifyEmail',
-  async ({ emailOrPhone, code }: { emailOrPhone: string; code: string }) => {
-    await axiosInstance.post('/auth/verify-email', { emailOrPhone, code });
-  }
-);
+export const verifyEmail = createAsyncThunk('auth/verifyEmail', async ({ emailOrPhone, code }: { emailOrPhone: string; code: string }) => {
+  await axiosInstance.post('/auth/verify-email', { emailOrPhone, code });
+});
 
 const authSlice = createSlice({
   name: 'auth',
@@ -198,16 +180,13 @@ const authSlice = createSlice({
       .addCase(refreshToken.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(
-        refreshToken.fulfilled,
-        (state, action: PayloadAction<{ token: string; refreshToken: string }>) => {
-          state.status = 'succeeded';
-          state.token = action.payload.token;
-          state.refreshToken = action.payload.refreshToken;
-          localStorage.setItem('token', action.payload.token);
-          localStorage.setItem('refreshToken', action.payload.refreshToken);
-        }
-      )
+      .addCase(refreshToken.fulfilled, (state, action: PayloadAction<{ token: string; refreshToken: string }>) => {
+        state.status = 'succeeded';
+        state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken;
+        localStorage.setItem('token', action.payload.token);
+        localStorage.setItem('refreshToken', action.payload.refreshToken);
+      })
       .addCase(refreshToken.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to refresh token';

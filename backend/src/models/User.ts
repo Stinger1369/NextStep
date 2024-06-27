@@ -32,6 +32,8 @@ export interface IUser extends Document {
   resetPasswordCode?: string;
   resetPasswordExpiresAt?: Date;
   sex?: string; // 'male', 'female', or 'other'
+  company?: string; // Ajout de la propriété company
+  companyId?: string; // Ajout de la propriété companyId
 }
 
 const UserSchema: Schema = new Schema({
@@ -67,6 +69,8 @@ const UserSchema: Schema = new Schema({
   resetPasswordCode: { type: String },
   resetPasswordExpiresAt: { type: Date },
   sex: { type: String },
+  company: { type: String }, // Ajout de la propriété company
+  companyId: { type: String }, // Ajout de la propriété companyId
 });
 
 UserSchema.pre<IUser>("save", function (next) {

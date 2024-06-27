@@ -59,9 +59,7 @@ const MediaInfo: React.FC = () => {
         const totalImages = userData.images.length + base64Images.length;
 
         if (totalImages > 5) {
-          setMaxImagesError(
-            `You can only upload 5 images. Please delete some images before adding new ones.`
-          );
+          setMaxImagesError(`You can only upload 5 images. Please delete some images before adding new ones.`);
           return;
         }
 
@@ -99,17 +97,13 @@ const MediaInfo: React.FC = () => {
     }
   };
 
-  const handleMultipleImagesUpload = async (
-    images: { imageName: string; imageBase64: string }[]
-  ) => {
+  const handleMultipleImagesUpload = async (images: { imageName: string; imageBase64: string }[]) => {
     if (user?._id && userData) {
       try {
         const results = await dispatch(addImages({ userId: user._id, images })).unwrap();
         console.log('Uploaded images results:', results);
 
-        const successfulImages = results
-          .filter((result) => result.status === 'success')
-          .map((result) => result.url as string);
+        const successfulImages = results.filter((result) => result.status === 'success').map((result) => result.url as string);
 
         const updatedValues = {
           ...userData,
@@ -167,10 +161,7 @@ const MediaInfo: React.FC = () => {
   return (
     <div className="media-info-container">
       <div className="header-icons">
-        <FaArrowLeft
-          className="icon"
-          onClick={() => navigate('/profile-edit-user/bio-skills-info')}
-        />
+        <FaArrowLeft className="icon" onClick={() => navigate('/profile-edit-user/bio-skills-info')} />
         <FaTimes className="icon" onClick={() => navigate('/')} />
       </div>
       <form onSubmit={formik.handleSubmit} className="media-info-form">
@@ -190,10 +181,7 @@ const MediaInfo: React.FC = () => {
           </div>
           {formik.touched.images && formik.errors.images ? (
             <div className="text-danger">
-              {Array.isArray(formik.errors.images) &&
-                formik.errors.images.map((error, index) => (
-                  <div key={index}>{typeof error === 'string' ? error : 'Invalid file type'}</div>
-                ))}
+              {Array.isArray(formik.errors.images) && formik.errors.images.map((error, index) => <div key={index}>{typeof error === 'string' ? error : 'Invalid file type'}</div>)}
             </div>
           ) : null}
           <div className="image-previews">
@@ -205,9 +193,7 @@ const MediaInfo: React.FC = () => {
                   .filter((error) => error.imageName === src.split('/').pop())
                   .map((error, i) => (
                     <div key={i} className="text-danger" style={{ fontSize: '0.8em' }}>
-                      Error:{' '}
-                      {userFriendlyMessages[error.code as keyof typeof userFriendlyMessages] ||
-                        error.message.split(':')[0]}
+                      Error: {userFriendlyMessages[error.code as keyof typeof userFriendlyMessages] || error.message.split(':')[0]}
                     </div>
                   ))}
               </div>
@@ -217,8 +203,7 @@ const MediaInfo: React.FC = () => {
 
         {imageError && (
           <div className="alert alert-danger" role="alert">
-            {userFriendlyMessages[imageError.code as keyof typeof userFriendlyMessages] ||
-              imageError.message.split(':')[0]}
+            {userFriendlyMessages[imageError.code as keyof typeof userFriendlyMessages] || imageError.message.split(':')[0]}
           </div>
         )}
         {maxImagesError && (
@@ -228,11 +213,7 @@ const MediaInfo: React.FC = () => {
         )}
 
         <div className="button-container">
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={userData?.images?.length !== undefined && userData.images.length >= 5}
-          >
+          <button type="submit" className="btn btn-primary" disabled={userData?.images?.length !== undefined && userData.images.length >= 5}>
             Save
           </button>
         </div>

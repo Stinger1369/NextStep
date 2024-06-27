@@ -21,7 +21,8 @@ interface User {
   address?: Address;
   age?: number;
   profession?: string;
-  company?: string;
+  company?: string; // Ajout de la propriété company
+  companyId?: string; // Ajout de la propriété companyId
   bio?: string;
   experience?: string[];
   education?: string[];
@@ -56,26 +57,23 @@ export const getUserById = createAsyncThunk('user/getUserById', async (id: strin
   return response.data;
 });
 
-export const updateUser = createAsyncThunk(
-  'user/updateUser',
-  async ({ id, userData }: { id: string; userData: Partial<User> }, { getState }) => {
-    const state = getState() as RootState;
-    const token = state.auth.token;
+export const updateUser = createAsyncThunk('user/updateUser', async ({ id, userData }: { id: string; userData: Partial<User> }, { getState }) => {
+  const state = getState() as RootState;
+  const token = state.auth.token;
 
-    try {
-      const response = await axiosInstance.put(`/users/${id}`, userData, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      console.log('User updated successfully:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating user:', error);
-      throw error;
-    }
+  try {
+    const response = await axiosInstance.put(`/users/${id}`, userData, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    console.log('User updated successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw error;
   }
-);
+});
 
 export const deleteUser = createAsyncThunk('user/deleteUser', async (id: string) => {
   await axiosInstance.delete(`/users/${id}`);

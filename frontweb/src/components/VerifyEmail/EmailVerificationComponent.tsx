@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AppDispatch } from '../../redux/store';
-import {
-  performVerifyEmail,
-  performResendVerificationCode
-} from '../../redux/features/auth/authVerifyEmail';
+import { performVerifyEmail, performResendVerificationCode } from '../../redux/features/auth/authVerifyEmail';
 //import "./VerifyEmailComponent.css";
 
 const VerifyEmailComponent: React.FC = () => {
@@ -80,13 +77,7 @@ const VerifyEmailComponent: React.FC = () => {
     <div className="verification-container">
       {error && <div className="error">{error}</div>}
       <form onSubmit={handleSubmit} className="verification-form">
-        <input
-          type="text"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          placeholder="Enter verification code"
-          required
-        />
+        <input type="text" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Enter verification code" required />
         <button type="submit">Verify Email</button>
       </form>
       <div className="resend-container">
