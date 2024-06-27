@@ -60,7 +60,9 @@ const UserProfile: React.FC = () => {
               </button>
             )}
             <div className="carousel-image-container">
-              <img src={user.images[currentImageIndex]} alt={`User ${currentImageIndex + 1}`} className="d-block w-100 rounded" />
+              {user.images.map((image, index) => (
+                <img key={index} src={image} alt={`User ${index + 1}`} className={`carousel-image ${index === currentImageIndex ? 'active' : ''}`} />
+              ))}
             </div>
             {user.images.length > 1 && (
               <button className="carousel-control-next" onClick={handleNextImage}>
