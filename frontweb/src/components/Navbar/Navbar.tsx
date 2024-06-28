@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
     if (user && (!user.firstName || !user.lastName)) {
       navigate('/profile-edit-user/personal-info');
     } else {
-      navigate('/user-profile');
+      navigate(`/user-profile/${user?._id}`);
     }
   };
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../pages/Home/Home';
 import About from '../pages/About/About';
@@ -23,10 +23,11 @@ import RecruitOtherInfo from '../pages/ProfileSection/ProfileEditRecruits/OtherI
 import RecruitSocialMediaInfo from '../pages/ProfileSection/ProfileEditRecruits/SocialMediaInfo/SocialMediaInfo';
 import UserProfile from '../pages/ProfileSection/UserProfile/UserProfile';
 import PublicUserProfile from '../pages/ProfileSection/PublicUserProfile/PublicUserProfile';
+import Members from '../pages/Members/Members';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../redux/store';
 import { getCompanies } from '../redux/features/company/companySlice';
-import { useEffect } from 'react';
+
 const AppRoutes: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const status = useSelector((state: RootState) => state.company.status);
@@ -63,8 +64,9 @@ const AppRoutes: React.FC = () => {
         <Route path="/edit-recruit/:companyId/other-info" element={<RecruitOtherInfo />} />
         <Route path="/edit-recruit/:companyId/social-media-info" element={<RecruitSocialMediaInfo />} />
         <Route path="/profile-edit-recruiter" element={user ? <ProfileEditRecruits /> : <Navigate to="/login" />} />
-        <Route path="/user-profile" element={user ? <UserProfile /> : <Navigate to="/login" />} />
+        <Route path="/user-profile/:userId" element={user ? <UserProfile /> : <Navigate to="/login" />} />
         <Route path="/public-profile/:userId" element={<PublicUserProfile />} />
+        <Route path="/members" element={<Members />} />
       </Routes>
     </Router>
   );

@@ -29,7 +29,13 @@ const RegisterComponent: React.FC = () => {
       await registerUser(formData, dispatch);
       navigate('/verify-email', { state: { emailOrPhone } });
     } catch (error) {
-      setError('Error registering user. Please check the form and try again.');
+      if (error instanceof Error) {
+        console.error('Error registering user:', error.message);
+        setError(error.message);
+      } else {
+        console.error('Unknown error registering user:', error);
+        setError('Error registering user. Please check the form and try again.');
+      }
     }
   };
 

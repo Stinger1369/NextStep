@@ -45,6 +45,7 @@ const validateRefreshToken = [
 const notificationService = new NotificationService();
 
 // Fonction pour enregistrer un utilisateur
+
 export const register = [
   ...validateRegister,
   async (req: Request, res: Response) => {
@@ -67,7 +68,13 @@ export const register = [
 
     // Vérification du domaine de l'email
     if (!validateEmailDomain(emailOrPhone)) {
-      return res.status(400).json({ message: "Invalid email domain." });
+      console.log(`Invalid email domain: ${emailOrPhone}`);
+      return res
+        .status(400)
+        .json({
+          message:
+            "Invalid email domain. We do not accept fake or temporary emails.",
+        });
     }
 
     try {
@@ -113,7 +120,6 @@ export const register = [
     }
   },
 ];
-
 // Fonction pour connecter un utilisateur
 export const login = [
   ...validateLogin,

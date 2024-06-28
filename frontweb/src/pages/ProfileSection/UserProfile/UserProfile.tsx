@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
 import { getUserById } from '../../../redux/features/user/userSlice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './UserProfile.css';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
@@ -11,6 +11,7 @@ import ModalUserProfile from '../../../components/ModalUserProfile/ModalUserProf
 const UserProfile: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const { userId } = useParams<{ userId: string }>();
   const authUser = useSelector((state: RootState) => state.auth.user);
   const user = useSelector((state: RootState) => state.user.user);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -18,18 +19,28 @@ const UserProfile: React.FC = () => {
   const [modalImageIndex, setModalImageIndex] = useState(0);
 
   useEffect(() => {
-    if (authUser?._id) {
-      dispatch(getUserById(authUser._id));
+    if (userId) {
+      console.log(`Fetching user with ID: ${userId}`);
+      dispatch(getUserById(userId));
     }
-  }, [dispatch, authUser?._id]);
+  }, [dispatch, userId]);
 
   useEffect(() => {
-    if (user?.images) {
-      console.log('User images:', user.images);
+    if (user) {
+      console.log('Fetched user:', user);
+      if (user.images) {
+        console.log('User images:', user.images);
+      }
     }
   }, [user]);
 
+  useEffect(() => {
+    console.log('Auth User:', authUser);
+    console.log('Profile User:', user);
+  }, [authUser, user]);
+
   const handleEditProfile = () => {
+    console.log('Navigating to profile-edit-user/personal-info');
     navigate('/profile-edit-user/personal-info');
   };
 
@@ -73,9 +84,15 @@ const UserProfile: React.FC = () => {
   return (
     <div className="user-profile-container container mt-5">
       <div className="profile-header position-relative">
-        <button className="btn btn-outline-primary edit-profile-btn" onClick={handleEditProfile} style={{ position: 'absolute', right: '10px', top: '10px' }}>
-          Edit My Profile
-        </button>
+        {authUser?._id === user._id && (
+          <button
+            className="btn btn-outline-primary edit-profile-btn"
+            onClick={handleEditProfile}
+            style={{ position: 'absolute', right: '10px', top: '10px', zIndex: 1000 }} // Adding z-index to ensure the button is clickable
+          >
+            Edit My Profile
+          </button>
+        )}
         {user.images && user.images.length > 0 && (
           <div className="carousel mb-3">
             {user.images.length > 1 && (

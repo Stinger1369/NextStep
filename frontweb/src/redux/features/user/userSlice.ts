@@ -1,3 +1,5 @@
+// redux/features/user/userSlice.ts
+
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '../../../axiosConfig';
 import { RootState } from '../../store';
@@ -35,13 +37,13 @@ interface User {
   skills?: string[];
   images?: string[];
   videos?: string[];
-  hobbies?: string[]; // Ajouté pour les hobbies
+  hobbies?: string[];
   sex?: string;
   showAge?: boolean;
-  company?: string; // Pour les utilisateurs travaillant dans une seule entreprise
-  companyId?: string; // Pour les utilisateurs travaillant dans une seule entreprise
-  companies?: string[]; // Pour les utilisateurs gérant plusieurs entreprises
-  socialLinks?: SocialLinks; // Liens de réseaux sociaux
+  company?: string;
+  companyId?: string;
+  companies?: string[];
+  socialLinks?: SocialLinks;
 }
 
 interface UserState {

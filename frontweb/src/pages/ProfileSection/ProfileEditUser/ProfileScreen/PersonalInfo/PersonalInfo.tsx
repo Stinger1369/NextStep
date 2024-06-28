@@ -60,8 +60,8 @@ const PersonalInfo: React.FC = () => {
       showAge: false
     },
     validationSchema: Yup.object({
-      firstName: Yup.string(),
-      lastName: Yup.string(),
+      firstName: Yup.string().required('First name is required'),
+      lastName: Yup.string().required('Last name is required'),
       phone: Yup.string(),
       dateOfBirth: Yup.date().nullable(),
       sex: Yup.string(),
@@ -133,7 +133,7 @@ const PersonalInfo: React.FC = () => {
             </div>
             <div className="col-md-6 form-field">
               <label htmlFor="age" className="form-label">
-                Your Have
+                You Have
               </label>
               <input type="text" id="age" className="form-control" value={age !== null ? age : ''} readOnly />
               <label htmlFor="showAge" className="form-label">

@@ -2,8 +2,10 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '../../../axiosConfig';
 import { RootState } from '../../store';
 import { AxiosError } from 'axios';
+import { ApiError } from '../../../../src/types';
 
-export interface Address {
+// Définir les types et interfaces nécessaires
+interface Address {
   street?: string;
   city?: string;
   state?: string;
@@ -11,7 +13,7 @@ export interface Address {
   country?: string;
 }
 
-export interface SocialLinks {
+interface SocialLinks {
   github?: string;
   twitter?: string;
   instagram?: string;
@@ -19,7 +21,7 @@ export interface SocialLinks {
   discord?: string;
 }
 
-export interface User {
+interface User {
   _id: string;
   firstName?: string;
   lastName?: string;
@@ -83,7 +85,7 @@ export const login = createAsyncThunk(
     } catch (error) {
       if (isAxiosError(error)) {
         if (error.response) {
-          return rejectWithValue(error.response.data);
+          return rejectWithValue(error.response.data as ApiError);
         }
       }
       throw error;
@@ -91,9 +93,18 @@ export const login = createAsyncThunk(
   }
 );
 
-export const register = createAsyncThunk('auth/register', async (formData: FormData) => {
-  const response = await axiosInstance.post('/auth/register', formData);
-  return response.data;
+export const register = createAsyncThunk('auth/register', async (formData: FormData, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.post('/auth/register', formData);
+    return response.data;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      if (error.response) {
+        return rejectWithValue(error.response.data as ApiError);
+      }
+    }
+    throw error;
+  }
 });
 
 export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, { getState }) => {
@@ -174,7 +185,7 @@ const authSlice = createSlice({
       )
       .addCase(login.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload ? action.payload.toString() : 'Failed to login';
+        state.error = action.payload ? (action.payload as ApiError).message : 'Failed to login';
       })
       .addCase(register.pending, (state) => {
         state.status = 'loading';
@@ -186,7 +197,7 @@ const authSlice = createSlice({
       })
       .addCase(register.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message || 'Failed to register';
+        state.error = action.payload ? (action.payload as ApiError).message : 'Failed to register';
       })
       .addCase(refreshToken.pending, (state) => {
         state.status = 'loading';
@@ -200,7 +211,7 @@ const authSlice = createSlice({
       })
       .addCase(refreshToken.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message || 'Failed to refresh token';
+        state.error = action.payload ? (action.payload as ApiError).message : 'Failed to refresh token';
       })
       .addCase(requestPasswordReset.pending, (state) => {
         state.status = 'loading';
@@ -210,7 +221,7 @@ const authSlice = createSlice({
       })
       .addCase(requestPasswordReset.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message || 'Failed to request password reset';
+        state.error = action.payload ? (action.payload as ApiError).message : 'Failed to request password reset';
       })
       .addCase(resendVerificationCode.pending, (state) => {
         state.status = 'loading';
@@ -220,7 +231,7 @@ const authSlice = createSlice({
       })
       .addCase(resendVerificationCode.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message || 'Failed to resend verification code';
+        state.error = action.payload ? (action.payload as ApiError).message : 'Failed to resend verification code';
       })
       .addCase(resetPassword.pending, (state) => {
         state.status = 'loading';
@@ -230,7 +241,7 @@ const authSlice = createSlice({
       })
       .addCase(resetPassword.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message || 'Failed to reset password';
+        state.error = action.payload ? (action.payload as ApiError).message : 'Failed to reset password';
       })
       .addCase(verifyEmail.pending, (state) => {
         state.status = 'loading';
@@ -240,7 +251,7 @@ const authSlice = createSlice({
       })
       .addCase(verifyEmail.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message || 'Failed to verify email';
+        state.error = action.payload ? (action.payload as ApiError).message : 'Failed to verify email';
       });
   }
 });
