@@ -36,7 +36,8 @@
   color: #333;
 }
 
-.form-group input {
+.form-group input,
+.form-group textarea {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
@@ -46,7 +47,8 @@
   transition: border-color 0.3s ease;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group textarea:focus {
   border-color: #007bff;
   outline: none;
 }
@@ -87,4 +89,12 @@ button.btn-primary {
 
 button.btn-primary:hover {
   background-color: #0056b3;
+}
+
+button.btn-danger {
+  background-color: #dc3545;
+}
+
+button.btn-danger:hover {
+  background-color: #c82333;
 }
