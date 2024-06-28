@@ -79,19 +79,16 @@ const UserProfile: React.FC = () => {
         {user.images && user.images.length > 0 && (
           <div className="carousel mb-3">
             {user.images.length > 1 && (
-              <button className="carousel-control-prev" onClick={handlePrevImage}>
+              <button className="carousel-control-prev" onClick={handlePrevImage} aria-label="Previous image">
                 <FaArrowLeft />
               </button>
             )}
             <div className="carousel-image-container">
               {user.images.map((image, index) => (
-                <img
+                <button
                   key={index}
-                  src={image}
-                  alt={`User ${index + 1}`}
                   className={`carousel-image ${index === currentImageIndex ? 'active' : ''}`}
                   onClick={() => openModal(index)}
-                  role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -99,11 +96,14 @@ const UserProfile: React.FC = () => {
                     }
                   }}
                   aria-label={`Image ${index + 1}`}
-                />
+                  style={{ background: 'none', border: 'none', padding: 0 }}
+                >
+                  <img src={image} alt={`User ${index + 1}`} className="carousel-image-content" />
+                </button>
               ))}
             </div>
             {user.images.length > 1 && (
-              <button className="carousel-control-next" onClick={handleNextImage}>
+              <button className="carousel-control-next" onClick={handleNextImage} aria-label="Next image">
                 <FaArrowRight />
               </button>
             )}

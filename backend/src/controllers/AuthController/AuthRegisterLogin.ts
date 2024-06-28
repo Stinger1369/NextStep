@@ -1,3 +1,5 @@
+// src/controllers/AuthController/AuthRegisterLogin.ts
+
 import { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import User from "../../models/User";
@@ -11,6 +13,7 @@ import {
 import crypto from "crypto";
 import { createSession } from "../../utils/sessionUtils";
 import NotificationService from "notiflib";
+import { validateEmailDomain } from "email-domain-validator-bilel"; // Import de la bibliothèque
 
 // Middleware de validation
 const validateRegister = [
@@ -60,6 +63,11 @@ export const register = [
       return res
         .status(400)
         .json({ message: "Email or phone and password are required" });
+    }
+
+    // Vérification du domaine de l'email
+    if (!validateEmailDomain(emailOrPhone)) {
+      return res.status(400).json({ message: "Invalid email domain." });
     }
 
     try {
