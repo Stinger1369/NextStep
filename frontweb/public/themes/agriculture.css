@@ -1,0 +1,76 @@
+/* Set a natural, green color scheme for the agriculture theme */
+body {
+  background-color: #f4f7f0; /* Light greenish background */
+  color: #2d4b23; /* Dark green text */
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Style headers with a dark green color */
+h1, h2, h3, h4, h5, h6 {
+  color: #2d4b23; /* Dark green */
+}
+
+/* Style buttons with green colors and rounded edges */
+button {
+  background-color: #6ba45b; /* Medium green */
+  color: #ffffff; /* White text */
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Change button color on hover */
+button:hover {
+  background-color: #507a3b; /* Darker green */
+}
+
+/* Add some padding to containers */
+.container {
+  padding: 20px;
+}
+
+/* Style links with a green color and underline */
+a {
+  color: #6ba45b; /* Medium green */
+  text-decoration: underline;
+}
+
+/* Change link color on hover */
+a:hover {
+  color: #507a3b; /* Darker green */
+}
+
+/* Add a border and padding to input fields */
+input, textarea {
+  border: 2px solid #6ba45b; /* Medium green border */
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* Add some margin to form elements */
+form .form-group {
+  margin-bottom: 15px;
+}
+
+/* Style for tables to make them look more natural */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+table th, table td {
+  border: 1px solid #6ba45b; /* Medium green border */
+  padding: 10px;
+  text-align: left;
+}
+
+table th {
+  background-color: #507a3b; /* Darker green background for headers */
+  color: #ffffff; /* White text */
+}
+
+table tr:nth-child(even) {
+  background-color: #f4f7f0; /* Light greenish background for even rows */
+}

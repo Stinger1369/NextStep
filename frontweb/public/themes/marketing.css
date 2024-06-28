@@ -1,0 +1,78 @@
+/* Set a vibrant and modern color scheme for the marketing theme */
+body {
+  background-color: #ffffff; /* White background */
+  color: #333333; /* Dark gray text */
+  font-family: 'Helvetica', sans-serif;
+}
+
+/* Style headers with a bold and eye-catching color */
+h1, h2, h3, h4, h5, h6 {
+  color: #ff5733; /* Vibrant orange-red */
+}
+
+/* Style buttons with marketing-themed colors and rounded edges */
+button {
+  background-color: #33c3ff; /* Bright blue */
+  color: #ffffff; /* White text */
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+/* Change button color on hover */
+button:hover {
+  background-color: #007acc; /* Darker blue */
+}
+
+/* Add some padding to containers */
+.container {
+  padding: 20px;
+}
+
+/* Style links with a vibrant blue color and underline */
+a {
+  color: #33c3ff; /* Bright blue */
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+/* Change link color on hover */
+a:hover {
+  color: #007acc; /* Darker blue */
+}
+
+/* Add a border and padding to input fields */
+input, textarea {
+  border: 2px solid #ff5733; /* Vibrant orange-red border */
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* Add some margin to form elements */
+form .form-group {
+  margin-bottom: 15px;
+}
+
+/* Style for tables to make them look more professional */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+table th, table td {
+  border: 1px solid #ff5733; /* Vibrant orange-red border */
+  padding: 10px;
+  text-align: left;
+}
+
+table th {
+  background-color: #ff5733; /* Vibrant orange-red background for headers */
+  color: #ffffff; /* White text */
+}
+
+table tr:nth-child(even) {
+  background-color: #f2f2f2; /* Light gray background for even rows */
+}

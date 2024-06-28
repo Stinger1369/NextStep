@@ -1,0 +1,76 @@
+/* Set a vibrant and warm color scheme for the food theme */
+body {
+  background-color: #fff5e1; /* Light beige background */
+  color: #6b4226; /* Brown text */
+  font-family: 'Comic Sans MS', sans-serif;
+}
+
+/* Style headers with a warm orange color */
+h1, h2, h3, h4, h5, h6 {
+  color: #ff6f00; /* Warm orange */
+}
+
+/* Style buttons with food-themed colors and rounded edges */
+button {
+  background-color: #ff6f00; /* Warm orange */
+  color: #ffffff; /* White text */
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Change button color on hover */
+button:hover {
+  background-color: #e65c00; /* Darker warm orange */
+}
+
+/* Add some padding to containers */
+.container {
+  padding: 20px;
+}
+
+/* Style links with a warm brown color and underline */
+a {
+  color: #6b4226; /* Brown */
+  text-decoration: underline;
+}
+
+/* Change link color on hover */
+a:hover {
+  color: #4d2e1f; /* Darker brown */
+}
+
+/* Add a border and padding to input fields */
+input, textarea {
+  border: 2px solid #ff6f00; /* Warm orange border */
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* Add some margin to form elements */
+form .form-group {
+  margin-bottom: 15px;
+}
+
+/* Style for tables to make them look more appetizing */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+table th, table td {
+  border: 1px solid #ff6f00; /* Warm orange border */
+  padding: 10px;
+  text-align: left;
+}
+
+table th {
+  background-color: #ff6f00; /* Warm orange background for headers */
+  color: #ffffff; /* White text */
+}
+
+table tr:nth-child(even) {
+  background-color: #fff5e1; /* Light beige background for even rows */
+}

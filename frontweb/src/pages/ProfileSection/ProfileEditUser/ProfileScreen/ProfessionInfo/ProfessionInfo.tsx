@@ -20,7 +20,7 @@ const ProfessionInfo: React.FC = () => {
       profession: '',
       company: '',
       hobbies: [''],
-      socialLinks: {
+      socialMediaLinks: {
         github: '',
         twitter: '',
         instagram: '',
@@ -32,7 +32,7 @@ const ProfessionInfo: React.FC = () => {
       profession: Yup.string(),
       company: Yup.string(),
       hobbies: Yup.array().of(Yup.string().required('Hobby is required')),
-      socialLinks: Yup.object({
+      socialMediaLinks: Yup.object({
         github: Yup.string().url('Invalid URL'),
         twitter: Yup.string().url('Invalid URL'),
         instagram: Yup.string().url('Invalid URL'),
@@ -47,7 +47,7 @@ const ProfessionInfo: React.FC = () => {
           profession: values.profession,
           company: values.company,
           hobbies: values.hobbies.filter((hobby) => hobby.trim() !== ''),
-          socialLinks: values.socialLinks
+          socialMediaLinks: values.socialMediaLinks
         };
         console.log('Updating user with profession info:', updatedValues);
         await dispatch(updateUser({ id: user._id, userData: updatedValues }));
@@ -68,12 +68,12 @@ const ProfessionInfo: React.FC = () => {
         profession: userData.profession || '',
         company: userData.company || '',
         hobbies: userData.hobbies && userData.hobbies.length > 0 ? userData.hobbies : [''],
-        socialLinks: {
-          github: userData.socialLinks?.github || '',
-          twitter: userData.socialLinks?.twitter || '',
-          instagram: userData.socialLinks?.instagram || '',
-          facebook: userData.socialLinks?.facebook || '',
-          discord: userData.socialLinks?.discord || ''
+        socialMediaLinks: {
+          github: userData.socialMediaLinks?.github || '',
+          twitter: userData.socialMediaLinks?.twitter || '',
+          instagram: userData.socialMediaLinks?.instagram || '',
+          facebook: userData.socialMediaLinks?.facebook || '',
+          discord: userData.socialMediaLinks?.discord || ''
         }
       });
     }
@@ -87,7 +87,7 @@ const ProfessionInfo: React.FC = () => {
         profession: formik.values.profession,
         company: formik.values.company,
         hobbies: formik.values.hobbies.filter((hobby) => hobby.trim() !== ''),
-        socialLinks: formik.values.socialLinks
+        socialMediaLinks: formik.values.socialMediaLinks
       };
       await dispatch(updateUser({ id: user._id, userData: updatedValues }));
     }
@@ -114,33 +114,33 @@ const ProfessionInfo: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="socialLinks.github">Github</label>
-            <input type="text" id="socialLinks.github" {...formik.getFieldProps('socialLinks.github')} className="form-control" />
-            {formik.touched.socialLinks?.github && formik.errors.socialLinks?.github ? <div className="text-danger">{formik.errors.socialLinks.github}</div> : null}
+            <label htmlFor="socialMediaLinks.github">Github</label>
+            <input type="text" id="socialMediaLinks.github" {...formik.getFieldProps('socialMediaLinks.github')} className="form-control" />
+            {formik.touched.socialMediaLinks?.github && formik.errors.socialMediaLinks?.github ? <div className="text-danger">{formik.errors.socialMediaLinks.github}</div> : null}
           </div>
 
           <div className="form-group">
-            <label htmlFor="socialLinks.twitter">Twitter</label>
-            <input type="text" id="socialLinks.twitter" {...formik.getFieldProps('socialLinks.twitter')} className="form-control" />
-            {formik.touched.socialLinks?.twitter && formik.errors.socialLinks?.twitter ? <div className="text-danger">{formik.errors.socialLinks.twitter}</div> : null}
+            <label htmlFor="socialMediaLinks.twitter">Twitter</label>
+            <input type="text" id="socialMediaLinks.twitter" {...formik.getFieldProps('socialMediaLinks.twitter')} className="form-control" />
+            {formik.touched.socialMediaLinks?.twitter && formik.errors.socialMediaLinks?.twitter ? <div className="text-danger">{formik.errors.socialMediaLinks.twitter}</div> : null}
           </div>
 
           <div className="form-group">
-            <label htmlFor="socialLinks.instagram">Instagram</label>
-            <input type="text" id="socialLinks.instagram" {...formik.getFieldProps('socialLinks.instagram')} className="form-control" />
-            {formik.touched.socialLinks?.instagram && formik.errors.socialLinks?.instagram ? <div className="text-danger">{formik.errors.socialLinks.instagram}</div> : null}
+            <label htmlFor="socialMediaLinks.instagram">Instagram</label>
+            <input type="text" id="socialMediaLinks.instagram" {...formik.getFieldProps('socialMediaLinks.instagram')} className="form-control" />
+            {formik.touched.socialMediaLinks?.instagram && formik.errors.socialMediaLinks?.instagram ? <div className="text-danger">{formik.errors.socialMediaLinks.instagram}</div> : null}
           </div>
 
           <div className="form-group">
-            <label htmlFor="socialLinks.facebook">Facebook</label>
-            <input type="text" id="socialLinks.facebook" {...formik.getFieldProps('socialLinks.facebook')} className="form-control" />
-            {formik.touched.socialLinks?.facebook && formik.errors.socialLinks?.facebook ? <div className="text-danger">{formik.errors.socialLinks.facebook}</div> : null}
+            <label htmlFor="socialMediaLinks.facebook">Facebook</label>
+            <input type="text" id="socialMediaLinks.facebook" {...formik.getFieldProps('socialMediaLinks.facebook')} className="form-control" />
+            {formik.touched.socialMediaLinks?.facebook && formik.errors.socialMediaLinks?.facebook ? <div className="text-danger">{formik.errors.socialMediaLinks.facebook}</div> : null}
           </div>
 
           <div className="form-group">
-            <label htmlFor="socialLinks.discord">Discord</label>
-            <input type="text" id="socialLinks.discord" {...formik.getFieldProps('socialLinks.discord')} className="form-control" />
-            {formik.touched.socialLinks?.discord && formik.errors.socialLinks?.discord ? <div className="text-danger">{formik.errors.socialLinks.discord}</div> : null}
+            <label htmlFor="socialMediaLinks.discord">Discord</label>
+            <input type="text" id="socialMediaLinks.discord" {...formik.getFieldProps('socialMediaLinks.discord')} className="form-control" />
+            {formik.touched.socialMediaLinks?.discord && formik.errors.socialMediaLinks?.discord ? <div className="text-danger">{formik.errors.socialMediaLinks.discord}</div> : null}
           </div>
 
           <div className="form-group">

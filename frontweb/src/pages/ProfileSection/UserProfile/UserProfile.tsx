@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './UserProfile.css';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import ModalUserProfile from '../../../components/ModalUserProfile/ModalUserProfile';
+import axios from 'axios';
 
 const UserProfile: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -17,6 +18,10 @@ const UserProfile: React.FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImageIndex, setModalImageIndex] = useState(0);
+  const [themeEnabled, setThemeEnabled] = useState(true);
+  const [themeLink, setThemeLink] = useState<HTMLLinkElement | null>(null);
+  const [theme, setTheme] = useState('no_theme');
+  const [key, setKey] = useState(0);
 
   useEffect(() => {
     if (userId) {
@@ -31,13 +36,67 @@ const UserProfile: React.FC = () => {
       if (user.images) {
         console.log('User images:', user.images);
       }
+      if (userId) {
+        fetchThemeStatus(userId);
+      }
     }
-  }, [user]);
+  }, [user, userId]);
+
+  const fetchThemeStatus = async (userId: string) => {
+    try {
+      const response = await axios.post('http://localhost:8001/theme_status', { userId });
+      setThemeEnabled(response.data.theme_enabled);
+      setTheme(response.data.theme);
+      if (response.data.theme_enabled) {
+        loadTheme(response.data.theme);
+      } else {
+        removeTheme();
+      }
+    } catch (error) {
+      console.error('Error fetching theme status:', error);
+    }
+  };
+
+  const loadTheme = (theme: string) => {
+    removeTheme();
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `/themes/${theme}.css`;
+    document.head.appendChild(link);
+    setThemeLink(link);
+  };
+
+  const removeTheme = () => {
+    if (themeLink) {
+      document.head.removeChild(themeLink);
+      setThemeLink(null);
+    }
+  };
+
+  const toggleTheme = async () => {
+    try {
+      const response = await axios.post('http://localhost:8001/toggle_theme', {
+        userId,
+        profession: user?.profession || 'No Profession' // Inclure la profession de l'utilisateur dans la requête
+      });
+      const themeStatus = response.data.theme_enabled;
+      setThemeEnabled(themeStatus);
+      if (themeStatus) {
+        loadTheme(response.data.theme);
+      } else {
+        removeTheme();
+      }
+      setKey((prevKey) => prevKey + 1);
+    } catch (error) {
+      console.error('Error toggling theme:', error);
+    }
+  };
 
   useEffect(() => {
-    console.log('Auth User:', authUser);
-    console.log('Profile User:', user);
-  }, [authUser, user]);
+    return () => {
+      removeTheme();
+    };
+  }, []);
 
   const handleEditProfile = () => {
     console.log('Navigating to profile-edit-user/personal-info');
@@ -82,14 +141,13 @@ const UserProfile: React.FC = () => {
   }
 
   return (
-    <div className="user-profile-container container mt-5">
+    <div key={key} className="user-profile-container container mt-5">
       <div className="profile-header position-relative">
+        <button className="btn btn-outline-secondary toggle-theme-btn" onClick={toggleTheme} style={{ position: 'absolute', right: '140px', top: '10px', zIndex: 1000 }}>
+          {themeEnabled ? 'Disable Theme' : 'Enable Theme'}
+        </button>
         {authUser?._id === user._id && (
-          <button
-            className="btn btn-outline-primary edit-profile-btn"
-            onClick={handleEditProfile}
-            style={{ position: 'absolute', right: '10px', top: '10px', zIndex: 1000 }} // Adding z-index to ensure the button is clickable
-          >
+          <button className="btn btn-outline-primary edit-profile-btn" onClick={handleEditProfile} style={{ position: 'absolute', right: '10px', top: '10px', zIndex: 1000 }}>
             Edit My Profile
           </button>
         )}

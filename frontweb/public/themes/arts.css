@@ -1,0 +1,81 @@
+/* Set a vibrant color scheme for the arts theme */
+body {
+  background-color: #f5e8e4; /* Light peach background */
+  color: #4a154b; /* Deep purple text */
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Style headers with a deep purple color */
+h1, h2, h3, h4, h5, h6 {
+  color: #4a154b; /* Deep purple */
+  font-family: 'Brush Script MT', cursive; /* Artistic font for headers */
+}
+
+/* Style buttons with vibrant colors and rounded edges */
+button {
+  background-color: #ff477e; /* Bright pink */
+  color: #ffffff; /* White text */
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Change button color on hover */
+button:hover {
+  background-color: #d6336c; /* Darker pink */
+}
+
+/* Add some padding to containers */
+.container {
+  padding: 20px;
+}
+
+/* Style links with a pink color and underline */
+a {
+  color: #ff477e; /* Bright pink */
+  text-decoration: underline;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Change link color on hover */
+a:hover {
+  color: #d6336c; /* Darker pink */
+}
+
+/* Add a border and padding to input fields */
+input, textarea {
+  border: 2px solid #ff477e; /* Bright pink border */
+  padding: 10px;
+  border-radius: 5px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Add some margin to form elements */
+form .form-group {
+  margin-bottom: 15px;
+}
+
+/* Style for tables to make them look more artistic */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+table th, table td {
+  border: 1px solid #ff477e; /* Bright pink border */
+  padding: 10px;
+  text-align: left;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+table th {
+  background-color: #d6336c; /* Darker pink background for headers */
+  color: #ffffff; /* White text */
+}
+
+table tr:nth-child(even) {
+  background-color: #f5e8e4; /* Light peach background for even rows */
+}

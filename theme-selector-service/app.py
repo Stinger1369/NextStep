@@ -1,0 +1,77 @@
+from flask import Flask, request, jsonify
+from flask_pymongo import PyMongo
+import logging
+import pandas as pd
+from flask_cors import CORS
+
+app = Flask(__name__)
+app.config["MONGO_URI"] = "mongodb://localhost:27017/mydatabase"
+mongo = PyMongo(app)
+
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+
+# Charger le mappage des professions
+mapping_df = pd.read_csv('data/profession_to_theme_mapping.csv')
+profession_to_theme = dict(zip(mapping_df['Profession'], mapping_df['Theme']))
+
+# Configuration du logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+
+@app.route('/predict_theme', methods=['POST'])
+def predict_theme():
+    data = request.get_json()
+    profession = data.get('profession', 'No Profession')
+
+    if profession in profession_to_theme:
+        theme = profession_to_theme[profession]
+    else:
+        theme = profession_to_theme['No Profession']
+
+    return jsonify({'theme': theme})
+
+@app.route('/toggle_theme', methods=['POST'])
+def toggle_theme():
+    data = request.get_json()
+    user_id = data.get('userId', 'dummy_user_id')
+    profession = data.get('profession', 'No Profession')
+
+    users_collection = mongo.db.users
+    user_theme = users_collection.find_one({'userId': user_id})
+
+    if not user_theme:
+        return jsonify({'error': 'User not found'}), 404
+
+    current_theme_enabled = user_theme.get('theme_enabled', True)
+    new_theme_enabled = not current_theme_enabled
+
+    users_collection.update_one(
+        {'userId': user_id},
+        {'$set': {'theme_enabled': new_theme_enabled}}
+    )
+
+    theme = profession_to_theme.get(profession, 'no_theme')
+
+    logging.info(f'Theme toggled: {"Enabled" if new_theme_enabled else "Disabled"}')
+    logging.info(f'Theme status for user {user_id}: {"Enabled" if new_theme_enabled else "Disabled"}, Theme: {theme}')
+
+    return jsonify({'theme_enabled': new_theme_enabled, 'theme': theme})
+
+@app.route('/theme_status', methods=['POST'])
+def get_theme_status():
+    data = request.get_json()
+    user_id = data.get('userId', 'dummy_user_id')
+
+    users_collection = mongo.db.users
+    user_theme = users_collection.find_one({'userId': user_id})
+
+    if user_theme:
+        theme_enabled = user_theme.get('theme_enabled', True)
+        profession = user_theme.get('profession', 'No Profession')
+        theme = profession_to_theme.get(profession, 'no_theme')
+        logging.info(f'Theme status for user {user_id}: {"Enabled" if theme_enabled else "Disabled"}, Theme: {theme}, Profession: {profession}')
+        return jsonify({'theme_enabled': theme_enabled, 'theme': theme, 'profession': profession})
+    else:
+        return jsonify({'error': 'User not found'}), 404
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8001)

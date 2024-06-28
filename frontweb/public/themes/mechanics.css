@@ -1,0 +1,80 @@
+/* Set an industrial and robust color scheme for the mechanics theme */
+body {
+  background-color: #f4f4f4; /* Light gray background */
+  color: #333333; /* Dark gray text */
+  font-family: 'Arial', sans-serif;
+}
+
+/* Style headers with a bold and strong color */
+h1, h2, h3, h4, h5, h6 {
+  color: #ff6600; /* Industrial orange */
+}
+
+/* Style buttons with mechanics-themed colors and bold borders */
+button {
+  background-color: #333333; /* Dark gray */
+  color: #ffffff; /* White text */
+  border: 2px solid #ff6600; /* Industrial orange border */
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 3px;
+}
+
+/* Change button color on hover */
+button:hover {
+  background-color: #ff6600; /* Industrial orange */
+  border: 2px solid #333333; /* Dark gray border */
+  color: #ffffff; /* White text */
+}
+
+/* Add some padding to containers */
+.container {
+  padding: 20px;
+}
+
+/* Style links with a dark gray color and underline */
+a {
+  color: #333333; /* Dark gray */
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+/* Change link color on hover */
+a:hover {
+  color: #ff6600; /* Industrial orange */
+}
+
+/* Add a border and padding to input fields */
+input, textarea {
+  border: 2px solid #333333; /* Dark gray border */
+  padding: 10px;
+  border-radius: 3px;
+}
+
+/* Add some margin to form elements */
+form .form-group {
+  margin-bottom: 15px;
+}
+
+/* Style for tables to make them look more professional */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+table th, table td {
+  border: 1px solid #333333; /* Dark gray border */
+  padding: 10px;
+  text-align: left;
+}
+
+table th {
+  background-color: #333333; /* Dark gray background for headers */
+  color: #ffffff; /* White text */
+}
+
+table tr:nth-child(even) {
+  background-color: #e0e0e0; /* Light gray background for even rows */
+}

@@ -53,16 +53,18 @@ export const updateUser = async (req: Request, res: Response) => {
     experience,
     education,
     skills,
-    hobbies, // Ajouté pour les hobbies
+    hobbies,
     images,
     videos,
     sex,
     dateOfBirth,
     showAge,
-    socialMediaLinks, // Ajouté pour les liens de réseaux sociaux
+    socialMediaLinks,
   } = req.body;
 
   try {
+    console.log("Received data:", req.body);
+
     let age;
     if (dateOfBirth) {
       const now = new Date();
@@ -83,9 +85,9 @@ export const updateUser = async (req: Request, res: Response) => {
       ...(phone && { phone }),
       ...(address && { address }),
       ...(profession && { profession }),
-      ...(company && { company }), // Ajout de company
-      ...(companyId && { companyId }), // Ajout de companyId
-      ...(companies && { companies }), // Ajout de la propriété companies
+      ...(company && { company }),
+      ...(companyId && { companyId }),
+      ...(companies && { companies }),
       ...(bio && { bio }),
       ...(experience && {
         experience: Array.isArray(experience)
@@ -98,15 +100,17 @@ export const updateUser = async (req: Request, res: Response) => {
           : education.split(",").map((edu: string) => edu.trim()),
       }),
       ...(skills && { skills }),
-      ...(hobbies && { hobbies }), // Ajouté pour les hobbies
+      ...(hobbies && { hobbies }),
       ...(images && { images }),
       ...(videos && { videos }),
       ...(sex && { sex }),
       ...(dateOfBirth && { dateOfBirth }),
       ...(age !== undefined && { age }),
       ...(showAge !== undefined && { showAge }),
-      ...(socialMediaLinks && { socialMediaLinks }), // Ajouté pour les liens de réseaux sociaux
+      ...(socialMediaLinks && { socialMediaLinks }),
     };
+
+    console.log("Update data:", updateData);
 
     const user = await User.findByIdAndUpdate(id, updateData, {
       new: true,
@@ -119,12 +123,14 @@ export const updateUser = async (req: Request, res: Response) => {
 
     res.status(200).json(user);
   } catch (error) {
+    console.error("Error updating user:", error);
     res.status(500).json({
       message: "Erreur lors de la mise à jour de l'utilisateur",
       error,
     });
   }
 };
+
 
 export const deleteUser = async (req: Request, res: Response) => {
   const { id } = req.params;

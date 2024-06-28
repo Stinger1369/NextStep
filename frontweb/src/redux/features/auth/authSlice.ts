@@ -13,7 +13,7 @@ interface Address {
   country?: string;
 }
 
-interface SocialLinks {
+interface socialMediaLinks {
   github?: string;
   twitter?: string;
   instagram?: string;
@@ -45,7 +45,7 @@ interface User {
   company?: string; // Pour les utilisateurs travaillant dans une seule entreprise
   companyId?: string; // Pour les utilisateurs travaillant dans une seule entreprise
   companies?: string[]; // Pour les utilisateurs gérant plusieurs entreprises
-  socialLinks?: SocialLinks; // Liens de réseaux sociaux
+  socialMediaLinks?: socialMediaLinks; // Liens de réseaux sociaux
 }
 
 interface AuthState {

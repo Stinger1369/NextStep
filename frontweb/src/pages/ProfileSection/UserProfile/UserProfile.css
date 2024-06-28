@@ -76,3 +76,9 @@
 .profile-section ul {
   text-align: left;
 }
+.toggle-theme-btn {
+  position: absolute;
+  right: 140px;
+  top: 10px;
+  z-index: 1000;
+}

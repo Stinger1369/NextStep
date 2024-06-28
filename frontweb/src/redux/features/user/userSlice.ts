@@ -12,7 +12,7 @@ interface Address {
   country?: string;
 }
 
-interface SocialLinks {
+interface socialMediaLinks {
   github?: string;
   twitter?: string;
   instagram?: string;
@@ -43,7 +43,7 @@ interface User {
   company?: string;
   companyId?: string;
   companies?: string[];
-  socialLinks?: SocialLinks;
+  socialMediaLinks?: socialMediaLinks;
 }
 
 interface UserState {

@@ -1,0 +1,50 @@
+Profession,Theme
+Accountants and Auditors,finance
+Actors,entertainment
+Actuaries,finance
+Acupuncturists,healthcare
+Acute Care Nurses,healthcare
+Software Developer,technology
+Web Developer,technology
+Data Scientist,technology
+Graphic Designer,arts
+Marketing Manager,marketing
+Mechanical Engineer,engineering
+Agricultural Engineer,agriculture
+Air Traffic Controller,aviation
+Artist,arts
+Automotive Technician,mechanics
+Baker,food
+Bartender,hospitality
+Biologist,science
+Bus Driver,transportation
+Business Analyst,business
+Chef,food
+Civil Engineer,engineering
+Construction Worker,construction
+Customer Service Representative,customer service
+Delivery Driver,delivery
+Doctor,healthcare
+Elementary School Teacher,education
+Farmer,agriculture
+Firefighter,public safety
+Journalist,media
+Lawyer,legal
+Librarian,library
+Marketing Specialist,marketing
+Nurse,healthcare
+Personal Trainer,personal care
+Photographer,arts
+Pilot,aviation
+Police Officer,law enforcement
+Real Estate Agent,business
+Restaurant Manager,hospitality
+Sales Manager,management
+Social Worker,social services
+Software Engineer,technology
+Sports Coach,sports
+Veterinarian,healthcare
+Waiter,hospitality
+Welder,manufacturing
+Writer,media
+No Profession,no_theme
