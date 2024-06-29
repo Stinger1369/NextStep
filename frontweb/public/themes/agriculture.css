@@ -1,12 +1,18 @@
 /* Set a natural, green color scheme for the agriculture theme */
-body {
+.user-profile-container {
   background-color: #f4f7f0; /* Light greenish background */
   color: #2d4b23; /* Dark green text */
   font-family: 'Roboto', sans-serif;
 }
 
 /* Style headers with a dark green color */
-h1, h2, h3, h4, h5, h6 {
+
+.user-profile-container h1,
+.user-profile-container h2,
+.user-profile-container h3,
+.user-profile-container h4,
+.user-profile-container h5,
+.user-profile-container h6  {
   color: #2d4b23; /* Dark green */
 }
 
@@ -21,28 +27,29 @@ button {
 }
 
 /* Change button color on hover */
-button:hover {
+.user-profile-container button:hover  {
   background-color: #507a3b; /* Darker green */
 }
 
 /* Add some padding to containers */
-.container {
+.user-profile-container a:hover {
   padding: 20px;
 }
 
 /* Style links with a green color and underline */
-a {
+.user-profile-container a {
   color: #6ba45b; /* Medium green */
   text-decoration: underline;
 }
 
 /* Change link color on hover */
-a:hover {
+.user-profile-container a:hover {
   color: #507a3b; /* Darker green */
 }
 
 /* Add a border and padding to input fields */
-input, textarea {
+.user-profile-container input,
+.user-profile-container textarea {
   border: 2px solid #6ba45b; /* Medium green border */
   padding: 10px;
   border-radius: 5px;
@@ -54,23 +61,24 @@ form .form-group {
 }
 
 /* Style for tables to make them look more natural */
-table {
+t.user-profile-container form .form-group {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
 }
 
-table th, table td {
+.user-profile-container table th,
+.user-profile-container table td{
   border: 1px solid #6ba45b; /* Medium green border */
   padding: 10px;
   text-align: left;
 }
 
-table th {
+.user-profile-container table th{
   background-color: #507a3b; /* Darker green background for headers */
   color: #ffffff; /* White text */
 }
 
-table tr:nth-child(even) {
+.user-profile-container table tr:nth-child(even){
   background-color: #f4f7f0; /* Light greenish background for even rows */
 }

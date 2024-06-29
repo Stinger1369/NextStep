@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik, FieldArray, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +14,7 @@ const BioSkillsInfo: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const userData = useSelector((state: RootState) => state.user.user);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (user?._id) {
@@ -47,6 +48,7 @@ const BioSkillsInfo: React.FC = () => {
     }),
     onSubmit: async (values) => {
       if (user?._id) {
+        setIsSubmitting(true);
         const updatedValues = {
           ...userData,
           bio: values.bio,
@@ -56,6 +58,7 @@ const BioSkillsInfo: React.FC = () => {
         };
         console.log('Updating user with bio and skills info:', updatedValues);
         await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+        setIsSubmitting(false);
         navigate('/profile-edit-user/media-info');
       }
     }
@@ -64,6 +67,7 @@ const BioSkillsInfo: React.FC = () => {
   const handleSave = async () => {
     console.log('Saved Bio and Skills Info:', formik.values);
     if (user?._id) {
+      setIsSubmitting(true);
       const updatedValues = {
         ...userData,
         bio: formik.values.bio,
@@ -72,6 +76,7 @@ const BioSkillsInfo: React.FC = () => {
         skills: formik.values.skills.filter((skill) => skill.trim() !== '')
       };
       await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+      setIsSubmitting(false);
     }
   };
 
@@ -156,11 +161,11 @@ const BioSkillsInfo: React.FC = () => {
           </div>
 
           <div className="button-container">
-            <button type="button" className="btn btn-secondary" onClick={handleSave}>
-              Save
+            <button type="button" className="btn btn-secondary" onClick={handleSave} disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : 'Save'}
             </button>
-            <button type="submit" className="btn btn-primary">
-              Continue
+            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : 'Continue'}
             </button>
           </div>
         </form>

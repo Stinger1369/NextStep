@@ -26,6 +26,43 @@ const MediaInfo: React.FC = () => {
   const imageErrors = useSelector((state: RootState) => state.images.imageErrors);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [maxImagesError, setMaxImagesError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [isSaveDisabled, setIsSaveDisabled] = useState(true);
+
+  const formik = useFormik<FormValues>({
+    initialValues: { images: [] },
+    validationSchema: Yup.object({
+      images: Yup.array().max(5, 'You can upload up to 5 images')
+    }),
+    onSubmit: async (values) => {
+      setIsSubmitting(true);
+      console.log('Submitting form with values:', values);
+
+      if (user?._id && userData?.images) {
+        const base64Images = await Promise.all(
+          values.images.slice(0, 5 - userData.images.length).map(async (image) => {
+            const base64 = await encodeFileToBase64(image);
+            console.log(`Encoded base64 for ${image.name}`);
+            return { imageName: image.name, imageBase64: base64 };
+          })
+        );
+
+        try {
+          if (base64Images.length === 1) {
+            await handleSingleImageUpload(base64Images[0]);
+          } else {
+            await handleMultipleImagesUpload(base64Images);
+          }
+        } catch (error) {
+          console.error('Error adding images:', error);
+        }
+
+        setIsSubmitting(false);
+        setShowSuccessMessage(true);
+      }
+    }
+  });
 
   useEffect(() => {
     if (user?._id) {
@@ -39,42 +76,9 @@ const MediaInfo: React.FC = () => {
     }
   }, [userData]);
 
-  const formik = useFormik<FormValues>({
-    initialValues: { images: [] },
-    validationSchema: Yup.object({
-      images: Yup.array().max(5, 'You can upload up to 5 images')
-    }),
-    onSubmit: async (values) => {
-      console.log('Submitting form with values:', values);
-
-      if (user?._id && userData?.images) {
-        const base64Images = await Promise.all(
-          values.images.map(async (image) => {
-            const base64 = await encodeFileToBase64(image);
-            console.log(`Encoded base64 for ${image.name}`);
-            return { imageName: image.name, imageBase64: base64 };
-          })
-        );
-
-        const totalImages = userData.images.length + base64Images.length;
-
-        if (totalImages > 5) {
-          setMaxImagesError(`You can only upload 5 images. Please delete some images before adding new ones.`);
-          return;
-        }
-
-        try {
-          if (base64Images.length === 1) {
-            await handleSingleImageUpload(base64Images[0]);
-          } else {
-            await handleMultipleImagesUpload(base64Images);
-          }
-        } catch (error) {
-          console.error('Error adding images:', error);
-        }
-      }
-    }
-  });
+  useEffect(() => {
+    setIsSaveDisabled(formik.values.images.length === 0 || (userData?.images?.length ?? 0) >= 5);
+  }, [formik.values.images, userData]);
 
   const handleSingleImageUpload = async (image: { imageName: string; imageBase64: string }) => {
     if (user?._id && userData) {
@@ -131,11 +135,13 @@ const MediaInfo: React.FC = () => {
 
   const handleImagesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.currentTarget.files || []);
-    console.log('Selected image files:', files);
+    const validFiles = files.slice(0, 5 - (userData?.images?.length || 0));
+    console.log('Selected image files:', validFiles);
 
-    const previews = files.map((file) => URL.createObjectURL(file));
+    const previews = validFiles.map((file) => URL.createObjectURL(file));
     setImagePreviews((prevPreviews) => [...prevPreviews, ...previews]);
-    formik.setFieldValue('images', files);
+    formik.setFieldValue('images', validFiles);
+    setIsSaveDisabled(validFiles.length === 0);
   };
 
   const handleDeleteImage = async (imageUrl: string) => {
@@ -213,11 +219,20 @@ const MediaInfo: React.FC = () => {
         )}
 
         <div className="button-container">
-          <button type="submit" className="btn btn-primary" disabled={userData?.images?.length !== undefined && userData.images.length >= 5}>
-            Save
+          <button type="submit" className="btn btn-primary" disabled={isSaveDisabled || isSubmitting}>
+            {isSubmitting ? 'Saving...' : 'Save'}
+          </button>
+          <button className="btn btn-success ms-2" onClick={() => navigate(`/user-profile/${user?._id}`)}>
+            Finish
           </button>
         </div>
       </form>
+
+      {showSuccessMessage && (
+        <div className="success-message mt-3">
+          <p>Your image has been added successfully.</p>
+        </div>
+      )}
     </div>
   );
 };

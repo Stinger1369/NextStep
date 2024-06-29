@@ -3,6 +3,7 @@ import axiosInstance from '../../../axiosConfig';
 import { RootState } from '../../store';
 import { AxiosError } from 'axios';
 import { ApiError } from '../../../../src/types';
+import { updateUser } from '../user/userSlice';
 
 // Définir les types et interfaces nécessaires
 interface Address {
@@ -252,6 +253,12 @@ const authSlice = createSlice({
       .addCase(verifyEmail.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload ? (action.payload as ApiError).message : 'Failed to verify email';
+      })
+      .addCase(updateUser.fulfilled, (state, action: PayloadAction<User>) => {
+        if (state.user && state.user._id === action.payload._id) {
+          state.user = action.payload;
+          localStorage.setItem('user', JSON.stringify(action.payload));
+        }
       });
   }
 });

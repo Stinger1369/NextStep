@@ -14,6 +14,7 @@ const PersonalInfo: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const userData = useSelector((state: RootState) => state.user.user);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [age, setAge] = useState<number | null>(null);
 
@@ -69,12 +70,14 @@ const PersonalInfo: React.FC = () => {
     }),
     onSubmit: async (values) => {
       if (user?._id) {
+        setIsSubmitting(true);
         const updatedValues = {
           ...values,
           dateOfBirth: values.dateOfBirth ? new Date(values.dateOfBirth) : undefined
         };
         console.log('Updating user with values:', updatedValues);
         await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+        setIsSubmitting(false);
         navigate('/profile-edit-user/address-info');
       }
     }
@@ -143,11 +146,11 @@ const PersonalInfo: React.FC = () => {
             </div>
           </div>
           <div className="button-container mt-3">
-            <button type="button" className="btn btn-secondary me-2" onClick={formik.submitForm}>
-              Save
+            <button type="button" className="btn btn-secondary me-2" onClick={formik.submitForm} disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : 'Save'}
             </button>
-            <button type="submit" className="btn btn-primary">
-              Continue
+            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : 'Continue'}
             </button>
           </div>
         </form>

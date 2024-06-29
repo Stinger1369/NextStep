@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +14,7 @@ const AddressInfo: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const userData = useSelector((state: RootState) => state.user.user);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (user?._id) {
@@ -50,12 +51,14 @@ const AddressInfo: React.FC = () => {
     }),
     onSubmit: async (values) => {
       if (user?._id) {
+        setIsSubmitting(true);
         const updatedValues = {
           ...userData,
           address: values
         };
         console.log('Updating user with address:', updatedValues);
         await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+        setIsSubmitting(false);
         navigate('/profile-edit-user/profession-info');
       }
     }
@@ -120,11 +123,11 @@ const AddressInfo: React.FC = () => {
         </div>
 
         <div className="button-container mt-3">
-          <button type="button" className="btn btn-secondary me-2" onClick={handleSave}>
-            Save
+          <button type="button" className="btn btn-secondary me-2" onClick={handleSave} disabled={isSubmitting}>
+            {isSubmitting ? 'Saving...' : 'Save'}
           </button>
-          <button type="submit" className="btn btn-primary">
-            Continue
+          <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+            {isSubmitting ? 'Saving...' : 'Continue'}
           </button>
         </div>
       </form>

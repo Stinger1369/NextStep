@@ -1,11 +1,12 @@
+// src/AppRoutes.tsx
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import Home from '../pages/Home/Home';
 import About from '../pages/About/About';
 import LoginComponent from '../pages/LoginPages/LoginComponent';
 import RegisterComponent from '../pages/RegisterPages/RegisterComponent';
 import PasswordResetComponent from '../pages/PasswordReset/PasswordReset/PasswordResetComponent';
-import JobOffers from '../pages/JobOffers/JobOffers';
 import Navbar from '../components/Navbar/Navbar';
 import VerifyEmailComponent from '../components/VerifyEmail/EmailVerificationComponent';
 import PasswordResetRequestComponent from '../pages/PasswordReset/PasswordRequest/PasswordResetRequestComponent';
@@ -24,7 +25,6 @@ import RecruitSocialMediaInfo from '../pages/ProfileSection/ProfileEditRecruits/
 import UserProfile from '../pages/ProfileSection/UserProfile/UserProfile';
 import PublicUserProfile from '../pages/ProfileSection/PublicUserProfile/PublicUserProfile';
 import Members from '../pages/Members/Members';
-import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../redux/store';
 import { getCompanies } from '../redux/features/company/companySlice';
 
@@ -48,7 +48,6 @@ const AppRoutes: React.FC = () => {
         <Route path="/login" element={!user ? <LoginComponent /> : <Navigate to="/" />} />
         <Route path="/register" element={!user ? <RegisterComponent /> : <Navigate to="/" />} />
         <Route path="/password-reset" element={<PasswordResetComponent />} />
-        <Route path="/job-offers" element={<JobOffers />} />
         <Route path="/verify-email" element={<VerifyEmailComponent />} />
         <Route path="/password-request-reset" element={<PasswordResetRequestComponent />} />
         <Route path="/profile-edit-user/personal-info" element={user ? <PersonalInfo /> : <Navigate to="/login" />} />

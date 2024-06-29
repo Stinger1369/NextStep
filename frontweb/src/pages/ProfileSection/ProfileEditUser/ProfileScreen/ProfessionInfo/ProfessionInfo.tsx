@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik, FieldArray, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +14,7 @@ const ProfessionInfo: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const userData = useSelector((state: RootState) => state.user.user);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -42,6 +43,7 @@ const ProfessionInfo: React.FC = () => {
     }),
     onSubmit: async (values) => {
       if (user?._id) {
+        setIsSubmitting(true);
         const updatedValues = {
           ...userData,
           profession: values.profession,
@@ -51,6 +53,7 @@ const ProfessionInfo: React.FC = () => {
         };
         console.log('Updating user with profession info:', updatedValues);
         await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+        setIsSubmitting(false);
         navigate('/profile-edit-user/bio-skills-info');
       }
     }
@@ -166,11 +169,11 @@ const ProfessionInfo: React.FC = () => {
           </div>
 
           <div className="button-container">
-            <button type="button" className="btn btn-secondary" onClick={handleSave}>
-              Save
+            <button type="button" className="btn btn-secondary" onClick={handleSave} disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : 'Save'}
             </button>
-            <button type="submit" className="btn btn-primary">
-              Continue
+            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : 'Continue'}
             </button>
           </div>
         </form>
