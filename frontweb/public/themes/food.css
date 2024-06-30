@@ -1,76 +1,85 @@
 /* Set a vibrant and warm color scheme for the food theme */
-body {
+.user-profile-container {
   background-color: #fff5e1; /* Light beige background */
   color: #6b4226; /* Brown text */
   font-family: 'Comic Sans MS', sans-serif;
 }
 
 /* Style headers with a warm orange color */
-h1, h2, h3, h4, h5, h6 {
+.user-profile-container h1,
+.user-profile-container h2,
+.user-profile-container h3,
+.user-profile-container h4,
+.user-profile-container h5,
+.user-profile-container h6 {
   color: #ff6f00; /* Warm orange */
 }
 
 /* Style buttons with food-themed colors and rounded edges */
-button {
+.user-profile-container button {
   background-color: #ff6f00; /* Warm orange */
   color: #ffffff; /* White text */
   border: none;
   padding: 10px 20px;
   cursor: pointer;
   border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
+  font-weight: bold;
 }
 
 /* Change button color on hover */
-button:hover {
+.user-profile-container button:hover {
   background-color: #e65c00; /* Darker warm orange */
 }
 
-/* Add some padding to containers */
-.container {
-  padding: 20px;
-}
-
 /* Style links with a warm brown color and underline */
-a {
+.user-profile-container a {
   color: #6b4226; /* Brown */
   text-decoration: underline;
+  font-weight: bold;
 }
 
 /* Change link color on hover */
-a:hover {
+.user-profile-container a:hover {
   color: #4d2e1f; /* Darker brown */
 }
 
 /* Add a border and padding to input fields */
-input, textarea {
+.user-profile-container input,
+.user-profile-container textarea {
   border: 2px solid #ff6f00; /* Warm orange border */
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 5px; /* Smooth borders */
+  background-color: #ffffff; /* Light input background */
+  color: #6b4226; /* Brown text */
 }
 
 /* Add some margin to form elements */
-form .form-group {
+.user-profile-container form .form-group {
   margin-bottom: 15px;
 }
 
 /* Style for tables to make them look more appetizing */
-table {
+.user-profile-container table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
+  background-color: #fff5e1; /* Light beige background for tables */
 }
 
-table th, table td {
+.user-profile-container table th,
+.user-profile-container table td {
   border: 1px solid #ff6f00; /* Warm orange border */
   padding: 10px;
   text-align: left;
+  color: #6b4226; /* Brown text */
 }
 
-table th {
+.user-profile-container table th {
   background-color: #ff6f00; /* Warm orange background for headers */
   color: #ffffff; /* White text */
 }
 
-table tr:nth-child(even) {
-  background-color: #fff5e1; /* Light beige background for even rows */
+.user-profile-container table tr:nth-child(even) {
+  background-color: #ffe8d1; /* Lighter beige background for even rows */
 }

@@ -1,76 +1,85 @@
 /* Set a warm and welcoming color scheme for the hospitality theme */
-body {
+.user-profile-container {
   background-color: #f2f2f2; /* Light gray background */
   color: #333333; /* Dark gray text */
   font-family: 'Arial', sans-serif;
 }
 
 /* Style headers with a warm brown color */
-h1, h2, h3, h4, h5, h6 {
+.user-profile-container h1,
+.user-profile-container h2,
+.user-profile-container h3,
+.user-profile-container h4,
+.user-profile-container h5,
+.user-profile-container h6 {
   color: #8b4513; /* Saddle brown */
 }
 
 /* Style buttons with hospitality-themed colors and rounded edges */
-button {
+.user-profile-container button {
   background-color: #d2691e; /* Chocolate brown */
   color: #ffffff; /* White text */
   border: none;
   padding: 10px 20px;
   cursor: pointer;
   border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
+  font-weight: bold;
 }
 
 /* Change button color on hover */
-button:hover {
+.user-profile-container button:hover {
   background-color: #a0522d; /* Sienna */
 }
 
-/* Add some padding to containers */
-.container {
-  padding: 20px;
-}
-
 /* Style links with a warm brown color and underline */
-a {
+.user-profile-container a {
   color: #8b4513; /* Saddle brown */
   text-decoration: underline;
+  font-weight: bold;
 }
 
 /* Change link color on hover */
-a:hover {
+.user-profile-container a:hover {
   color: #5a3d2b; /* Darker brown */
 }
 
 /* Add a border and padding to input fields */
-input, textarea {
+.user-profile-container input,
+.user-profile-container textarea {
   border: 2px solid #d2691e; /* Chocolate brown border */
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 5px; /* Smooth borders */
+  background-color: #ffffff; /* Light input background */
+  color: #333333; /* Dark gray text */
 }
 
 /* Add some margin to form elements */
-form .form-group {
+.user-profile-container form .form-group {
   margin-bottom: 15px;
 }
 
 /* Style for tables to make them look more elegant */
-table {
+.user-profile-container table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
+  background-color: #ffffff; /* Light background for tables */
 }
 
-table th, table td {
+.user-profile-container table th,
+.user-profile-container table td {
   border: 1px solid #d2691e; /* Chocolate brown border */
   padding: 10px;
   text-align: left;
+  color: #333333; /* Dark gray text */
 }
 
-table th {
+.user-profile-container table th {
   background-color: #d2691e; /* Chocolate brown background for headers */
   color: #ffffff; /* White text */
 }
 
-table tr:nth-child(even) {
+.user-profile-container table tr:nth-child(even) {
   background-color: #f2f2f2; /* Light gray background for even rows */
 }

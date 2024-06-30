@@ -5,6 +5,7 @@ import companyReducer from './features/company/companySlice';
 import userReducer from './features/user/userSlice';
 import imageReducer from './features/image/imageSlice';
 import jobReducer from './features/jobs/jobSlice';
+import themeReducer from './features/theme/themeSlice';
 
 const store = configureStore({
   reducer: {
@@ -12,7 +13,8 @@ const store = configureStore({
     company: companyReducer,
     user: userReducer,
     images: imageReducer,
-    jobs: jobReducer
+    jobs: jobReducer,
+    theme: themeReducer
   }
 });
 

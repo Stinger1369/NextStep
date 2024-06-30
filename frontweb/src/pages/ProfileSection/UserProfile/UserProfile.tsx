@@ -2,26 +2,29 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
 import { getUserById } from '../../../redux/features/user/userSlice';
-import { useNavigate, useParams } from 'react-router-dom';
+import { getThemeStatus, changeThemeStatus } from '../../../redux/features/theme/thunks/themeThunk';
+import { ThemeStatus } from '../../../redux/features/theme/themeSlice';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './UserProfile.css';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import ModalUserProfile from '../../../components/ModalUserProfile/ModalUserProfile';
-import axios from 'axios';
 
 const UserProfile: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
+  const location = useLocation();
   const authUser = useSelector((state: RootState) => state.auth.user);
   const user = useSelector((state: RootState) => state.user.user);
+  const themeStatus = useSelector((state: RootState) => state.theme.themeStatus);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImageIndex, setModalImageIndex] = useState(0);
-  const [themeEnabled, setThemeEnabled] = useState(true);
   const [themeLink, setThemeLink] = useState<HTMLLinkElement | null>(null);
-  const [theme, setTheme] = useState('no_theme');
   const [key, setKey] = useState(0);
+
+  const profession = location.state?.profession;
 
   useEffect(() => {
     if (userId) {
@@ -32,28 +35,23 @@ const UserProfile: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      console.log('Fetched user:', user);
-      if (user.images) {
-        console.log('User images:', user.images);
-      }
-      if (userId) {
-        fetchThemeStatus(userId);
-      }
+      console.log(`Fetching theme status for profession: ${profession}`);
+      dispatch(getThemeStatus({ userId: user._id, profession: profession || 'No Profession' }));
     }
-  }, [user, userId]);
+  }, [user, dispatch, profession]);
 
-  const fetchThemeStatus = async (userId: string) => {
-    try {
-      const response = await axios.post('http://localhost:8001/theme_status', { userId });
-      setThemeEnabled(response.data.theme_enabled);
-      setTheme(response.data.theme);
-      if (response.data.theme_enabled) {
-        loadTheme(response.data.theme);
-      } else {
-        removeTheme();
-      }
-    } catch (error) {
-      console.error('Error fetching theme status:', error);
+  useEffect(() => {
+    if (themeStatus) {
+      console.log(`Applying theme for profession: ${profession}`);
+      applyTheme(themeStatus);
+    }
+  }, [themeStatus, profession]);
+
+  const applyTheme = (themeStatus: ThemeStatus) => {
+    if (themeStatus.theme_enabled) {
+      loadTheme(themeStatus.theme);
+    } else {
+      removeTheme();
     }
   };
 
@@ -61,34 +59,23 @@ const UserProfile: React.FC = () => {
     removeTheme();
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = `/themes/${theme}.css`;
+    link.href = `/themes/${theme}.css?${new Date().getTime()}`; // Ajoute un paramètre unique pour forcer le rechargement
     document.head.appendChild(link);
     setThemeLink(link);
   };
 
   const removeTheme = () => {
-    if (themeLink) {
-      document.head.removeChild(themeLink);
-      setThemeLink(null);
-    }
+    // Supprimer tous les liens de thèmes existants
+    const themeLinks = document.querySelectorAll('link[href*="/themes/"]');
+    themeLinks.forEach((link) => link.parentNode?.removeChild(link));
+    setThemeLink(null);
   };
 
   const toggleTheme = async () => {
-    try {
-      const response = await axios.post('http://localhost:8001/toggle_theme', {
-        userId,
-        profession: user?.profession || 'No Profession' // Inclure la profession de l'utilisateur dans la requête
-      });
-      const themeStatus = response.data.theme_enabled;
-      setThemeEnabled(themeStatus);
-      if (themeStatus) {
-        loadTheme(response.data.theme);
-      } else {
-        removeTheme();
-      }
+    if (userId && user) {
+      await dispatch(changeThemeStatus({ userId, profession: profession || 'No Profession' }));
+      await dispatch(getThemeStatus({ userId: user._id, profession: profession || 'No Profession' }));
       setKey((prevKey) => prevKey + 1);
-    } catch (error) {
-      console.error('Error toggling theme:', error);
     }
   };
 
@@ -99,7 +86,6 @@ const UserProfile: React.FC = () => {
   }, []);
 
   const handleEditProfile = () => {
-    console.log('Navigating to profile-edit-user/personal-info');
     navigate('/profile-edit-user/personal-info');
   };
 
@@ -144,7 +130,7 @@ const UserProfile: React.FC = () => {
     <div key={key} className="user-profile-container container mt-5">
       <div className="profile-header position-relative">
         <button className="btn btn-outline-secondary toggle-theme-btn" onClick={toggleTheme} style={{ position: 'absolute', right: '140px', top: '10px', zIndex: 1000 }}>
-          {themeEnabled ? 'Disable Theme' : 'Enable Theme'}
+          {themeStatus.theme_enabled ? 'Disable Theme' : 'Enable Theme'}
         </button>
         {authUser?._id === user._id && (
           <button className="btn btn-outline-primary edit-profile-btn" onClick={handleEditProfile} style={{ position: 'absolute', right: '10px', top: '10px', zIndex: 1000 }}>

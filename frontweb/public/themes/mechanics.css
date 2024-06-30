@@ -1,80 +1,87 @@
 /* Set an industrial and robust color scheme for the mechanics theme */
-body {
+.user-profile-container {
   background-color: #f4f4f4; /* Light gray background */
   color: #333333; /* Dark gray text */
-  font-family: 'Arial', sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 /* Style headers with a bold and strong color */
-h1, h2, h3, h4, h5, h6 {
+.user-profile-container h1,
+.user-profile-container h2,
+.user-profile-container h3,
+.user-profile-container h4,
+.user-profile-container h5,
+.user-profile-container h6 {
   color: #ff6600; /* Industrial orange */
 }
 
 /* Style buttons with mechanics-themed colors and bold borders */
-button {
+.user-profile-container button {
   background-color: #333333; /* Dark gray */
   color: #ffffff; /* White text */
   border: 2px solid #ff6600; /* Industrial orange border */
   padding: 10px 20px;
   cursor: pointer;
+  border-radius: 5px; /* Smooth borders */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
   font-weight: bold;
-  border-radius: 3px;
 }
 
 /* Change button color on hover */
-button:hover {
+.user-profile-container button:hover {
   background-color: #ff6600; /* Industrial orange */
   border: 2px solid #333333; /* Dark gray border */
   color: #ffffff; /* White text */
 }
 
-/* Add some padding to containers */
-.container {
-  padding: 20px;
-}
-
 /* Style links with a dark gray color and underline */
-a {
+.user-profile-container a {
   color: #333333; /* Dark gray */
   text-decoration: underline;
   font-weight: bold;
 }
 
 /* Change link color on hover */
-a:hover {
+.user-profile-container a:hover {
   color: #ff6600; /* Industrial orange */
 }
 
 /* Add a border and padding to input fields */
-input, textarea {
+.user-profile-container input,
+.user-profile-container textarea {
   border: 2px solid #333333; /* Dark gray border */
   padding: 10px;
-  border-radius: 3px;
+  border-radius: 5px; /* Smooth borders */
+  background-color: #ffffff; /* Light input background */
+  color: #333333; /* Dark gray text */
 }
 
 /* Add some margin to form elements */
-form .form-group {
+.user-profile-container form .form-group {
   margin-bottom: 15px;
 }
 
 /* Style for tables to make them look more professional */
-table {
+.user-profile-container table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
+  background-color: #ffffff; /* Light background for tables */
 }
 
-table th, table td {
+.user-profile-container table th,
+.user-profile-container table td {
   border: 1px solid #333333; /* Dark gray border */
   padding: 10px;
   text-align: left;
+  color: #333333; /* Dark gray text */
 }
 
-table th {
-  background-color: #333333; /* Dark gray background for headers */
+.user-profile-container table th {
+  background-color: #333333; /* Dark background for headers */
   color: #ffffff; /* White text */
 }
 
-table tr:nth-child(even) {
+.user-profile-container table tr:nth-child(even) {
   background-color: #e0e0e0; /* Light gray background for even rows */
 }

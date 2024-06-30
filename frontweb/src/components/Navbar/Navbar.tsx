@@ -1,8 +1,7 @@
-// src/components/Navbar/Navbar.tsx
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { FaHome, FaInfoCircle, FaUser, FaUserPlus, FaSignOutAlt, FaBriefcase, FaUserCircle, FaUsers } from 'react-icons/fa'; // Ajout de FaUsers pour l'icône des membres
+import { FaHome, FaInfoCircle, FaUser, FaUserPlus, FaSignOutAlt, FaBriefcase, FaUserCircle, FaUsers } from 'react-icons/fa';
 import logo from '../../assests/Images/nextstep.webp';
 import { RootState, AppDispatch } from '../../redux/store';
 import { performLogout } from '../../redux/features/auth/authLogout';
@@ -21,8 +20,9 @@ const Navbar: React.FC = () => {
   const handleProfileClick = () => {
     if (user && (!user.firstName || !user.lastName)) {
       navigate('/profile-edit-user/personal-info');
-    } else {
-      navigate(`/user-profile/${user?._id}`);
+    } else if (user && user._id) {
+      console.log(`Navigating to profile with profession: ${user.profession}`);
+      navigate(`/user-profile/${user._id}`, { state: { profession: user.profession } });
     }
   };
 

@@ -1,3 +1,5 @@
+// src/components/ProfessionInfo/ProfessionInfo.tsx
+
 import React, { useEffect, useState } from 'react';
 import { useFormik, FieldArray, FormikProvider } from 'formik';
 import * as Yup from 'yup';
@@ -8,6 +10,7 @@ import './ProfessionInfo.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../../redux/store';
 import { updateUser, getUserById } from '../../../../../redux/features/user/userSlice';
+import { changeThemeStatus, getThemeStatus } from '../../../../../redux/features/theme/thunks/themeThunk';
 
 const ProfessionInfo: React.FC = () => {
   const navigate = useNavigate();
@@ -32,7 +35,7 @@ const ProfessionInfo: React.FC = () => {
     validationSchema: Yup.object({
       profession: Yup.string(),
       company: Yup.string(),
-      hobbies: Yup.array().of(Yup.string().required('Hobby is required')),
+      hobbies: Yup.array().of(Yup.string()),
       socialMediaLinks: Yup.object({
         github: Yup.string().url('Invalid URL'),
         twitter: Yup.string().url('Invalid URL'),
@@ -53,6 +56,8 @@ const ProfessionInfo: React.FC = () => {
         };
         console.log('Updating user with profession info:', updatedValues);
         await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+        await dispatch(changeThemeStatus({ userId: user._id, profession: values.profession }));
+        await dispatch(getThemeStatus({ userId: user._id, profession: values.profession }));
         setIsSubmitting(false);
         navigate('/profile-edit-user/bio-skills-info');
       }
@@ -93,6 +98,8 @@ const ProfessionInfo: React.FC = () => {
         socialMediaLinks: formik.values.socialMediaLinks
       };
       await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+      await dispatch(changeThemeStatus({ userId: user._id, profession: formik.values.profession }));
+      await dispatch(getThemeStatus({ userId: user._id, profession: formik.values.profession }));
     }
   };
 
