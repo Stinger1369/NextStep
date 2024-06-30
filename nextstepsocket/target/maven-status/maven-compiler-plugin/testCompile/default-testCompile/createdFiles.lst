@@ -1,2 +1,2 @@
-com/example/AppTest.class
-com/example/SimpleChannelHandler.class
+com/mychat/AppTest.class
+com/mychat/handler/ChatHandlerTest.class

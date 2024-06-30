@@ -1,2 +1,4 @@
-/mnt/h/NextStep/nextstepsocket/src/test/java/com/example/AppTest.java
-/mnt/h/NextStep/nextstepsocket/src/test/java/com/example/SimpleChannelHandler.java
+/mnt/h/NextStep/nextstepsocket/src/test/java/com/mychat/AppTest.java
+/mnt/h/NextStep/nextstepsocket/src/test/java/com/mychat/handler/ChatHandlerTest.java
+/mnt/h/NextStep/nextstepsocket/src/test/java/com/mychat/service/UserServiceTest.java
+/mnt/h/NextStep/nextstepsocket/src/test/java/com/mychat/util/EncryptionUtilTest.java

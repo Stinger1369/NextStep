@@ -21,51 +21,139 @@ nextstepsocket/
 
 
 nextstepsocket/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── mychat/
-│   │   │           ├── config/
-│   │   │           │   ├── ServerConfig.java
-│   │   │           ├── handler/
-│   │   │           │   ├── ChatHandler.java
-│   │   │           │   ├── NotificationHandler.java
-│   │   │           │   └── AuthHandler.java
-│   │   │           ├── model/
-│   │   │           │   ├── User.java
-│   │   │           │   ├── Message.java
-│   │   │           │   └── Notification.java
-│   │   │           ├── service/
-│   │   │           │   ├── UserService.java
-│   │   │           │   ├── ChatService.java
-│   │   │           │   └── NotificationService.java
-│   │   │           ├── util/
-│   │   │           │   ├── EncryptionUtil.java
-│   │   │           │   └── ValidationUtil.java
-│   │   │           ├── ChatServer.java
-│   │   │           └── Main.java
-│   │   └── resources/
-│   │       └── application.properties
-│   ├── test/
-│   │   └── java/
-│   │       └── com/
-│   │           └── mychat/
-│   │               ├── handler/
-│   │               │   └── ChatHandlerTest.java
-│   │               ├── service/
-│   │               │   └── UserServiceTest.java
-│   │               └── util/
-│   │                   └── EncryptionUtilTest.java
-├── build/
-├── logs/
-├── data/
-│   └── database/
+├── Dockerfile
+├── build
+├── data
+│   └── database
 │       └── mychat.db
-├── scripts/
+├── dependency-reduced-pom.xml
+├── docker-compose.yml
+├── logs
+├── pom.xml
+├── readme.md
+├── scripts
 │   ├── start.sh
 │   └── stop.sh
-├── Dockerfile
-├── docker-compose.yml
-├── README.md
-└── pom.xml
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── com
+│   │   │       └── mychat
+│   │   │           ├── ChatServer.java
+│   │   │           ├── Main.java
+│   │   │           ├── config
+│   │   │           │   ├── MongoDBConnection.java
+│   │   │           │   └── ServerConfig.java
+│   │   │           ├── handler
+│   │   │           │   ├── AuthHandler.java
+│   │   │           │   ├── ChatHandler.java
+│   │   │           │   ├── NotificationHandler.java
+│   │   │           │   └── WebSocketFrameHandler.java
+│   │   │           ├── model
+│   │   │           │   ├── Message.java
+│   │   │           │   ├── Notification.java
+│   │   │           │   └── User.java
+│   │   │           ├── service
+│   │   │           │   ├── NotificationService.java
+│   │   │           │   └── UserService.java
+│   │   │           ├── util
+│   │   │               ├── EncryptionUtil.java
+│   │   │               └── ValidationUtil.java
+│   │   └── resources
+│   │       └── application.properties
+│   └── test
+│       └── java
+│           └── com
+│               └── mychat
+│                   ├── AppTest.java
+│                   ├── handler
+│                   │   └── ChatHandlerTest.java
+│                   ├── service
+│                   │   └── UserServiceTest.java
+│                   └── util
+│                       └── EncryptionUtilTest.java
+└── target
+    ├── classes
+    │   ├── application.properties
+    │   └── com
+    │       └── mychat
+    │           ├── ChatServer$1.class
+    │           ├── ChatServer.class
+    │           ├── Main.class
+    │           ├── config
+    │           │   └── MongoDBConnection.class
+    │           ├── handler
+    │           │   ├── AuthHandler.class
+    │           │   ├── ChatHandler.class
+    │           │   ├── NotificationHandler.class
+    │           │   └── WebSocketFrameHandler.class
+    │           ├── model
+    │           │   └── User.class
+    │           ├── service
+    │           │   └── UserService.class
+    │           └── util
+    │               └── EncryptionUtil.class
+    ├── generated-sources
+    │   └── annotations
+    ├── generated-test-sources
+    │   └── test-annotations
+    ├── maven-archiver
+    │   └── pom.properties
+    ├── maven-status
+    │   └── maven-compiler-plugin
+    │       ├── compile
+    │       │   └── default-compile
+    │       │       ├── createdFiles.lst
+    │       │       └── inputFiles.lst
+    │       └── testCompile
+    │           └── default-testCompile
+    │               ├── createdFiles.lst
+    │               └── inputFiles.lst
+    ├── nextstepsocket-1.0-SNAPSHOT-shaded.jar
+    ├── nextstepsocket-1.0-SNAPSHOT.jar
+    ├── surefire-reports
+    │   ├── TEST-com.mychat.AppTest.xml
+    │   └── com.mychat.AppTest.txt
+    └── test-classes
+        └── com
+            └── mychat
+                ├── AppTest.class
+                ├── handler
+                │   └── ChatHandlerTest.class
+                ├── service
+                └── util
+
+54 directories, 49 files
+
+
+# NextStep Socket Server
+
+This is a chat server built with Java and Netty for handling real-time communication.
+
+## Structure
+
+- **src/main/java/com/mychat**: Contains the main application code.
+- **src/test/java/com/mychat**: Contains test cases.
+- **scripts**: Contains scripts to start and stop the server.
+- **Dockerfile**: Docker configuration.
+- **docker-compose.yml**: Docker Compose configuration.
+- **logs**: Directory for log files.
+- **data**: Directory for database files.
+
+## How to Run
+### Using Maven
+
+```sh
+mvn clean install -U
+java -jar target/nextstepsocket-1.0-SNAPSHOT-shaded.jar
+
+## avec springboot
+mvn clean install -U
+mvn spring-boot:run
+
+without test
+mvn spring-boot:run -DskipTests
+
+pour docker
+docker-compose down
+docker-compose up -d
