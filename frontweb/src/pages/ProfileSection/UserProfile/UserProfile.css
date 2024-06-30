@@ -76,9 +76,29 @@
 .profile-section ul {
   text-align: left;
 }
+
 .toggle-theme-btn {
   position: absolute;
   right: 140px;
   top: 10px;
   z-index: 1000;
+}
+
+.Personal-Information {
+  display: flex;
+  flex-direction: row;
+}
+
+.social-media-links {
+  margin-left: 20px;
+}
+
+.separator {
+  border-left: 1px solid #ccc;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.hobbies-section {
+  margin-top: 20px;
 }

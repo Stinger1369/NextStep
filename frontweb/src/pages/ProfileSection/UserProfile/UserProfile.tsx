@@ -175,17 +175,38 @@ const UserProfile: React.FC = () => {
         </h2>
         <p className="text-muted">{user.profession}</p>
       </div>
-      <div className="profile-section">
-        <h3 className="text-secondary">Personal Information</h3>
-        <p>
-          <strong>Email:</strong> {user.emailOrPhone}
-        </p>
-        <p>
-          <strong>Phone:</strong> {user.phone}
-        </p>
-        <p>
-          <strong>Address:</strong> {user.address?.street}, {user.address?.city}, {user.address?.state}, {user.address?.zipCode}, {user.address?.country}
-        </p>
+      <div className="Personal-Information">
+        <div className="profile-section">
+          <h3 className="text-secondary">Personal Information</h3>
+          <p>
+            <strong>Email:</strong> {user.emailOrPhone}
+          </p>
+          <p>
+            <strong>Phone:</strong> {user.phone}
+          </p>
+          <p>
+            <strong>Address:</strong> {user.address?.street}, {user.address?.city}, {user.address?.state}, {user.address?.zipCode}, {user.address?.country}
+          </p>
+        </div>
+        <div className="separator"></div>
+        <div className="social-media-links">
+          <h3 className="text-secondary">Social Media Links</h3>
+          <p>
+            <strong>Github:</strong> {user.socialMediaLinks?.github}
+          </p>
+          <p>
+            <strong>Twitter:</strong> {user.socialMediaLinks?.twitter}
+          </p>
+          <p>
+            <strong>Instagram:</strong> {user.socialMediaLinks?.instagram}
+          </p>
+          <p>
+            <strong>Facebook:</strong> {user.socialMediaLinks?.facebook}
+          </p>
+          <p>
+            <strong>Discord:</strong> {user.socialMediaLinks?.discord}
+          </p>
+        </div>
       </div>
       <div className="row profile-section mt-4">
         <div className="col-md-6">
@@ -199,6 +220,10 @@ const UserProfile: React.FC = () => {
           <div>
             <strong>Education:</strong>
             <ul>{user.education?.map((edu, index) => <li key={index}>{edu}</li>)}</ul>
+          </div>
+          <div className="hobbies-section">
+            <h3 className="text-secondary">Hobbies</h3>
+            <ul>{user.hobbies?.map((hobby, index) => <li key={index}>{hobby}</li>)}</ul>
           </div>
         </div>
         <div className="col-md-6 vertical-line">
