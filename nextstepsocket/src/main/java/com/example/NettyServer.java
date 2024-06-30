@@ -1,29 +1,18 @@
-package com.example;
+package com.example; // Ensure the package declaration matches your directory structure
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpObject;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.*;
 
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
+import java.nio.charset.StandardCharsets;
+
+import static io.netty.handler.codec.http.HttpResponseStatus.*;
+import static io.netty.handler.codec.http.HttpVersion.*;
 
 public class NettyServer {
 
@@ -40,7 +29,7 @@ public class NettyServer {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .handler(new LoggingHandler(LogLevel.INFO))
+                    .handler(new LoggingHandler(LogLevel.INFO)) // Added LoggingHandler import
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
@@ -73,21 +62,59 @@ public class NettyServer {
     }
 
     private static class SimpleHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
+
+        private static final String CONTENT_TYPE = "text/plain";
+        private static final String CONNECTION = "keep-alive";
+
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
             if (msg instanceof FullHttpRequest) {
                 FullHttpRequest request = (FullHttpRequest) msg;
-                System.out.println("Received HTTP request: " + request.uri());
 
-                DefaultFullHttpResponse response = new DefaultFullHttpResponse(
-                        HTTP_1_1, OK, Unpooled.wrappedBuffer("Hello, World!".getBytes()));
-                response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
-                response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-                response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-
-                ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-                System.out.println("Sent HTTP response: Hello, World!");
+                if (request.method() == HttpMethod.GET) {
+                    handleGetRequest(ctx, request);
+                } else if (request.method() == HttpMethod.POST) {
+                    handlePostRequest(ctx, request);
+                } else {
+                    sendError(ctx, METHOD_NOT_ALLOWED);
+                }
             }
+        }
+
+        private void handleGetRequest(ChannelHandlerContext ctx, FullHttpRequest request) {
+            DefaultFullHttpResponse response = new DefaultFullHttpResponse(
+                    HTTP_1_1, OK, Unpooled.wrappedBuffer("Hello, World! This is a GET request.".getBytes()));
+            setCommonResponseHeaders(response);
+            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+            System.out.println("Received HTTP GET request: " + request.uri());
+            System.out.println("Sent HTTP response for GET request");
+        }
+
+        private void handlePostRequest(ChannelHandlerContext ctx, FullHttpRequest request) {
+            ByteBuf content = request.content();
+            String message = content.toString(StandardCharsets.UTF_8);
+
+            // You can process the message here, e.g., store it in a database or send a response
+            // For demonstration purposes, we'll just echo back the message in the response
+            DefaultFullHttpResponse response = new DefaultFullHttpResponse(
+                    HTTP_1_1, OK, Unpooled.wrappedBuffer(("Received message: " + message).getBytes()));
+            setCommonResponseHeaders(response);
+            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+            System.out.println("Received HTTP POST request: " + request.uri());
+            System.out.println("Sent HTTP response for POST request");
+        }
+
+        private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
+            DefaultFullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, status,
+                    Unpooled.wrappedBuffer(status.toString().getBytes()));
+            setCommonResponseHeaders(response);
+            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+        }
+
+        private void setCommonResponseHeaders(DefaultFullHttpResponse response) {
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE, CONTENT_TYPE);
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
+            response.headers().set(HttpHeaderNames.CONNECTION, CONNECTION);
         }
     }
 }
