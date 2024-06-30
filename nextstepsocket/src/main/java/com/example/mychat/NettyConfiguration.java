@@ -1,6 +1,6 @@
 package com.example.mychat;
 
-import com.example.mychat.controller.MessageController;
+import com.example.mychat.controller.ConversationController;
 import com.example.mychat.controller.NotificationController;
 import com.example.mychat.model.Message;
 import com.example.mychat.model.Notification;
@@ -33,20 +33,13 @@ public class NettyConfiguration {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> route(MessageController messageController,
+    public RouterFunction<ServerResponse> route(ConversationController conversationController,
             NotificationController notificationController) {
         return RouterFunctions.route()
-                .POST("/messages",
-                        request -> request.bodyToMono(Message.class).flatMap(messageController::createMessage))
-                .GET("/messages/{id}", request -> messageController.getMessageById(request.pathVariable("id")))
-                .GET("/messages", request -> messageController.getAllMessages())
-                .PUT("/messages/{id}",
-                        request -> request.bodyToMono(Message.class)
-                                .flatMap(message -> messageController.updateMessage(request.pathVariable("id"),
-                                        message)))
-                .DELETE("/messages/{id}",
-                        request -> messageController.deleteMessage(request.pathVariable("id"))
-                                .then(ServerResponse.noContent().build()))
+                .POST("/conversations",
+                        request -> request.bodyToMono(Message.class).flatMap(conversationController::addMessageToConversation))
+                .GET("/conversations/{id}", request -> conversationController.getConversationById(request.pathVariable("id")))
+                .GET("/conversations", request -> conversationController.getAllConversations())
 
                 .POST("/notifications",
                         request -> request.bodyToMono(Notification.class)

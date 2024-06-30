@@ -5,8 +5,8 @@ import com.example.mychat.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class UserService {
@@ -18,28 +18,31 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User createUser(User user) {
+    public Mono<User> createUser(User user) {
         return userRepository.save(user);
     }
 
-    public User getUserById(String id) {
-        return userRepository.findById(new ObjectId(id)).orElse(null);
+    public Mono<User> getUserById(String id) {
+        return userRepository.findById(new ObjectId(id));
     }
 
-    public List<User> getAllUsers() {
+    public Flux<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public User updateUser(String id, User user) {
-        if (userRepository.existsById(new ObjectId(id))) {
-            user.setId(new ObjectId(id));
-            return userRepository.save(user);
-        } else {
-            return null;
-        }
+    public Mono<User> updateUser(String id, User user) {
+        return userRepository.existsById(new ObjectId(id))
+                .flatMap(exists -> {
+                    if (exists) {
+                        user.setId(new ObjectId(id));
+                        return userRepository.save(user);
+                    } else {
+                        return Mono.empty();
+                    }
+                });
     }
 
-    public void deleteUser(String id) {
-        userRepository.deleteById(new ObjectId(id));
+    public Mono<Void> deleteUser(String id) {
+        return userRepository.deleteById(new ObjectId(id));
     }
 }
