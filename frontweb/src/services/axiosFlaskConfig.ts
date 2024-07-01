@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const axiosFlaskInstance = axios.create({
-  baseURL: 'http://localhost:8001', // URL du backend Flask
+  baseURL: process.env.REACT_APP_FLASK_API_BASE_URL, // Utilisez la variable d'environnement
   headers: {
     'Content-Type': 'application/json'
   }

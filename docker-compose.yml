@@ -6,10 +6,10 @@ services:
     ports:
       - "5001:5000"
     environment:
-      - MONGO_URI=${MONGO_URI_BACKEND}
+      - MONGO_URI=${MONGO_URI_Backend_NODE}
       - JWT_SECRET=${JWT_SECRET}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=${REDIS_URL}
       - EMAIL_USER=${EMAIL_USER}
       - EMAIL_PASS=${EMAIL_PASS}
       - IMAGE_SERVICE_URL=${IMAGE_SERVICE_URL}
@@ -29,6 +29,9 @@ services:
       - "3000:3000"
     volumes:
       - ./frontweb:/usr/src/app
+    environment:
+      - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
+      - REACT_APP_FLASK_API_BASE_URL=${REACT_APP_FLASK_API_BASE_URL}
 
   theme-selector-service:
     build: ./theme-selector-service

@@ -3,7 +3,7 @@ import axios from 'axios';
 import store from './redux/store';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5000/api', // Assurez-vous que le port est correct
+  baseURL: process.env.REACT_APP_API_BASE_URL, // Utilisez la variable d'environnement
   headers: {
     'Content-Type': 'application/json'
   }
