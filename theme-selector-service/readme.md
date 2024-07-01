@@ -13,3 +13,6 @@ pip install flask pandas scikit-learn joblib
 
 
 python app.py
+
+pour voir l'arborescence
+python tree.py

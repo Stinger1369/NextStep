@@ -16,26 +16,15 @@ const ModalUserProfile: React.FC<ModalUserProfileProps> = ({ images, currentInde
   if (!isOpen) return null;
 
   return (
-    <div
-      className="modal-overlay"
-      onClick={onClose}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          onClose();
-        }
-      }}
-      aria-label="Close modal"
-    >
-      <div className="modal-content" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+    <div className="modal-overlay" role="dialog" aria-modal="true" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()} role="document">
         <button className="close-modal" onClick={onClose} aria-label="Close modal">
           <FaTimes />
         </button>
         <button className="modal-control-prev" onClick={onPrev} aria-label="Previous image">
           <FaArrowLeft />
         </button>
-        <img src={images[currentIndex]} alt={`Image ${currentIndex + 1}`} className="modal-image" />
+        <img src={images[currentIndex]} alt={`User profile ${currentIndex + 1}`} className="modal-image" />
         <button className="modal-control-next" onClick={onNext} aria-label="Next image">
           <FaArrowRight />
         </button>

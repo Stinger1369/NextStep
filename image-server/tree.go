@@ -1,24 +1,34 @@
-// xe fichier pour fairele Tree de l'arborescence des fichiers et dossiers node tree.js
+package main
 
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+)
 
-const fs = require("fs");
-const path = require("path");
+func main() {
+	root := "."
 
-function printTree(dir, level = 0) {
-  const files = fs.readdirSync(dir);
+	// Liste des répertoires à ignorer
+	ignoredDirs := []string{"venv", "node_modules", "build"}
 
-  files.forEach((file) => {
-    const filePath = path.join(dir, file);
-    const stats = fs.statSync(filePath);
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 
-    if (file !== "node_modules") {
-      console.log(" ".repeat(level * 2) + file);
-      if (stats.isDirectory()) {
-        printTree(filePath, level + 1);
-      }
-    }
-  });
+		// Ignorer les répertoires spécifiés
+		for _, ignoredDir := range ignoredDirs {
+			if info.IsDir() && strings.Contains(path, ignoredDir) {
+				return filepath.SkipDir
+			}
+		}
+
+		fmt.Println(path)
+		return nil
+	})
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
 }
-
-const directory = process.argv[2] || ".";
-printTree(directory);

@@ -3,20 +3,33 @@ from flask_pymongo import PyMongo
 import logging
 import pandas as pd
 from flask_cors import CORS
-from bson import ObjectId
+from dotenv import load_dotenv
+import os
+
+# Charger les variables d'environnement depuis le fichier .env
+load_dotenv()
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/mydatabase"
-mongo = PyMongo(app)
 
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+# Utiliser la variable d'environnement pour configurer la connexion MongoDB
+mongo_uri = os.getenv("MONGO_URITHEME")
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+logging.info(f"Connecting to MongoDB with URI: {mongo_uri}")
+app.config["MONGO_URI"] = mongo_uri
+
+try:
+    mongo = PyMongo(app)
+    logging.info("Successfully connected to MongoDB")
+except Exception as e:
+    logging.error(f"Failed to connect to MongoDB: {e}")
+
+cors_origin = os.getenv("CORS_ORIGIN")
+logging.info(f"Allowing CORS for origin: {cors_origin}")
+CORS(app, resources={r"/*": {"origins": cors_origin}})
 
 # Charger le mappage des professions
 mapping_df = pd.read_csv('data/profession_to_theme_mapping.csv')
 profession_to_theme = dict(zip(mapping_df['Profession'], mapping_df['Theme']))
-
-# Configuration du logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
 @app.route('/predict_theme', methods=['POST'])
 def predict_theme():
@@ -36,22 +49,32 @@ def toggle_theme():
     user_id = data.get('userId', 'dummy_user_id')
     profession = data.get('profession', 'No Profession')
 
-    users_collection = mongo.db.users
-    user_theme = users_collection.find_one({'userId': user_id})
+    logging.info(f"Finding user with userId: {user_id}")
+    users_collection = mongo.db.theme_users  # Utiliser une collection distincte pour les thèmes
+    try:
+        user_theme = users_collection.find_one({'userId': user_id})
+    except Exception as e:
+        logging.error(f"Error finding user: {e}")
+        return jsonify({'error': 'Database error', 'details': str(e)}), 500
 
     if not user_theme:
+        logging.info(f"User with userId: {user_id} not found")
         return jsonify({'error': 'User not found'}), 404
 
     current_theme_enabled = user_theme.get('theme_enabled', True)
     new_theme_enabled = not current_theme_enabled
 
-    users_collection.update_one(
-        {'userId': user_id},
-        {'$set': {
-            'theme_enabled': new_theme_enabled,
-            'profession': profession  # Mettre à jour la profession de l'utilisateur
-        }}
-    )
+    try:
+        users_collection.update_one(
+            {'userId': user_id},
+            {'$set': {
+                'theme_enabled': new_theme_enabled,
+                'profession': profession  # Mettre à jour la profession de l'utilisateur
+            }}
+        )
+    except Exception as e:
+        logging.error(f"Error updating user: {e}")
+        return jsonify({'error': 'Database error', 'details': str(e)}), 500
 
     theme = profession_to_theme.get(profession, 'no_theme')
 
@@ -68,8 +91,13 @@ def get_theme_status():
 
     logging.info(f'Received request for theme status with userId: {user_id} and profession: {profession}')
 
-    users_collection = mongo.db.users
-    user_theme = users_collection.find_one({'userId': user_id})
+    logging.info(f"Finding user with userId: {user_id}")
+    users_collection = mongo.db.theme_users  # Utiliser une collection distincte pour les thèmes
+    try:
+        user_theme = users_collection.find_one({'userId': user_id})
+    except Exception as e:
+        logging.error(f"Error finding user: {e}")
+        return jsonify({'error': 'Database error', 'details': str(e)}), 500
 
     if not user_theme:
         logging.info(f'User with userId: {user_id} not found, creating user with default values')
@@ -80,7 +108,11 @@ def get_theme_status():
             'theme_enabled': False,
             'profession': default_profession
         }
-        users_collection.insert_one(user_theme)
+        try:
+            users_collection.insert_one(user_theme)
+        except Exception as e:
+            logging.error(f"Error inserting new user: {e}")
+            return jsonify({'error': 'Database error', 'details': str(e)}), 500
     else:
         theme_enabled = user_theme.get('theme_enabled', True)
         profession = user_theme.get('profession', profession)

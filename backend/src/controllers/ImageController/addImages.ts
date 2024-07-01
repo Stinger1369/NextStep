@@ -2,9 +2,7 @@ import { Request, Response } from "express";
 import axios, { AxiosError } from "axios";
 import User from "../../models/User";
 import { ERROR_CODES } from "../../constants/errorCodes";
-
-const IMAGE_SERVER_URL = "http://localhost:7000/server-image";
-const MAX_IMAGES_PER_USER = 5;
+import { config } from "../../config/config";
 
 function isAxiosError(error: any): error is AxiosError {
   return error.isAxiosError === true;
@@ -35,7 +33,7 @@ export const addImages = async (req: Request, res: Response) => {
     );
 
     const totalImages = user.images.length + images.length;
-    if (totalImages > MAX_IMAGES_PER_USER) {
+    if (totalImages > config.maxImagesPerUser) {
       console.log(`User ${id} has reached the maximum number of images`);
       return res.status(400).json({
         message: ERROR_CODES.ErrMaxImagesReached,
@@ -48,7 +46,7 @@ export const addImages = async (req: Request, res: Response) => {
 
     for (const img of images) {
       try {
-        const response = await axios.post(`${IMAGE_SERVER_URL}/ajouter-image`, {
+        const response = await axios.post(`${config.imageServerURL}/ajouter-image`, {
           user_id: id,
           nom: img.imageName,
           base64: img.imageBase64,
@@ -103,7 +101,7 @@ export const addImages = async (req: Request, res: Response) => {
       }
     }
 
-    user.images = Array.from(uniqueImageUrls).slice(0, MAX_IMAGES_PER_USER);
+    user.images = Array.from(uniqueImageUrls).slice(0, config.maxImagesPerUser);
 
     await user.save();
     console.log(`Images array after saving: ${JSON.stringify(user.images)}`);

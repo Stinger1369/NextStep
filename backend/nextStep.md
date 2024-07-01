@@ -48,3 +48,4 @@ npm audit fix
 
 
 
+string mongodb+srv://admin:Q4TuAyL6Yg7WtJIk3p2Z@mongodb-bdfa4b0a-oe50eda50.database.cloud.ovh.net/admin?replicaSet=replicaset&tls=true
