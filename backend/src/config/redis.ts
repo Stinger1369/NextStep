@@ -20,3 +20,4 @@ const connectRedis = async () => {
 connectRedis();
 
 export default client;
+

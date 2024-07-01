@@ -40,11 +40,11 @@ public class ServerConfig {
   }
 
   public String getDatabaseConnectionString() {
-    return getProperty("database.connectionString");
+    return getProperty("spring.data.mongodb.uri");
   }
 
   public String getDatabaseName() {
-    return getProperty("database.name");
+    return "serverSocketDB"; // Assurez-vous que ce nom de base de données est correct
   }
 
   public int getServerPort() {

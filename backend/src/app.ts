@@ -1,5 +1,3 @@
-// src/app.ts
-
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
@@ -43,6 +41,11 @@ app.use("/api/users", authMiddleware, userRoutes);
 app.use("/api/jobs", authMiddleware, jobRoutes);
 app.use("/api/applications", authMiddleware, applicationRoutes);
 app.use("/api/images", authMiddleware, imageRoutes);
+
+// Add a route for the root URL
+app.get("/", (req, res) => {
+  res.send("Welcome to the API");
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

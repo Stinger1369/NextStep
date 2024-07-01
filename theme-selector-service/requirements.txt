@@ -1,4 +1,7 @@
 Flask
+flask_pymongo
 pandas
 scikit-learn
 joblib
+flask_cors
+python-dotenv
