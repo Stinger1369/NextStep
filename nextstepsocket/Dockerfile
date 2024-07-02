@@ -1,12 +1,6 @@
 # nextstepsocket/Dockerfile
-FROM openjdk:11
 
-WORKDIR /app
-
-COPY . .
-
-RUN ./mvnw package
-
-EXPOSE 8080
-
-CMD ["java", "-jar", "target/your-application.jar"]
+FROM openjdk:17-slim
+VOLUME /tmp
+COPY target/nextstepsocket-1.0-SNAPSHOT-shaded.jar app.jar
+ENTRYPOINT ["java", "-jar", "/app.jar"]
