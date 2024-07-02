@@ -123,4 +123,4 @@ def get_theme_status():
     return jsonify({'theme_enabled': user_theme['theme_enabled'], 'theme': default_theme, 'profession': user_theme['profession']})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8001)
+    app.run(host='0.0.0.0', port=8000)
