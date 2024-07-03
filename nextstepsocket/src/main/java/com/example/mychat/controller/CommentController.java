@@ -6,6 +6,7 @@ import com.example.mychat.model.Notification;
 import com.example.mychat.service.CommentService;
 import com.example.mychat.service.NotificationService;
 import com.example.mychat.service.PostService;
+import com.example.mychat.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +20,15 @@ public class CommentController {
     private final PostService postService;
     private final NotificationService notificationService;
     private final CommentService commentService;
+    private final UserService userService;
 
     @Autowired
     public CommentController(PostService postService, NotificationService notificationService,
-            CommentService commentService) {
+            CommentService commentService, UserService userService) {
         this.postService = postService;
         this.notificationService = notificationService;
         this.commentService = commentService;
+        this.userService = userService;
     }
 
     @PostMapping("/post/{postId}")
@@ -36,12 +39,30 @@ public class CommentController {
                         .flatMap(post -> {
                             post.addComment(savedComment);
                             return postService.updatePost(postId, post)
-                                    .flatMap(updatedPost -> {
-                                        Notification notification = new Notification(updatedPost.getUserId(),
-                                                "New comment on your post");
-                                        return notificationService.createNotification(notification)
-                                                .then(ServerResponse.ok().bodyValue(savedComment));
-                                    });
+                                    .flatMap(updatedPost -> userService.getUserById(savedComment.getAuthorId())
+                                            .flatMap(user -> {
+                                                user.addComment(savedComment);
+                                                return userService.updateUser(user.getId().toHexString(), user)
+                                                        .flatMap(updatedUser -> {
+                                                            Notification notification = new Notification(
+                                                                    updatedPost.getUserId(),
+                                                                    "New comment on your post");
+                                                            return notificationService.createNotification(notification)
+                                                                    .flatMap(notif -> {
+                                                                        return userService
+                                                                                .getUserById(notif.getUserId())
+                                                                                .flatMap(notificationUser -> {
+                                                                                    notificationUser
+                                                                                            .addNotification(notif);
+                                                                                    return userService.updateUser(
+                                                                                            notificationUser.getId()
+                                                                                                    .toHexString(),
+                                                                                            notificationUser);
+                                                                                });
+                                                                    })
+                                                                    .then(ServerResponse.ok().bodyValue(savedComment));
+                                                        });
+                                            }));
                         }))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
@@ -62,6 +83,16 @@ public class CommentController {
                                                     Notification notification = new Notification(post.getUserId(),
                                                             "A comment on your post was updated");
                                                     return notificationService.createNotification(notification)
+                                                            .flatMap(notif -> {
+                                                                return userService.getUserById(notif.getUserId())
+                                                                        .flatMap(notificationUser -> {
+                                                                            notificationUser.addNotification(notif);
+                                                                            return userService.updateUser(
+                                                                                    notificationUser.getId()
+                                                                                            .toHexString(),
+                                                                                    notificationUser);
+                                                                        });
+                                                            })
                                                             .then(ServerResponse.ok().bodyValue(updatedComment));
                                                 });
                                     }));
@@ -82,6 +113,15 @@ public class CommentController {
                                                 Notification notification = new Notification(post.getUserId(),
                                                         "A comment on your post was deleted");
                                                 return notificationService.createNotification(notification)
+                                                        .flatMap(notif -> {
+                                                            return userService.getUserById(notif.getUserId())
+                                                                    .flatMap(notificationUser -> {
+                                                                        notificationUser.addNotification(notif);
+                                                                        return userService.updateUser(
+                                                                                notificationUser.getId().toHexString(),
+                                                                                notificationUser);
+                                                                    });
+                                                        })
                                                         .then(ServerResponse.noContent().build());
                                             }));
                         }))

@@ -38,6 +38,8 @@ public class UserService {
                     existingUser.setPassword(user.getPassword());
                     existingUser.setPosts(user.getPosts());
                     existingUser.setComments(user.getComments());
+                    existingUser.setNotifications(user.getNotifications());
+                    existingUser.setConversations(user.getConversations());
                     return userRepository.save(existingUser);
                 });
     }

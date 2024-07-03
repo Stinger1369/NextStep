@@ -1,14 +1,14 @@
 package com.example.mychat.service;
 
 import com.example.mychat.model.Post;
-import com.example.mychat.model.User;
 import com.example.mychat.repository.PostRepository;
 import com.example.mychat.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
+
 import java.util.Date;
 
 @Service
@@ -24,12 +24,16 @@ public class PostService {
     }
 
     public Mono<Post> createPost(Post post) {
-        return userRepository.findById(new ObjectId(post.getUserId()))
-                .flatMap(user -> {
-                    user.addPost(post);
-                    return userRepository.save(user)
-                            .then(postRepository.save(post));
-                });
+        post.setCreatedAt(new Date());
+        post.setUpdatedAt(new Date());
+        return postRepository.save(post)
+                .flatMap(savedPost -> userRepository.findById(new ObjectId(post.getUserId()))
+                        .flatMap(user -> {
+                            if (!user.getPosts().contains(savedPost)) {
+                                user.addPost(savedPost);
+                            }
+                            return userRepository.save(user).thenReturn(savedPost);
+                        }));
     }
 
     public Mono<Post> getPostById(String id) {

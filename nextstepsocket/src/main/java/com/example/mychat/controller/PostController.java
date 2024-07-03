@@ -4,6 +4,7 @@ import com.example.mychat.model.Post;
 import com.example.mychat.model.Notification;
 import com.example.mychat.service.PostService;
 import com.example.mychat.service.NotificationService;
+import com.example.mychat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -15,11 +16,13 @@ public class PostController {
 
     private final PostService postService;
     private final NotificationService notificationService;
+    private final UserService userService;
 
     @Autowired
-    public PostController(PostService postService, NotificationService notificationService) {
+    public PostController(PostService postService, NotificationService notificationService, UserService userService) {
         this.postService = postService;
         this.notificationService = notificationService;
+        this.userService = userService;
     }
 
     @PostMapping
@@ -28,7 +31,12 @@ public class PostController {
                 .flatMap(savedPost -> {
                     Notification notification = new Notification(savedPost.getUserId(), "New post created");
                     return notificationService.createNotification(notification)
-                            .then(ServerResponse.ok().bodyValue(savedPost));
+                            .flatMap(notif -> userService.getUserById(savedPost.getUserId())
+                                    .flatMap(user -> {
+                                        user.addNotification(notif);
+                                        return userService.updateUser(user.getId().toHexString(), user)
+                                                .then(ServerResponse.ok().bodyValue(savedPost));
+                                    }));
                 });
     }
 
