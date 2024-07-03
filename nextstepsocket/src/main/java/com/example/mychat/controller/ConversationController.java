@@ -6,6 +6,7 @@ import com.example.mychat.model.Notification;
 import com.example.mychat.service.ConversationService;
 import com.example.mychat.service.NotificationService;
 import com.example.mychat.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -18,8 +19,8 @@ public class ConversationController {
     private final NotificationService notificationService;
     private final UserService userService;
 
-    public ConversationController(ConversationService conversationService, NotificationService notificationService,
-            UserService userService) {
+    @Autowired
+    public ConversationController(ConversationService conversationService, NotificationService notificationService, UserService userService) {
         this.conversationService = conversationService;
         this.notificationService = notificationService;
         this.userService = userService;
@@ -28,31 +29,19 @@ public class ConversationController {
     @PostMapping
     public Mono<ServerResponse> addMessageToConversation(@RequestBody ConversationDTO conversationDTO) {
         return conversationService
-                .addMessageToConversation(conversationDTO.getSenderId(), conversationDTO.getReceiverId(),
-                        conversationDTO.getContent())
+                .addMessageToConversation(conversationDTO.getSenderId(), conversationDTO.getReceiverId(), conversationDTO.getContent())
                 .flatMap(conversation -> {
-                    Notification notification = new Notification(conversationDTO.getReceiverId(),
-                            "New message from " + conversationDTO.getSenderId());
+                    Notification notification = new Notification(conversationDTO.getReceiverId(), "New message from " + conversationDTO.getSenderId());
                     return notificationService.createNotification(notification)
-                            .flatMap(notif -> {
-                                return userService.getUserById(conversationDTO.getSenderId())
-                                        .flatMap(sender -> {
-                                            sender.addConversation(conversation);
-                                            return userService.updateUser(sender.getId().toHexString(), sender)
-                                                    .thenReturn(conversation);
-                                        })
-                                        .flatMap(updatedConversation -> {
-                                            return userService.getUserById(conversationDTO.getReceiverId())
-                                                    .flatMap(receiver -> {
-                                                        receiver.addConversation(updatedConversation);
-                                                        receiver.addNotification(notif);
-                                                        return userService.updateUser(receiver.getId().toHexString(),
-                                                                receiver);
-                                                    });
-                                        });
-                            })
-                            .then(ServerResponse.ok().bodyValue(conversation));
-                });
+                            .flatMap(notif -> userService.getUserById(conversationDTO.getReceiverId())
+                                    .flatMap(receiver -> {
+                                        receiver.addNotification(notif);
+                                        receiver.addConversation(conversation);
+                                        return userService.updateUser(receiver.getId().toHexString(), receiver);
+                                    })
+                                    .thenReturn(conversation));
+                })
+                .flatMap(conversation -> ServerResponse.ok().bodyValue(conversation));
     }
 
     @GetMapping("/{id}")
