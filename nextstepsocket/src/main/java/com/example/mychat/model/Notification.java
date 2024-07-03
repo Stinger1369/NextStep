@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Notification {
     @Id
     private ObjectId id;
-    private String userId;
+    private String userId; // Ajoutez ce champ
     private String message;
 
     public Notification() {
@@ -41,14 +41,5 @@ public class Notification {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    @Override
-    public String toString() {
-        return "Notification{" +
-                "id=" + id +
-                ", userId='" + userId + '\'' +
-                ", message='" + message + '\'' +
-                '}';
     }
 }

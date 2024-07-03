@@ -6,6 +6,7 @@ com\example\mychat\repository\ConversationRepository.class
 com\example\mychat\model\Notification.class
 com\example\mychat\service\PostService.class
 com\example\mychat\handler\NotificationHandler.class
+com\example\mychat\dto\ConversationDTO.class
 com\example\mychat\HttpServerHandler.class
 com\example\mychat\handler\AuthHandler.class
 com\example\mychat\model\Post.class
@@ -14,9 +15,12 @@ com\example\mychat\controller\PostController.class
 com\example\mychat\config\MongoDBConnection.class
 com\example\mychat\repository\NotificationRepository.class
 com\example\mychat\service\ConversationService.class
+com\example\mychat\util\EncryptionUtil.class
 com\example\mychat\config\ServerConfig.class
 com\example\mychat\controller\CommentController.class
+com\example\mychat\dto\CommentDTO.class
 com\example\mychat\service\UserService.class
+com\example\mychat\model\Conversation$Message.class
 com\example\mychat\ChatServer$1.class
 com\example\mychat\ChatServer.class
 com\example\mychat\handler\WebSocketFrameHandler$1.class
@@ -24,9 +28,7 @@ com\example\mychat\service\CommentService.class
 com\example\mychat\config\EnvironmentConfig.class
 com\example\mychat\config\MongoDBConnection$1.class
 com\example\mychat\Main.class
-com\example\mychat\model\Message.class
 com\example\mychat\model\User.class
-com\example\mychat\repository\MessageRepository.class
 com\example\mychat\model\Comment.class
 com\example\mychat\NettyConfiguration.class
 com\example\mychat\controller\NotificationController.class

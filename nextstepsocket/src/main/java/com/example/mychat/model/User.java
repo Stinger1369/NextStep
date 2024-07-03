@@ -4,6 +4,9 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Document(collection = "users")
 public class User {
     @Id
@@ -11,6 +14,8 @@ public class User {
     private String username;
     private String email;
     private String password;
+    private List<Post> posts = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
     public User() {
     }
@@ -21,6 +26,7 @@ public class User {
         this.password = password;
     }
 
+    // getters and setters
     public ObjectId getId() {
         return id;
     }
@@ -51,6 +57,30 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public void addPost(Post post) {
+        this.posts.add(post);
+    }
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
     }
 
     @Override

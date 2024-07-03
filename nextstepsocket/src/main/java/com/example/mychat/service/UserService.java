@@ -31,14 +31,14 @@ public class UserService {
     }
 
     public Mono<User> updateUser(String id, User user) {
-        return userRepository.existsById(new ObjectId(id))
-                .flatMap(exists -> {
-                    if (exists) {
-                        user.setId(new ObjectId(id));
-                        return userRepository.save(user);
-                    } else {
-                        return Mono.empty();
-                    }
+        return userRepository.findById(new ObjectId(id))
+                .flatMap(existingUser -> {
+                    existingUser.setUsername(user.getUsername());
+                    existingUser.setEmail(user.getEmail());
+                    existingUser.setPassword(user.getPassword());
+                    existingUser.setPosts(user.getPosts());
+                    existingUser.setComments(user.getComments());
+                    return userRepository.save(existingUser);
                 });
     }
 

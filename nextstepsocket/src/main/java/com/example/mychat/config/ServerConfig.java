@@ -3,6 +3,8 @@ package com.example.mychat.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Configuration
 public class ServerConfig {
@@ -10,13 +12,15 @@ public class ServerConfig {
   @Value("${spring.data.mongodb.uri}")
   private String databaseConnectionString;
 
-  @Value("${spring.server.port:8080}")
+  private static final Logger logger = LoggerFactory.getLogger(ServerConfig.class);
+
+  @Value("${server.port}")
   private int serverPort;
 
   @PostConstruct
   public void printConfig() {
-    System.out.println("Database Connection String: " + databaseConnectionString);
-    System.out.println("Server Port: " + serverPort);
+    logger.info("Database Connection String: {}", databaseConnectionString);
+    logger.info("Server Port: {}", serverPort);
   }
 
   public String getDatabaseConnectionString() {
@@ -28,6 +32,6 @@ public class ServerConfig {
   }
 
   public String getDatabaseName() {
-    return "serverSocketDB"; // Assurez-vous que ce nom de base de données est correct
+    return "serverSocketDB";
   }
 }

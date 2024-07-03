@@ -1,27 +1,28 @@
 package com.example.mychat.service;
 
 import com.example.mychat.model.Conversation;
-import com.example.mychat.model.Message;
 import com.example.mychat.repository.ConversationRepository;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class ConversationService {
 
     private final ConversationRepository conversationRepository;
 
+    @Autowired
     public ConversationService(ConversationRepository conversationRepository) {
         this.conversationRepository = conversationRepository;
     }
 
-    public Mono<Conversation> addMessageToConversation(String senderId, String receiverId, Message message) {
+    public Mono<Conversation> addMessageToConversation(String senderId, String receiverId, String content) {
         return conversationRepository.findBySenderIdAndReceiverId(senderId, receiverId)
-                .switchIfEmpty(conversationRepository.save(new Conversation(senderId, receiverId)))
+                .defaultIfEmpty(new Conversation(senderId, senderId, receiverId))
                 .flatMap(conversation -> {
-                    conversation.addMessage(message);
+                    conversation.addMessage(senderId, receiverId, content);
                     return conversationRepository.save(conversation);
                 });
     }

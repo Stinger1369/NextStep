@@ -8,6 +8,8 @@ H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\controller\Conversat
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\controller\NotificationController.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\controller\PostController.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\controller\UserController.java
+H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\dto\CommentDTO.java
+H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\dto\ConversationDTO.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\handler\AuthHandler.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\handler\ChatHandler.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\handler\NotificationHandler.java
@@ -16,14 +18,12 @@ H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\HttpServerHandler.ja
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\Main.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\model\Comment.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\model\Conversation.java
-H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\model\Message.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\model\Notification.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\model\Post.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\model\User.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\NettyConfiguration.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\repository\CommentRepository.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\repository\ConversationRepository.java
-H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\repository\MessageRepository.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\repository\NotificationRepository.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\repository\PostRepository.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\repository\UserRepository.java

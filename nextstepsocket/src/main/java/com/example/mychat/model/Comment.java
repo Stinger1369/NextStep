@@ -21,6 +21,13 @@ public class Comment {
         this.updatedAt = new Date();
     }
 
+    public Comment(String content, String authorId, ObjectId postId) {
+        this();
+        this.content = content;
+        this.authorId = authorId;
+        this.postId = postId;
+    }
+
     public ObjectId getId() {
         return id;
     }

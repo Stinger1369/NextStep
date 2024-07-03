@@ -5,10 +5,8 @@ import com.example.mychat.repository.NotificationRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
-
-import java.util.List;
+import reactor.core.publisher.Mono;
 
 @Service
 public class NotificationService {

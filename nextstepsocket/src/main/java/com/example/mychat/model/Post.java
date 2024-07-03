@@ -4,21 +4,31 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Document(collection = "posts")
 public class Post {
     @Id
     private ObjectId id;
+    private String userId;
     private String title;
     private String content;
-    private String authorId;
     private Date createdAt;
     private Date updatedAt;
+    private List<Comment> comments = new ArrayList<>();
 
     public Post() {
         this.createdAt = new Date();
         this.updatedAt = new Date();
+    }
+
+    public Post(String userId, String title, String content) {
+        this();
+        this.userId = userId;
+        this.title = title;
+        this.content = content;
     }
 
     public ObjectId getId() {
@@ -27,6 +37,14 @@ public class Post {
 
     public void setId(ObjectId id) {
         this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getTitle() {
@@ -45,14 +63,6 @@ public class Post {
         this.content = content;
     }
 
-    public String getAuthorId() {
-        return authorId;
-    }
-
-    public void setAuthorId(String authorId) {
-        this.authorId = authorId;
-    }
-
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -67,5 +77,30 @@ public class Post {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+    }
+
+    public void updateComment(Comment comment) {
+        for (int i = 0; i < comments.size(); i++) {
+            if (comments.get(i).getId().equals(comment.getId())) {
+                comments.set(i, comment);
+                break;
+            }
+        }
+    }
+
+    public void removeComment(Comment comment) {
+        comments.removeIf(c -> c.getId().equals(comment.getId()));
     }
 }

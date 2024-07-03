@@ -1,9 +1,9 @@
 package com.example.mychat.controller;
 
-import com.example.mychat.model.Conversation;
-import com.example.mychat.model.Message;
+import com.example.mychat.dto.ConversationDTO;
+import com.example.mychat.model.Notification;
 import com.example.mychat.service.ConversationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.mychat.service.NotificationService;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -13,16 +13,23 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 public class ConversationController {
 
     private final ConversationService conversationService;
-
-    @Autowired
-    public ConversationController(ConversationService conversationService) {
+    private final NotificationService notificationService;
+    public ConversationController(ConversationService conversationService, NotificationService notificationService) {
         this.conversationService = conversationService;
+        this.notificationService = notificationService;
     }
 
     @PostMapping
-    public Mono<ServerResponse> addMessageToConversation(@RequestBody Message message) {
-        return conversationService.addMessageToConversation(message.getSenderId(), message.getReceiverId(), message)
-                .flatMap(conversation -> ServerResponse.ok().bodyValue(conversation));
+    public Mono<ServerResponse> addMessageToConversation(@RequestBody ConversationDTO conversationDTO) {
+        return conversationService
+                .addMessageToConversation(conversationDTO.getSenderId(), conversationDTO.getReceiverId(),
+                        conversationDTO.getContent())
+                .flatMap(conversation -> {
+                    Notification notification = new Notification(conversationDTO.getReceiverId(),
+                            "New message from " + conversationDTO.getSenderId());
+                    return notificationService.createNotification(notification)
+                            .then(ServerResponse.ok().bodyValue(conversation));
+                });
     }
 
     @GetMapping("/{id}")
@@ -34,6 +41,8 @@ public class ConversationController {
 
     @GetMapping
     public Mono<ServerResponse> getAllConversations() {
-        return ServerResponse.ok().body(conversationService.getAllConversations(), Conversation.class);
+        return conversationService.getAllConversations()
+                .collectList()
+                .flatMap(conversations -> ServerResponse.ok().bodyValue(conversations));
     }
 }
