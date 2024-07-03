@@ -1,7 +1,8 @@
-/* Testimonials.css */
 .testimonials-container {
   text-align: left;
   padding: 20px;
+  height: 100%;
+  width: 100%;
 }
 
 .testimonials-container h3 {

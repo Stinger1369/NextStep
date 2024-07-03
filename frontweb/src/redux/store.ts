@@ -6,6 +6,7 @@ import userReducer from './features/user/userSlice';
 import imageReducer from './features/image/imageSlice';
 import jobReducer from './features/jobs/jobSlice';
 import themeReducer from './features/theme/themeSlice';
+import springUserReducer from './features/springUser/springUserSlice';
 
 const store = configureStore({
   reducer: {
@@ -14,7 +15,8 @@ const store = configureStore({
     user: userReducer,
     images: imageReducer,
     jobs: jobReducer,
-    theme: themeReducer
+    theme: themeReducer,
+    springUsers: springUserReducer
   }
 });
 

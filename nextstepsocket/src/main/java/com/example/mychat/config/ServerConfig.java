@@ -1,53 +1,33 @@
 package com.example.mychat.config;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import javax.annotation.PostConstruct;
 
+@Configuration
 public class ServerConfig {
-  private static final Logger logger = Logger.getLogger(ServerConfig.class.getName());
-  private Properties properties = new Properties();
 
-  public ServerConfig() {
-    loadProperties();
-  }
+  @Value("${spring.data.mongodb.uri}")
+  private String databaseConnectionString;
 
-  private void loadProperties() {
-    try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
-      if (input == null) {
-        logger.severe("Sorry, unable to find application.properties");
-        return;
-      }
-      properties.load(input);
-    } catch (IOException ex) {
-      logger.severe("Error loading properties file: " + ex.getMessage());
-    }
-  }
+  @Value("${spring.server.port:8080}")
+  private int serverPort;
 
-  public String getProperty(String key) {
-    return properties.getProperty(key);
-  }
-
-  public int getIntProperty(String key, int defaultValue) {
-    String value = properties.getProperty(key);
-    try {
-      return Integer.parseInt(value);
-    } catch (NumberFormatException e) {
-      logger.warning("Invalid number format for key: " + key + ", using default: " + defaultValue);
-      return defaultValue;
-    }
+  @PostConstruct
+  public void printConfig() {
+    System.out.println("Database Connection String: " + databaseConnectionString);
+    System.out.println("Server Port: " + serverPort);
   }
 
   public String getDatabaseConnectionString() {
-    return getProperty("spring.data.mongodb.uri");
+    return databaseConnectionString;
+  }
+
+  public int getServerPort() {
+    return serverPort;
   }
 
   public String getDatabaseName() {
     return "serverSocketDB"; // Assurez-vous que ce nom de base de données est correct
-  }
-
-  public int getServerPort() {
-    return getIntProperty("server.port", 8080);
   }
 }

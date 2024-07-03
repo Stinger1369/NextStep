@@ -1,7 +1,9 @@
-/* HomeJob.css */
 .home-job-container {
   text-align: left;
   padding: 20px;
+  height: 100%;
+  width: 98%;
+  margin: 0 auto;
 }
 
 .home-job-container h3 {

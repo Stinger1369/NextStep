@@ -1,7 +1,8 @@
-/* EventsActivities.css */
 .events-activities-container {
   text-align: left;
   padding: 20px;
+  height: 100%;
+  width: 100%;
 }
 
 .events-activities-container h3 {

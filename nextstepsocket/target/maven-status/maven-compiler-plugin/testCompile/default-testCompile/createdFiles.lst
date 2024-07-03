@@ -1,2 +1,2 @@
-com/mychat/AppTest.class
-com/mychat/handler/ChatHandlerTest.class
+com\mychat\handler\ChatHandlerTest.class
+com\mychat\AppTest.class
