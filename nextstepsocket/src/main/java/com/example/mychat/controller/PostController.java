@@ -37,7 +37,8 @@ public class PostController {
                                         return userService.updateUser(user.getId().toHexString(), user)
                                                 .then(ServerResponse.ok().bodyValue(savedPost));
                                     }));
-                });
+                })
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 
     @GetMapping("/{id}")

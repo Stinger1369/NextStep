@@ -26,14 +26,22 @@ public class PostService {
     public Mono<Post> createPost(Post post) {
         post.setCreatedAt(new Date());
         post.setUpdatedAt(new Date());
-        return postRepository.save(post)
-                .flatMap(savedPost -> userRepository.findById(new ObjectId(post.getUserId()))
-                        .flatMap(user -> {
-                            if (!user.getPosts().contains(savedPost)) {
-                                user.addPost(savedPost);
-                            }
-                            return userRepository.save(user).thenReturn(savedPost);
-                        }));
+
+        // Convertir le authorId en ObjectId
+        try {
+            ObjectId authorObjectId = new ObjectId(post.getUserId());
+            post.setUserId(authorObjectId.toHexString());
+            return postRepository.save(post)
+                    .flatMap(savedPost -> userRepository.findById(authorObjectId)
+                            .flatMap(user -> {
+                                if (!user.getPosts().contains(savedPost)) {
+                                    user.addPost(savedPost);
+                                }
+                                return userRepository.save(user).thenReturn(savedPost);
+                            }));
+        } catch (IllegalArgumentException e) {
+            return Mono.error(new Exception("Invalid authorId"));
+        }
     }
 
     public Mono<Post> getPostById(String id) {

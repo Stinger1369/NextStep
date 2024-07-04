@@ -5,7 +5,15 @@ public class CommentDTO {
     private String authorId;
     private String postId;
 
-    // Getters and Setters
+    public CommentDTO() {
+    }
+
+    public CommentDTO(String content, String authorId, String postId) {
+        this.content = content;
+        this.authorId = authorId;
+        this.postId = postId;
+    }
+
     public String getContent() {
         return content;
     }

@@ -15,9 +15,8 @@ public class User {
     private String email;
     private String password;
     private List<Post> posts = new ArrayList<>();
-    private List<Comment> comments = new ArrayList<>();
     private List<Notification> notifications = new ArrayList<>();
-    private List<Conversation> conversations = new ArrayList<>(); // Ajouter cette ligne
+    private List<Conversation> conversations = new ArrayList<>();
 
     public User() {
     }
@@ -69,14 +68,6 @@ public class User {
         this.posts = posts;
     }
 
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
     public List<Notification> getNotifications() {
         return notifications;
     }
@@ -97,10 +88,6 @@ public class User {
         if (!this.posts.contains(post)) {
             this.posts.add(post);
         }
-    }
-
-    public void addComment(Comment comment) {
-        this.comments.add(comment);
     }
 
     public void addNotification(Notification notification) {
