@@ -3,6 +3,7 @@ package com.example.mychat.service;
 import com.example.mychat.dto.ConversationDTO;
 import com.example.mychat.model.Conversation;
 import com.example.mychat.repository.ConversationRepository;
+import com.example.mychat.util.EncryptionUtil;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,13 +24,31 @@ public class ConversationService {
         return conversationRepository.findBySenderIdAndReceiverId(senderId, receiverId)
                 .defaultIfEmpty(new Conversation(senderId, senderId, receiverId))
                 .flatMap(conversation -> {
-                    conversation.addMessage(senderId, receiverId, content);
+                    try {
+                        String encryptedContent = EncryptionUtil.encrypt(content, EncryptionUtil.generateKey());
+                        conversation.addMessage(senderId, receiverId, encryptedContent);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return Mono.error(e);
+                    }
                     return conversationRepository.save(conversation);
                 });
     }
 
     public Mono<Conversation> getConversationById(String id) {
-        return conversationRepository.findById(new ObjectId(id));
+        return conversationRepository.findById(new ObjectId(id))
+                .flatMap(conversation -> {
+                    conversation.getMessages().forEach(message -> {
+                        try {
+                            String decryptedContent = EncryptionUtil.decrypt(message.getContent(),
+                                    EncryptionUtil.generateKey());
+                            message.setContent(decryptedContent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    return Mono.just(conversation);
+                });
     }
 
     public Flux<Conversation> getAllConversations() {

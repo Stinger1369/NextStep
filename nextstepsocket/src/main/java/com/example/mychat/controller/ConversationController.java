@@ -20,7 +20,8 @@ public class ConversationController {
     private final UserService userService;
 
     @Autowired
-    public ConversationController(ConversationService conversationService, NotificationService notificationService, UserService userService) {
+    public ConversationController(ConversationService conversationService, NotificationService notificationService,
+            UserService userService) {
         this.conversationService = conversationService;
         this.notificationService = notificationService;
         this.userService = userService;
@@ -29,9 +30,11 @@ public class ConversationController {
     @PostMapping
     public Mono<ServerResponse> addMessageToConversation(@RequestBody ConversationDTO conversationDTO) {
         return conversationService
-                .addMessageToConversation(conversationDTO.getSenderId(), conversationDTO.getReceiverId(), conversationDTO.getContent())
+                .addMessageToConversation(conversationDTO.getSenderId(), conversationDTO.getReceiverId(),
+                        conversationDTO.getContent())
                 .flatMap(conversation -> {
-                    Notification notification = new Notification(conversationDTO.getReceiverId(), "New message from " + conversationDTO.getSenderId());
+                    Notification notification = new Notification(conversationDTO.getReceiverId(),
+                            "New message from " + conversationDTO.getSenderId());
                     return notificationService.createNotification(notification)
                             .flatMap(notif -> userService.getUserById(conversationDTO.getReceiverId())
                                     .flatMap(receiver -> {
@@ -59,7 +62,8 @@ public class ConversationController {
     }
 
     @PutMapping("/{id}")
-    public Mono<ServerResponse> updateConversation(@PathVariable String id, @RequestBody ConversationDTO conversationDTO) {
+    public Mono<ServerResponse> updateConversation(@PathVariable String id,
+            @RequestBody ConversationDTO conversationDTO) {
         return conversationService.updateConversation(id, conversationDTO)
                 .flatMap(updatedConversation -> ServerResponse.ok().bodyValue(updatedConversation))
                 .switchIfEmpty(ServerResponse.notFound().build());
