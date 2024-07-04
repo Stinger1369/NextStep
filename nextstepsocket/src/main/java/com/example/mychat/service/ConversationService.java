@@ -1,5 +1,6 @@
 package com.example.mychat.service;
 
+import com.example.mychat.dto.ConversationDTO;
 import com.example.mychat.model.Conversation;
 import com.example.mychat.repository.ConversationRepository;
 import org.bson.types.ObjectId;
@@ -33,5 +34,17 @@ public class ConversationService {
 
     public Flux<Conversation> getAllConversations() {
         return conversationRepository.findAll();
+    }
+
+    public Mono<Conversation> updateConversation(String id, ConversationDTO conversationDTO) {
+        return conversationRepository.findById(new ObjectId(id))
+                .flatMap(existingConversation -> {
+                    existingConversation.setMessages(conversationDTO.getMessages());
+                    return conversationRepository.save(existingConversation);
+                });
+    }
+
+    public Mono<Void> deleteConversation(String id) {
+        return conversationRepository.deleteById(new ObjectId(id));
     }
 }

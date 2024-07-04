@@ -1,9 +1,13 @@
 package com.example.mychat.dto;
 
+import com.example.mychat.model.Conversation.Message;
+import java.util.List;
+
 public class ConversationDTO {
     private String senderId;
     private String receiverId;
     private String content;
+    private List<Message> messages;
 
     // Getters and setters
     public String getSenderId() {
@@ -28,5 +32,13 @@ public class ConversationDTO {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
     }
 }

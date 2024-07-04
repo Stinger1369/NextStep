@@ -1,9 +1,11 @@
 import axios from 'axios';
 
+const API_KEY = '06b30677-6927-43d1-a668-c7a5379c126f';
+
 const axiosSpringInstance = axios.create({
-  baseURL: process.env.REACT_APP_SPRING_API_BASE_URL, // Utilisez la variable d'environnement
+  baseURL: 'http://localhost:8080',
   headers: {
-    'Content-Type': 'application/json'
+    'API-Key': API_KEY
   }
 });
 

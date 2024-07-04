@@ -57,4 +57,17 @@ public class ConversationController {
                 .collectList()
                 .flatMap(conversations -> ServerResponse.ok().bodyValue(conversations));
     }
+
+    @PutMapping("/{id}")
+    public Mono<ServerResponse> updateConversation(@PathVariable String id, @RequestBody ConversationDTO conversationDTO) {
+        return conversationService.updateConversation(id, conversationDTO)
+                .flatMap(updatedConversation -> ServerResponse.ok().bodyValue(updatedConversation))
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public Mono<ServerResponse> deleteConversation(@PathVariable String id) {
+        return conversationService.deleteConversation(id)
+                .then(ServerResponse.noContent().build());
+    }
 }
