@@ -1,4 +1,4 @@
-# Created at 2024-07-04T12:26:31.860
+# Created at 2024-07-04T13:28:49.958
 Boot Manifest-JAR contains absolute paths in classpath 'H:\NextStep\nextstepsocket\target\test-classes'
 Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
 'other' has different root

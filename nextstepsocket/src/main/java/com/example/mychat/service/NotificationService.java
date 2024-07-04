@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Date;
+
 @Service
 public class NotificationService {
 
@@ -19,6 +21,8 @@ public class NotificationService {
     }
 
     public Mono<Notification> createNotification(Notification notification) {
+        notification.setCreatedAt(new Date());
+        notification.setUpdatedAt(new Date());
         return notificationRepository.save(notification);
     }
 
@@ -34,6 +38,7 @@ public class NotificationService {
         return notificationRepository.findById(new ObjectId(id))
                 .flatMap(existingNotification -> {
                     notification.setId(new ObjectId(id));
+                    notification.setUpdatedAt(new Date());
                     return notificationRepository.save(notification);
                 });
     }

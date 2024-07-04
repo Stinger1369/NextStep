@@ -17,6 +17,10 @@ public class EncryptionUtil {
     }
 
     public static String encrypt(String data, SecretKey key) throws Exception {
+        if (data == null) {
+            throw new IllegalArgumentException("Data to encrypt cannot be null");
+        }
+
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, key);
         byte[] encryptedData = cipher.doFinal(data.getBytes());
@@ -24,6 +28,10 @@ public class EncryptionUtil {
     }
 
     public static String decrypt(String encryptedData, SecretKey key) throws Exception {
+        if (encryptedData == null) {
+            throw new IllegalArgumentException("Data to decrypt cannot be null");
+        }
+
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, key);
         byte[] decodedData = Base64.getDecoder().decode(encryptedData);

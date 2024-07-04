@@ -95,6 +95,7 @@ public class User {
     }
 
     public void addConversation(Conversation conversation) {
+        this.conversations.removeIf(conv -> conv.getId().equals(conversation.getId()));
         this.conversations.add(conversation);
     }
 
