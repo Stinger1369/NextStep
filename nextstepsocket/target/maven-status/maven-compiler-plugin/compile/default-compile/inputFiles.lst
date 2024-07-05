@@ -26,6 +26,7 @@ H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\model\Notification.j
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\model\Post.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\model\User.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\NettyConfiguration.java
+H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\NettyServer.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\repository\ApiKeyRepository.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\repository\CommentRepository.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\repository\ConversationRepository.java

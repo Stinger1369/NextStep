@@ -1,7 +1,17 @@
+server:
+  port: ${SPRING_SERVER_PORT:8081}
+
 spring:
+  main:
+    allow-bean-definition-overriding: true
   data:
     mongodb:
-      uri: mongodb://localhost:27017/mychatdb
+      uri: ${MONGO_URI_SPRING}
+  application:
+    name: nextstepsocket
 
-server:
-  port: 8080
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    com.example.mychat: DEBUG

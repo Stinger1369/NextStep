@@ -10,7 +10,6 @@ com\example\mychat\util\EncryptionUtil.class
 com\example\mychat\config\ServerConfig.class
 com\example\mychat\controller\CommentController.class
 com\example\mychat\ChatServer$1.class
-com\example\mychat\handler\WebSocketFrameHandler$1.class
 com\example\mychat\config\EnvironmentConfig.class
 com\example\mychat\filter\ApiKeyFilter.class
 com\example\mychat\service\ApiKeyService.class
@@ -22,7 +21,7 @@ com\example\mychat\repository\PostRepository.class
 com\example\mychat\controller\ConversationController.class
 com\example\mychat\handler\WebSocketFrameHandler.class
 com\example\mychat\handler\ChatHandler.class
-com\example\mychat\handler\WebSocketFrameHandler$2.class
+com\example\mychat\NettyServer.class
 com\example\mychat\model\Conversation.class
 com\example\mychat\repository\ConversationRepository.class
 com\example\mychat\service\PostService.class
@@ -39,6 +38,7 @@ com\example\mychat\ChatServer.class
 com\example\mychat\service\CommentService.class
 com\example\mychat\config\MongoDBConnection$1.class
 com\example\mychat\Main.class
+com\example\mychat\NettyServer$1.class
 com\example\mychat\controller\ApiKeyController.class
 com\example\mychat\model\ApiKey.class
 com\example\mychat\model\Comment.class

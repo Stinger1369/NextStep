@@ -157,3 +157,8 @@ mvn spring-boot:run -DskipTests
 pour docker
 docker-compose down
 docker-compose up -d
+
+
+debug full
+mvn clean install -X -e
+mvn spring-boot:run -X -e
