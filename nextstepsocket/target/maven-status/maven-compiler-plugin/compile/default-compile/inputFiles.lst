@@ -1,5 +1,4 @@
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\ApiConstants.java
-H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\ChatServer.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\config\EnvironmentConfig.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\config\MongoDBConnection.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\config\SecurityConfig.java
@@ -13,11 +12,14 @@ H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\controller\UserContr
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\dto\CommentDTO.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\dto\ConversationDTO.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\filter\ApiKeyFilter.java
+H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\handler\ApiKeyWebSocketHandler.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\handler\AuthHandler.java
-H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\handler\ChatHandler.java
-H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\handler\NotificationHandler.java
+H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\handler\CommentWebSocketHandler.java
+H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\handler\ConversationWebSocketHandler.java
+H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\handler\NotificationWebSocketHandler.java
+H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\handler\PostWebSocketHandler.java
+H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\handler\UserWebSocketHandler.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\handler\WebSocketFrameHandler.java
-H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\HttpServerHandler.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\Main.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\model\ApiKey.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\model\Comment.java
@@ -41,3 +43,4 @@ H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\service\PostService.
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\service\UserService.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\util\EncryptionUtil.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\util\ValidationUtil.java
+H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\websocket\WebSocketManager.java

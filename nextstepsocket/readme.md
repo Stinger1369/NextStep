@@ -162,3 +162,33 @@ docker-compose up -d
 debug full
 mvn clean install -X -e
 mvn spring-boot:run -X -e
+
+
+
+{
+  "action": "createUser",
+  "data": {
+    "username": "testuser1",
+    "email": "testuser@example.com",
+    "password": "password123"
+  }
+}
+
+{
+  "action": "createPost",
+  "data": {
+    "title": "My First Post",
+    "content": "This is the content of my first post",
+    "userId": "6687e109cc6e8e3e2c58e2d4"  // Replace with the correct user ID
+  }
+}
+
+
+{
+  "action": "createComment",
+  "data": {
+    "postId": "6687e191cc6e8e3e2c58e2d5", // Replace with the correct post ID
+    "userId": "6687e109cc6e8e3e2c58e2d4", // Replace with the correct user ID
+    "content": "This is a comment on the first post"
+  }
+}

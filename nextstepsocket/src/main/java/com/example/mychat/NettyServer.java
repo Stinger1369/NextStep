@@ -13,16 +13,21 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import com.example.mychat.handler.WebSocketFrameHandler;
+import com.example.mychat.service.UserService;
+import com.example.mychat.websocket.WebSocketManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 public class NettyServer {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
     private final int port;
+    private final ApplicationContext context;
 
-    public NettyServer(int port) {
+    public NettyServer(int port, ApplicationContext context) {
         this.port = port;
+        this.context = context;
     }
 
     public void start() throws InterruptedException {
@@ -42,7 +47,10 @@ public class NettyServer {
                         pipeline.addLast(new HttpObjectAggregator(64 * 1024));
                         pipeline.addLast(new ChunkedWriteHandler());
                         pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
-                        pipeline.addLast(new WebSocketFrameHandler());
+
+                        // Inject dependencies
+                        WebSocketFrameHandler webSocketFrameHandler = context.getBean(WebSocketFrameHandler.class);
+                        pipeline.addLast(webSocketFrameHandler);
                     }
                 });
 

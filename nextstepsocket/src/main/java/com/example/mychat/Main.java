@@ -21,7 +21,7 @@ public class Main {
 
         // Start Netty server
         try {
-            NettyServer nettyServer = new NettyServer(8080);
+            NettyServer nettyServer = new NettyServer(8080, context);
             new Thread(() -> {
                 try {
                     nettyServer.start();
