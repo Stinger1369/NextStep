@@ -1,4 +1,5 @@
 // src/app/store.ts
+
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './features/auth/authSlice';
 import companyReducer from './features/company/companySlice';
@@ -6,7 +7,9 @@ import userReducer from './features/user/userSlice';
 import imageReducer from './features/image/imageSlice';
 import jobReducer from './features/jobs/jobSlice';
 import themeReducer from './features/theme/themeSlice';
-import springUserReducer from './features/springUser/springUserSlice';
+import conversationReducer from './features/SocketServer/conversationSlice';
+import postReducer from './features/SocketServer/postSlice';
+import commentReducer from './features/SocketServer/commentSlice';
 
 const store = configureStore({
   reducer: {
@@ -16,7 +19,9 @@ const store = configureStore({
     images: imageReducer,
     jobs: jobReducer,
     theme: themeReducer,
-    springUsers: springUserReducer
+    conversation: conversationReducer,
+    post: postReducer,
+    comment: commentReducer
   }
 });
 

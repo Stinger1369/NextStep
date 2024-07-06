@@ -10,14 +10,16 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.cors.CorsConfig;
+import io.netty.handler.codec.http.cors.CorsConfigBuilder;
+import io.netty.handler.codec.http.cors.CorsHandler;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import com.example.mychat.handler.WebSocketFrameHandler;
-import com.example.mychat.service.UserService;
-import com.example.mychat.websocket.WebSocketManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import com.example.mychat.handler.WebSocketFrameHandler;
+import io.netty.handler.codec.http.HttpMethod;
 
 public class NettyServer {
 
@@ -35,28 +37,40 @@ public class NettyServer {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel ch) {
-                        logger.info("Initializing channel: {}", ch);
+            b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) {
+                            logger.info("Initializing channel: {}", ch);
 
-                        ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(new HttpServerCodec());
-                        pipeline.addLast(new HttpObjectAggregator(64 * 1024));
-                        pipeline.addLast(new ChunkedWriteHandler());
-                        pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
+                            ChannelPipeline pipeline = ch.pipeline();
+                            pipeline.addLast(new HttpServerCodec());
+                            pipeline.addLast(new HttpObjectAggregator(64 * 1024));
+                            pipeline.addLast(new ChunkedWriteHandler());
 
-                        // Inject dependencies
-                        WebSocketFrameHandler webSocketFrameHandler = context.getBean(WebSocketFrameHandler.class);
-                        pipeline.addLast(webSocketFrameHandler);
-                    }
-                });
+                            // Configure CORS
+                            CorsConfig corsConfig = CorsConfigBuilder.forAnyOrigin()
+                                    .allowedRequestHeaders("*")
+                                    .allowedRequestMethods(HttpMethod.GET, HttpMethod.POST,
+                                            HttpMethod.PUT, HttpMethod.DELETE, HttpMethod.OPTIONS)
+                                    .allowCredentials().build();
+                            pipeline.addLast(new CorsHandler(corsConfig));
+
+                            pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
+
+                            // Inject dependencies
+                            WebSocketFrameHandler webSocketFrameHandler =
+                                    context.getBean(WebSocketFrameHandler.class);
+                            pipeline.addLast(webSocketFrameHandler);
+                        }
+                    });
 
             ChannelFuture f = b.bind(port).sync();
             logger.info("Netty server started on port {}", port);
             f.channel().closeFuture().sync();
+        } catch (InterruptedException e) {
+            logger.error("Server interrupted", e);
+            Thread.currentThread().interrupt(); // Re-interrupt the thread
         } catch (Exception e) {
             logger.error("Error starting Netty server", e);
         } finally {

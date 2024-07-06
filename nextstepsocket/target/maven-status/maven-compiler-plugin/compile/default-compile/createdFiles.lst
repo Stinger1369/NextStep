@@ -1,5 +1,6 @@
 com\example\mychat\controller\UserController.class
 com\example\mychat\repository\CommentRepository.class
+com\example\mychat\config\WebConfig.class
 com\example\mychat\model\Notification.class
 com\example\mychat\handler\AuthHandler.class
 com\example\mychat\model\Post.class

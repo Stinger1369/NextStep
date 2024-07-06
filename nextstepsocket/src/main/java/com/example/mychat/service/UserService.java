@@ -31,16 +31,16 @@ public class UserService {
     }
 
     public Mono<User> updateUser(String id, User user) {
-        return userRepository.findById(new ObjectId(id))
-                .flatMap(existingUser -> {
-                    existingUser.setUsername(user.getUsername());
-                    existingUser.setEmail(user.getEmail());
-                    existingUser.setPassword(user.getPassword());
-                    existingUser.setPosts(user.getPosts());
-                    existingUser.setNotifications(user.getNotifications());
-                    existingUser.setConversations(user.getConversations());
-                    return userRepository.save(existingUser);
-                });
+        return userRepository.findById(new ObjectId(id)).flatMap(existingUser -> {
+            existingUser.setUsername(user.getUsername());
+            existingUser.setEmail(user.getEmail());
+            existingUser.setPassword(user.getPassword());
+            existingUser.setApiKey(user.getApiKey()); // Mise à jour de l'API key
+            existingUser.setPosts(user.getPosts());
+            existingUser.setNotifications(user.getNotifications());
+            existingUser.setConversations(user.getConversations());
+            return userRepository.save(existingUser);
+        });
     }
 
     public Mono<Void> deleteUser(String id) {

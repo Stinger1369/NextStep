@@ -14,12 +14,12 @@ public class User {
     private String username;
     private String email;
     private String password;
+    private String apiKey;
     private List<Post> posts = new ArrayList<>();
     private List<Notification> notifications = new ArrayList<>();
     private List<Conversation> conversations = new ArrayList<>();
 
-    public User() {
-    }
+    public User() {}
 
     public User(String username, String email, String password) {
         this.username = username;
@@ -58,6 +58,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
     public List<Post> getPosts() {
@@ -101,11 +109,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                '}';
+        return "User{" + "id=" + id + ", username='" + username + '\'' + ", email='" + email + '\''
+                + ", password='" + password + '\'' + ", apiKey='" + apiKey + '\'' + '}';
     }
 }

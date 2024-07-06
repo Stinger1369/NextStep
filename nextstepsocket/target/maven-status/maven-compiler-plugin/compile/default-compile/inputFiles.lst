@@ -3,6 +3,7 @@ H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\config\EnvironmentCo
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\config\MongoDBConnection.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\config\SecurityConfig.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\config\ServerConfig.java
+H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\config\WebConfig.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\controller\ApiKeyController.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\controller\CommentController.java
 H:\NextStep\nextstepsocket\src\main\java\com\example\mychat\controller\ConversationController.java
