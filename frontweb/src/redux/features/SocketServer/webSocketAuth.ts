@@ -9,10 +9,29 @@ interface User {
   emailOrPhone: string;
 }
 
+const extractJsonFromMessage = (message: string): string | null => {
+  const jsonStartIndex = message.indexOf('{');
+  if (jsonStartIndex !== -1) {
+    const jsonString = message.substring(jsonStartIndex);
+    try {
+      JSON.parse(jsonString);
+      return jsonString;
+    } catch (e) {
+      console.error('Error parsing JSON part of the message:', e);
+    }
+  }
+  return null;
+};
+
 export const sendLoginInfo = (user: User) => {
   const handleMessage = (event: MessageEvent) => {
-    const data = JSON.parse(event.data);
-    console.log('Received from WebSocket:', data);
+    const jsonString = extractJsonFromMessage(event.data);
+    if (jsonString) {
+      const data = JSON.parse(jsonString);
+      console.log('Received from WebSocket:', data);
+    } else {
+      console.error('Invalid JSON received from WebSocket:', event.data);
+    }
   };
 
   webSocketService.connect('ws://localhost:8080/ws', handleMessage);
@@ -28,26 +47,36 @@ export const sendLoginInfo = (user: User) => {
 
   console.log('Sending login data via WebSocket:', loginData);
 
-  // Envoie le message via WebSocket
-  webSocketService.send(JSON.stringify(loginData));
+  webSocketService.sendWhenOpen(JSON.stringify(loginData));
 };
 
 export const fetchApiKey = createAsyncThunk('auth/fetchApiKey', async (owner: string, { rejectWithValue }) => {
   return new Promise<string>((resolve, reject) => {
     const handleMessage = (event: MessageEvent) => {
-      const data = JSON.parse(event.data);
-      if (data.action === 'generateApiKey') {
-        if (data.success) {
-          resolve(data.apiKey);
-        } else {
-          reject(data.error);
+      const jsonString = extractJsonFromMessage(event.data);
+      if (jsonString) {
+        try {
+          const data = JSON.parse(jsonString);
+          if (data.action === 'generateApiKey') {
+            if (data.success) {
+              resolve(data.apiKey);
+            } else {
+              reject(data.error);
+            }
+          }
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+          reject({ message: 'Invalid JSON response' } as ApiError);
         }
+      } else {
+        console.error('Invalid JSON received from WebSocket:', event.data);
+        reject({ message: 'Invalid JSON response' } as ApiError);
       }
     };
 
     webSocketService.connect('ws://localhost:8080/ws', handleMessage);
 
-    webSocketService.send(JSON.stringify({ action: 'generateApiKey', data: { owner } }));
+    webSocketService.sendWhenOpen(JSON.stringify({ action: 'generateApiKey', data: { owner } }));
   }).catch((error: ApiError) => {
     return rejectWithValue(error);
   });
