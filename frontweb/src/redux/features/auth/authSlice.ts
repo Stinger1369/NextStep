@@ -4,9 +4,8 @@ import { RootState } from '../../store';
 import { AxiosError } from 'axios';
 import { ApiError } from '../../../../src/types';
 import { updateUser } from '../user/userSlice';
-import { webSocketService } from '../../../websocket/websocket';
+import { sendLoginInfo, fetchApiKey } from '../SocketServer/webSocketAuth';
 
-// Définir les types et interfaces nécessaires
 interface Address {
   street?: string;
   city?: string;
@@ -41,20 +40,20 @@ interface User {
   skills?: string[];
   images?: string[];
   videos?: string[];
-  hobbies?: string[]; // Ajouté pour les hobbies
+  hobbies?: string[];
   sex?: string;
   isVerified: boolean;
-  company?: string; // Pour les utilisateurs travaillant dans une seule entreprise
-  companyId?: string; // Pour les utilisateurs travaillant dans une seule entreprise
-  companies?: string[]; // Pour les utilisateurs gérant plusieurs entreprises
-  socialMediaLinks?: socialMediaLinks; // Liens de réseaux sociaux
+  company?: string;
+  companyId?: string;
+  companies?: string[];
+  socialMediaLinks?: socialMediaLinks;
 }
 
 interface AuthState {
   user: User | null;
   token: string | null;
   refreshToken: string | null;
-  apiKey: string | null; // Ajout de l'API key
+  apiKey: string | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
@@ -63,30 +62,10 @@ const initialState: AuthState = {
   user: JSON.parse(localStorage.getItem('user') || 'null'),
   token: localStorage.getItem('token'),
   refreshToken: localStorage.getItem('refreshToken'),
-  apiKey: localStorage.getItem('apiKey'), // Initialisation de l'API key
+  apiKey: localStorage.getItem('apiKey'),
   status: 'idle',
   error: null
 };
-
-// Thunk pour générer l'API key via WebSocket
-export const fetchApiKey = createAsyncThunk('auth/fetchApiKey', async (owner: string, { rejectWithValue }) => {
-  return new Promise<string>((resolve, reject) => {
-    webSocketService.connect('ws://localhost:8080/ws', (event) => {
-      const data = JSON.parse(event.data);
-      if (data.action === 'generateApiKey') {
-        if (data.success) {
-          resolve(data.apiKey);
-        } else {
-          reject(data.error);
-        }
-      }
-    });
-
-    webSocketService.send(JSON.stringify({ action: 'generateApiKey', data: { owner } }));
-  }).catch((error: ApiError) => {
-    return rejectWithValue(error);
-  });
-});
 
 export const login = createAsyncThunk(
   'auth/login',
@@ -106,9 +85,9 @@ export const login = createAsyncThunk(
         password
       });
 
-      // Générer l'API key après la connexion réussie
       const { user } = response.data;
       dispatch(fetchApiKey(user._id));
+      sendLoginInfo(user);
 
       return response.data;
     } catch (error) {
@@ -178,17 +157,17 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.refreshToken = null;
-      state.apiKey = null; // Réinitialisation de l'API key
+      state.apiKey = null;
       localStorage.removeItem('user');
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
-      localStorage.removeItem('apiKey'); // Suppression de l'API key
+      localStorage.removeItem('apiKey');
     },
     initializeAuthState: (state) => {
       state.user = JSON.parse(localStorage.getItem('user') || 'null');
       state.token = localStorage.getItem('token');
       state.refreshToken = localStorage.getItem('refreshToken');
-      state.apiKey = localStorage.getItem('apiKey'); // Initialisation de l'API key
+      state.apiKey = localStorage.getItem('apiKey');
     }
   },
   extraReducers: (builder) => {
@@ -310,7 +289,6 @@ export const { logout, initializeAuthState } = authSlice.actions;
 
 export default authSlice.reducer;
 
-// Helper function to check if an error is an AxiosError
 function isAxiosError(error: unknown): error is AxiosError {
   return (error as AxiosError).isAxiosError !== undefined;
 }

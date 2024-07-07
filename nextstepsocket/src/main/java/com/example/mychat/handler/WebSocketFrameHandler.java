@@ -1,11 +1,15 @@
 package com.example.mychat.handler;
 
 import com.example.mychat.service.ApiKeyService;
+import com.example.mychat.service.UserService;
+import com.example.mychat.model.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,13 +30,14 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<TextWebSo
     private final PostWebSocketHandler postWebSocketHandler;
     private final UserWebSocketHandler userWebSocketHandler;
     private final ApiKeyService apiKeyService;
+    private final UserService userService;
 
     public WebSocketFrameHandler(ApiKeyWebSocketHandler apiKeyWebSocketHandler,
             CommentWebSocketHandler commentWebSocketHandler,
             ConversationWebSocketHandler conversationWebSocketHandler,
             NotificationWebSocketHandler notificationWebSocketHandler,
             PostWebSocketHandler postWebSocketHandler, UserWebSocketHandler userWebSocketHandler,
-            ApiKeyService apiKeyService) {
+            ApiKeyService apiKeyService, UserService userService) {
         this.apiKeyWebSocketHandler = apiKeyWebSocketHandler;
         this.commentWebSocketHandler = commentWebSocketHandler;
         this.conversationWebSocketHandler = conversationWebSocketHandler;
@@ -40,6 +45,7 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<TextWebSo
         this.postWebSocketHandler = postWebSocketHandler;
         this.userWebSocketHandler = userWebSocketHandler;
         this.apiKeyService = apiKeyService;
+        this.userService = userService;
     }
 
     @Override
@@ -63,6 +69,7 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<TextWebSo
             // Vérification de la présence de "action"
             JsonNode actionNode = jsonNode.get("action");
             if (actionNode == null || !actionNode.isTextual()) {
+                logger.error("Missing or invalid action");
                 ctx.channel().writeAndFlush(new TextWebSocketFrame("Missing or invalid action"));
                 return;
             }
@@ -71,6 +78,7 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<TextWebSo
             // Vérification de la présence de "data"
             JsonNode dataNode = jsonNode.get("data");
             if (dataNode == null || !dataNode.isObject()) {
+                logger.error("Missing or invalid data");
                 ctx.channel().writeAndFlush(new TextWebSocketFrame("Missing or invalid data"));
                 return;
             }
@@ -85,10 +93,15 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<TextWebSo
                 case "createUser":
                     userWebSocketHandler.handleCreateUser(dataNode, ctx);
                     break;
+                case "login":
+                    logger.info("Handling login action with data: {}", dataNode);
+                    handleUserLogin(ctx, dataNode);
+                    break;
                 default:
                     // Vérification de la présence de "apiKey" pour toutes les autres actions
                     JsonNode apiKeyNode = jsonNode.get("apiKey");
                     if (apiKeyNode == null || !apiKeyNode.isTextual()) {
+                        logger.error("Missing or invalid API key");
                         ctx.channel().writeAndFlush(
                                 new TextWebSocketFrame("Missing or invalid API key"));
                         ctx.close();
@@ -114,10 +127,12 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<TextWebSo
                                     postWebSocketHandler.handleCreatePost(ctx, dataNode);
                                     break;
                                 default:
+                                    logger.error("Unknown action: {}", action);
                                     ctx.channel().writeAndFlush(
                                             new TextWebSocketFrame("Unknown action: " + action));
                             }
                         } else {
+                            logger.error("Invalid API key");
                             ctx.channel().writeAndFlush(new TextWebSocketFrame("Invalid API key"));
                             ctx.close();
                         }
@@ -128,6 +143,53 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<TextWebSo
             ctx.channel().writeAndFlush(
                     new TextWebSocketFrame("Error processing message: " + e.getMessage()));
         }
+    }
+
+    private void handleUserLogin(ChannelHandlerContext ctx, JsonNode dataNode) {
+        String userId = dataNode.get("userId").asText();
+        String username = dataNode.get("username").asText(null);
+        String email = dataNode.get("email").asText(null);
+
+        logger.info("Handling user login for userId: {}", userId);
+        logger.info("Username: {}, Email: {}", username, email);
+
+        // Création ou mise à jour de l'utilisateur
+        userService.getUserById(userId).switchIfEmpty(Mono.defer(() -> {
+            logger.info("Creating new user with userId: {}", userId);
+            User newUser = new User();
+            newUser.setId(new ObjectId(userId));
+            newUser.setUsername(username);
+            newUser.setEmail(email);
+            return userService.createUser(newUser);
+        })).flatMap(user -> {
+            logger.info("Updating existing user with userId: {}", user.getId());
+            if (username != null) {
+                user.setUsername(username);
+            }
+            if (email != null) {
+                user.setEmail(email);
+            }
+
+            return apiKeyService.generateOrFetchApiKey(user.getId().toString()).flatMap(apiKey -> {
+                user.setApiKey(apiKey.getKey());
+                return userService.updateUser(user.getId().toString(), user);
+            });
+        }).subscribe(updatedUser -> {
+            String response;
+            try {
+                response = OBJECT_MAPPER.writeValueAsString(updatedUser);
+                logger.info("User updated successfully: {}", response);
+                ctx.channel().writeAndFlush(new TextWebSocketFrame("User updated: " + response));
+            } catch (JsonProcessingException e) {
+                logger.error("Error processing user update response: {}", e.getMessage());
+                ctx.channel().writeAndFlush(new TextWebSocketFrame(
+                        "Error processing user update response: " + e.getMessage()));
+            }
+        }, error -> {
+            logger.error("Error updating user: {}", error.getMessage());
+            ctx.channel().writeAndFlush(
+                    new TextWebSocketFrame("Error updating user: " + error.getMessage()));
+        });
     }
 
     @Override
