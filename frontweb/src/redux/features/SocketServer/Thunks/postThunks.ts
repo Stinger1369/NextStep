@@ -2,17 +2,14 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
 import { Post } from '../../../../types';
 import { addPost, fetchPostsFailure } from '../postSlice';
+import { webSocketService } from '../../../../websocket/websocket';
 
 export const createPost = createAsyncThunk<void, Post, { rejectValue: string }>('post/createPost', async (post: Post, { dispatch, getState, rejectWithValue }) => {
   const state = getState() as RootState;
-  const apiKey = state.auth.apiKey; // Récupérer l'API key de l'état auth
+  const apiKey = state.auth.apiKey;
 
   try {
-    const socket = new WebSocket('ws://localhost:8080/ws');
-    socket.onopen = () => {
-      socket.send(JSON.stringify({ action: 'createPost', apiKey, data: post }));
-    };
-    socket.onmessage = (event) => {
+    webSocketService.connect('ws://localhost:8080/ws', (event) => {
       try {
         const data = JSON.parse(event.data);
         if (data.action === 'createPostSuccess') {
@@ -23,10 +20,9 @@ export const createPost = createAsyncThunk<void, Post, { rejectValue: string }>(
       } catch (error) {
         dispatch(fetchPostsFailure('Invalid response from server'));
       }
-    };
-    socket.onerror = () => {
-      dispatch(fetchPostsFailure('WebSocket error'));
-    };
+    });
+
+    webSocketService.send(JSON.stringify({ action: 'createPost', apiKey, data: post }));
   } catch (error) {
     return rejectWithValue('An unknown error occurred');
   }

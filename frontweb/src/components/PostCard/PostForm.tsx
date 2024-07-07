@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { createPost } from '../../redux//features/SocketServer/Thunks/postThunks';
+import { useDispatch, useSelector } from 'react-redux';
+import { createPost } from '../../redux/features/SocketServer/Thunks/postThunks';
 import { Post } from '../../types';
-import { AppDispatch } from '../../redux/store'; // Import correct du type AppDispatch
+import { AppDispatch, RootState } from '../../redux/store';
 
 const PostForm: React.FC = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [author, setAuthor] = useState('');
-  const dispatch: AppDispatch = useDispatch(); // Typage correct pour dispatch
+  const userId = useSelector((state: RootState) => state.auth.user?._id);
+  const dispatch: AppDispatch = useDispatch();
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    const newPost: Post = { id: '', title, content, author, createdAt: new Date(), updatedAt: new Date() };
+    if (!userId) {
+      alert('User ID is missing.');
+      return;
+    }
+    const newPost: Post = { id: '', title, content, userId, createdAt: new Date(), updatedAt: new Date() };
     dispatch(createPost(newPost));
   };
 
@@ -25,10 +29,6 @@ const PostForm: React.FC = () => {
       <div>
         <label htmlFor="content">Content:</label>
         <textarea id="content" value={content} onChange={(e) => setContent(e.target.value)}></textarea>
-      </div>
-      <div>
-        <label htmlFor="author">Author:</label>
-        <input id="author" value={author} onChange={(e) => setAuthor(e.target.value)} />
       </div>
       <button type="submit">Create Post</button>
     </form>

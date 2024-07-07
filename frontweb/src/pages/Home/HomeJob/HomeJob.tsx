@@ -11,9 +11,9 @@ const HomeJob: React.FC = () => {
 
   // Exemple de données pour les posts
   const posts = [
-    { id: '1', title: 'Titre du Post 1', content: 'Contenu du post 1...', author: 'Auteur 1', createdAt: new Date() },
-    { id: '2', title: 'Titre du Post 2', content: 'Contenu du post 2...', author: 'Auteur 2', createdAt: new Date() },
-    { id: '3', title: 'Titre du Post 3', content: 'Contenu du post 3...', author: 'Auteur 3', createdAt: new Date() }
+    { id: '1', title: 'Titre du Post 1', content: 'Contenu du post 1...', userId: 'Auteur 1', createdAt: new Date() },
+    { id: '2', title: 'Titre du Post 2', content: 'Contenu du post 2...', userId: 'Auteur 2', createdAt: new Date() },
+    { id: '3', title: 'Titre du Post 3', content: 'Contenu du post 3...', userId: 'Auteur 3', createdAt: new Date() }
   ];
 
   return (
@@ -22,7 +22,7 @@ const HomeJob: React.FC = () => {
       <PostForm />
       <div className="home-job__posts">
         {posts.map((post, index) => (
-          <PostCard key={index} title={post.title} content={post.content} author={post.author} />
+          <PostCard key={index} title={post.title} content={post.content} userId={post.userId} />
         ))}
       </div>
     </div>

@@ -2,7 +2,6 @@ package com.example.mychat.handler;
 
 import com.example.mychat.model.Notification;
 import com.example.mychat.model.Post;
-import com.example.mychat.model.User;
 import com.example.mychat.service.NotificationService;
 import com.example.mychat.service.PostService;
 import com.example.mychat.service.UserService;
@@ -10,11 +9,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PostWebSocketHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(PostWebSocketHandler.class);
     private final PostService postService;
     private final NotificationService notificationService;
     private final UserService userService;
@@ -30,7 +32,13 @@ public class PostWebSocketHandler {
     public void handleCreatePost(ChannelHandlerContext ctx, JsonNode dataNode) {
         try {
             Post post = OBJECT_MAPPER.treeToValue(dataNode, Post.class);
-            postService.createPost(post).subscribe(createdPost -> {
+            postService.createPost(post).flatMap(createdPost -> {
+                return userService.getUserById(createdPost.getUserId()).flatMap(user -> {
+                    user.addPost(createdPost);
+                    return userService.updateUser(user.getId().toHexString(), user)
+                            .thenReturn(createdPost);
+                });
+            }).subscribe(createdPost -> {
                 try {
                     String response = OBJECT_MAPPER.writeValueAsString(createdPost);
                     ctx.channel()
@@ -52,6 +60,9 @@ public class PostWebSocketHandler {
                     ctx.channel().writeAndFlush(
                             new TextWebSocketFrame("Error creating post: " + e.getMessage()));
                 }
+            }, error -> {
+                ctx.channel().writeAndFlush(
+                        new TextWebSocketFrame("Error creating post: " + error.getMessage()));
             });
         } catch (Exception e) {
             ctx.channel().writeAndFlush(

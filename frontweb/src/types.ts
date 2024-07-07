@@ -1,5 +1,3 @@
-// src/types.ts
-
 export interface ApiError {
   message: string;
   status?: number;
@@ -10,9 +8,10 @@ export interface Post {
   id: string;
   title: string;
   content: string;
-  author: string;
+  userId: string;
   createdAt: Date;
   updatedAt?: Date;
+
 }
 
 export interface Conversation {

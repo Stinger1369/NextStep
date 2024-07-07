@@ -93,7 +93,9 @@ public class User {
     }
 
     public void addPost(Post post) {
-        if (!this.posts.contains(post)) {
+        boolean postExists =
+                posts.stream().anyMatch(existingPost -> existingPost.getId().equals(post.getId()));
+        if (!postExists) {
             this.posts.add(post);
         }
     }

@@ -1,5 +1,3 @@
-// src/redux/features/SocketServer/postSlice.ts
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Post } from '../../../types';
 

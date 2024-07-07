@@ -16,8 +16,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-
-    @Autowired
+@Autowired
     public PostService(PostRepository postRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
@@ -27,22 +26,21 @@ public class PostService {
         post.setCreatedAt(new Date());
         post.setUpdatedAt(new Date());
 
-        // Convertir le authorId en ObjectId
+        // Convertir le userId en ObjectId
         try {
-            ObjectId authorObjectId = new ObjectId(post.getUserId());
-            post.setUserId(authorObjectId.toHexString());
+            ObjectId userIdObjectId = new ObjectId(post.getUserId());
+            post.setUserId(userIdObjectId.toHexString());
             return postRepository.save(post)
-                    .flatMap(savedPost -> userRepository.findById(authorObjectId)
+                    .flatMap(savedPost -> userRepository.findById(userIdObjectId)
                             .flatMap(user -> {
-                                if (!user.getPosts().contains(savedPost)) {
-                                    user.addPost(savedPost);
-                                }
+                                user.addPost(savedPost);
                                 return userRepository.save(user).thenReturn(savedPost);
                             }));
         } catch (IllegalArgumentException e) {
-            return Mono.error(new Exception("Invalid authorId"));
+            return Mono.error(new Exception("Invalid userId"));
         }
     }
+
 
     public Mono<Post> getPostById(String id) {
         return postRepository.findById(new ObjectId(id));
@@ -53,22 +51,20 @@ public class PostService {
     }
 
     public Mono<Post> updatePost(String id, Post post) {
-        return postRepository.findById(new ObjectId(id))
-                .flatMap(existingPost -> {
-                    existingPost.setTitle(post.getTitle());
-                    existingPost.setContent(post.getContent());
-                    existingPost.setUpdatedAt(new Date());
-                    return postRepository.save(existingPost);
-                });
+        return postRepository.findById(new ObjectId(id)).flatMap(existingPost -> {
+            existingPost.setTitle(post.getTitle());
+            existingPost.setContent(post.getContent());
+            existingPost.setUpdatedAt(new Date());
+            return postRepository.save(existingPost);
+        });
     }
 
     public Mono<Void> deletePost(String id) {
-        return postRepository.findById(new ObjectId(id))
-                .flatMap(post -> userRepository.findById(new ObjectId(post.getUserId()))
-                        .flatMap(user -> {
-                            user.getPosts().removeIf(p -> p.getId().equals(post.getId()));
-                            return userRepository.save(user)
-                                    .then(postRepository.deleteById(new ObjectId(id)));
-                        }));
+        return postRepository.findById(new ObjectId(id)).flatMap(
+                post -> userRepository.findById(new ObjectId(post.getUserId())).flatMap(user -> {
+                    user.getPosts().removeIf(p -> p.getId().equals(post.getId()));
+                    return userRepository.save(user)
+                            .then(postRepository.deleteById(new ObjectId(id)));
+                }));
     }
 }
