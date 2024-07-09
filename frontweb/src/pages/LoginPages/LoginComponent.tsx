@@ -33,7 +33,11 @@ const LoginComponent: React.FC = () => {
         ).unwrap();
 
         if (resultAction.user) {
-          sendCreateUser(resultAction.user); // Envoyer les informations de l'utilisateur via WebSocket après un login réussi
+          sendCreateUser({
+            emailOrPhone: resultAction.user.emailOrPhone,
+            firstName: resultAction.user.firstName ?? 'DefaultFirstName',
+            lastName: resultAction.user.lastName ?? 'DefaultLastName'
+          });
           navigate('/'); // Rediriger vers la page d'accueil après une connexion réussie
         }
       } catch (error) {
