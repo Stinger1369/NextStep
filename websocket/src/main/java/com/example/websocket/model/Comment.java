@@ -10,9 +10,9 @@ import java.util.Date;
 public class Comment {
     @Id
     private ObjectId id;
+    private String userId;
+    private String postId;
     private String content;
-    private String authorId;
-    private ObjectId postId;
     private Date createdAt;
     private Date updatedAt;
 
@@ -21,14 +21,12 @@ public class Comment {
         this.updatedAt = new Date();
     }
 
-    public Comment(String content, String authorId, ObjectId postId) {
+    public Comment(String userId, String postId, String content) {
         this();
-        this.content = content;
-        this.authorId = authorId;
+        this.userId = userId;
         this.postId = postId;
+        this.content = content;
     }
-
-    // Getters and setters
 
     public ObjectId getId() {
         return id;
@@ -38,28 +36,28 @@ public class Comment {
         this.id = id;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getPostId() {
+        return postId;
+    }
+
+    public void setPostId(String postId) {
+        this.postId = postId;
+    }
+
     public String getContent() {
         return content;
     }
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getAuthorId() {
-        return authorId;
-    }
-
-    public void setAuthorId(String authorId) {
-        this.authorId = authorId;
-    }
-
-    public ObjectId getPostId() {
-        return postId;
-    }
-
-    public void setPostId(ObjectId postId) {
-        this.postId = postId;
     }
 
     public Date getCreatedAt() {

@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Document(collection = "usersocket")
 public class User {
@@ -21,11 +22,11 @@ public class User {
 
     public User() {}
 
-    public User(String username, String email, String password, String apiKey) {
+    public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.apiKey = apiKey;
+        this.apiKey = UUID.randomUUID().toString();
     }
 
     // Getters and setters

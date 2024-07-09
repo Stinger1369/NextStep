@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Document(collection = "posts")
 public class Post {
@@ -33,7 +32,6 @@ public class Post {
     }
 
     // Getters and setters
-
     public ObjectId getId() {
         return id;
     }
@@ -92,16 +90,6 @@ public class Post {
 
     public void addComment(Comment comment) {
         this.comments.add(comment);
-    }
-
-    public void updateComment(Comment updatedComment) {
-        this.comments = this.comments.stream()
-                .map(comment -> comment.getId().equals(updatedComment.getId()) ? updatedComment
-                        : comment)
-                .collect(Collectors.toList());
-    }
-
-    public void removeComment(Comment comment) {
-        this.comments.removeIf(c -> c.getId().equals(comment.getId()));
+        this.updatedAt = new Date();
     }
 }

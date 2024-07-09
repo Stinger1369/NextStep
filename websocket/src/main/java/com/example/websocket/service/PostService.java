@@ -5,7 +5,6 @@ import com.example.websocket.model.Post;
 import com.example.websocket.repository.PostRepository;
 import com.example.websocket.repository.UserRepository;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
@@ -19,7 +18,6 @@ public class PostService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
 
-    @Autowired
     public PostService(PostRepository postRepository, UserRepository userRepository,
             NotificationService notificationService) {
         this.postRepository = postRepository;
@@ -33,12 +31,12 @@ public class PostService {
 
         try {
             ObjectId userIdObjectId = new ObjectId(post.getUserId());
-            post.setUserId(userIdObjectId.toHexString());
+            post.setUserId(userIdObjectId.toString());
             return postRepository.save(post)
                     .flatMap(savedPost -> userRepository.findById(userIdObjectId).flatMap(user -> {
                         user.addPost(savedPost);
                         return userRepository.save(user).flatMap(updatedUser -> {
-                            Notification notification = new Notification(user.getId().toHexString(),
+                            Notification notification = new Notification(user.getId().toString(),
                                     "New post created: " + savedPost.getTitle());
                             return notificationService.createNotification(notification)
                                     .flatMap(savedNotification -> {

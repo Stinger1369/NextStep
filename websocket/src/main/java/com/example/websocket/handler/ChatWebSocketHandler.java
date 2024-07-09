@@ -1,38 +1,164 @@
 package com.example.websocket.handler;
 
+import com.example.websocket.model.*;
+import com.example.websocket.service.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
-import org.springframework.web.socket.CloseStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import org.springframework.stereotype.Component;
 
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.List;
+import java.io.IOException;
 
 @Component
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
-    private List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
+    private static final Logger logger = LoggerFactory.getLogger(ChatWebSocketHandler.class);
 
-    @Override
-    public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
-        sessions.add(session);
+    private final UserService userService;
+    private final PostService postService;
+    private final CommentService commentService;
+    private final ConversationService conversationService;
+    private final ObjectMapper objectMapper;
+
+    public ChatWebSocketHandler(UserService userService, PostService postService,
+            CommentService commentService, ConversationService conversationService,
+            ObjectMapper objectMapper) {
+        this.userService = userService;
+        this.postService = postService;
+        this.commentService = commentService;
+        this.conversationService = conversationService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     protected void handleTextMessage(@NonNull WebSocketSession session,
-            @NonNull TextMessage message) throws Exception {
-        for (WebSocketSession webSocketSession : sessions) {
-            if (webSocketSession.isOpen() && !session.getId().equals(webSocketSession.getId())) {
-                webSocketSession.sendMessage(message);
+            @NonNull TextMessage message) {
+        logger.info("Received message: {}", message.getPayload());
+
+        try {
+            JsonNode jsonNode = objectMapper.readTree(message.getPayload());
+            String messageType = jsonNode.get("type").asText();
+            JsonNode payload = jsonNode.get("payload");
+
+            switch (messageType) {
+                case "user.create":
+                    handleUserCreate(session, payload);
+                    break;
+                case "post.create":
+                    handlePostCreate(session, payload);
+                    break;
+                case "comment.create":
+                    handleCommentCreate(session, payload);
+                    break;
+                case "conversation.create":
+                    handleConversationCreate(session, payload);
+                    break;
+                case "post.getById":
+                    handleGetPost(session, payload);
+                    break;
+                default:
+                    session.sendMessage(new TextMessage(
+                            String.format("Unknown message type: %s", messageType)));
             }
+        } catch (IOException e) {
+            logger.error("Error processing message", e);
         }
     }
 
-    @Override
-    public void afterConnectionClosed(@NonNull WebSocketSession session,
-            @NonNull CloseStatus status) throws Exception {
-        sessions.remove(session);
+    private void handleUserCreate(WebSocketSession session, JsonNode payload) {
+        User user = new User(payload.get("username").asText(), payload.get("email").asText(),
+                payload.get("password").asText());
+
+        userService.createUser(user).subscribe(createdUser -> {
+            try {
+                session.sendMessage(new TextMessage(
+                        String.format("User created with ID: %s", createdUser.getId())));
+                logger.info("User created: {}", createdUser);
+            } catch (IOException e) {
+                logger.error("Error sending creation confirmation", e);
+            }
+        }, error -> sendErrorMessage(session, "Error creating user", error));
+    }
+
+    private void handlePostCreate(WebSocketSession session, JsonNode payload) {
+        Post post = new Post(payload.get("userId").asText(), payload.get("title").asText(),
+                payload.get("content").asText());
+
+        postService.createPost(post).subscribe(createdPost -> {
+            try {
+                session.sendMessage(new TextMessage(
+                        String.format("Post created with ID: %s", createdPost.getId())));
+                logger.info("Post created: {}", createdPost);
+            } catch (IOException e) {
+                logger.error("Error sending post creation confirmation", e);
+            }
+        }, error -> sendErrorMessage(session, "Error creating post", error));
+    }
+
+    private void handleCommentCreate(WebSocketSession session, JsonNode payload) {
+        Comment comment = new Comment(payload.get("userId").asText(),
+                payload.get("postId").asText(), payload.get("content").asText());
+
+        logger.info("Creating comment: {}", comment);
+
+        commentService.createComment(comment).subscribe(updatedUser -> {
+            try {
+                int numComments = updatedUser.getPosts().stream()
+                        .filter(post -> post.getId().toString().equals(comment.getPostId()))
+                        .findFirst().map(post -> post.getComments().size()).orElse(0);
+
+                session.sendMessage(new TextMessage(String.format(
+                        "Comment added to post. Updated post now has %d comments", numComments)));
+                logger.info("Comment added to post: {}", updatedUser);
+            } catch (IOException e) {
+                logger.error("Error sending comment creation confirmation", e);
+            }
+        }, error -> sendErrorMessage(session, "Error creating comment", error));
+    }
+
+    private void handleConversationCreate(WebSocketSession session, JsonNode payload) {
+        Conversation conversation = new Conversation(payload.get("senderId").asText(),
+                payload.get("receiverId").asText(), payload.get("name").asText());
+
+        String initialMessage = payload.get("message").asText();
+
+        conversationService.createConversation(conversation, initialMessage)
+                .subscribe(createdConversation -> {
+                    try {
+                        session.sendMessage(new TextMessage(String.format(
+                                "Conversation created with ID: %s", createdConversation.getId())));
+                        logger.info("Conversation created: {}", createdConversation);
+                    } catch (IOException e) {
+                        logger.error("Error sending conversation creation confirmation", e);
+                    }
+                }, error -> sendErrorMessage(session, "Error creating conversation", error));
+    }
+
+    private void handleGetPost(WebSocketSession session, JsonNode payload) {
+        String postId = payload.get("postId").asText();
+        postService.getPostById(postId).subscribe(post -> {
+            try {
+                session.sendMessage(new TextMessage(String
+                        .format("Post retrieved. It has %d comments", post.getComments().size())));
+                logger.info("Post retrieved: {}", post);
+            } catch (IOException e) {
+                logger.error("Error sending post retrieval confirmation", e);
+            }
+        }, error -> sendErrorMessage(session, "Error retrieving post", error));
+    }
+
+    private void sendErrorMessage(WebSocketSession session, String errorMessage, Throwable error) {
+        logger.error("{}: {}", errorMessage, error.getMessage(), error);
+        try {
+            session.sendMessage(
+                    new TextMessage(String.format("%s: %s", errorMessage, error.getMessage())));
+        } catch (IOException e) {
+            logger.error("Error sending error message", e);
+        }
     }
 }

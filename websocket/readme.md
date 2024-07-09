@@ -40,3 +40,7 @@ websocket
 │                   └── websocket
 │                       └── WebSocketApplicationTests.java
 └── pom.xml
+
+
+mvn clean install -U
+mvn spring-boot:run -U
