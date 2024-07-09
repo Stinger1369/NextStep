@@ -1,71 +1,42 @@
-class WebSocketService {
-  private socket: WebSocket | null = null;
-  private isConnected: boolean = false;
-  private isConnecting: boolean = false;
-  private pendingMessages: string[] = [];
+// src/websocket/websocket.ts
+import { User, WebSocketMessage } from '../types';
 
-  connect(url: string, onMessage: (event: MessageEvent) => void) {
-    if (this.isConnecting || (this.socket && this.socket.readyState === WebSocket.OPEN)) {
-      console.log('WebSocket connection is already in progress or open.');
-      return;
+let socket: WebSocket;
+
+export const initializeWebSocket = () => {
+  socket = new WebSocket('ws://localhost:8080/ws/chat');
+
+  socket.onopen = () => {
+    console.log('WebSocket connected');
+  };
+
+  socket.onmessage = (event: MessageEvent) => {
+    try {
+      const message: WebSocketMessage = JSON.parse(event.data);
+      handleWebSocketMessage(message);
+    } catch (error) {
+      console.error('Invalid JSON:', event.data);
     }
+  };
 
-    this.isConnecting = true;
-    this.socket = new WebSocket(url);
+  socket.onerror = (error: Event) => {
+    console.error('WebSocket error:', error);
+  };
 
-    this.socket.onopen = () => {
-      console.log('WebSocket connection established');
-      this.isConnected = true;
-      this.isConnecting = false;
-      this.flushPendingMessages();
-    };
+  socket.onclose = () => {
+    console.log('WebSocket closed');
+  };
+};
 
-    this.socket.onmessage = onMessage;
+const handleWebSocketMessage = (message: WebSocketMessage) => {
+  // Handle incoming messages from WebSocket
+  console.log('Message from WebSocket:', message);
+};
 
-    this.socket.onclose = () => {
-      console.log('WebSocket connection closed');
-      this.isConnected = false;
-      this.isConnecting = false;
-    };
-
-    this.socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      this.isConnected = false;
-      this.isConnecting = false;
-    };
-  }
-
-  send(message: string) {
-    if (this.isConnected) {
-      this.socket?.send(message);
-    } else {
-      console.error('WebSocket is not open. Adding message to pending queue.');
-      this.pendingMessages.push(message);
-    }
-  }
-
-  sendWhenOpen(message: string) {
-    if (this.isConnected) {
-      this.send(message);
-    } else {
-      this.pendingMessages.push(message);
-    }
-  }
-
-  private flushPendingMessages() {
-    while (this.pendingMessages.length > 0 && this.isConnected) {
-      const message = this.pendingMessages.shift();
-      if (message && this.socket) {
-        this.socket.send(message);
-      }
-    }
-  }
-
-  close() {
-    if (this.socket) {
-      this.socket.close();
-    }
-  }
-}
-
-export const webSocketService = new WebSocketService();
+export const sendCreateUser = (user: User) => {
+  const message: WebSocketMessage = {
+    type: 'user.create',
+    payload: user
+  };
+  socket.send(JSON.stringify(message));
+};

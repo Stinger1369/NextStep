@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Service
 public class UserService {
 
@@ -21,6 +23,11 @@ public class UserService {
     }
 
     public Mono<User> createUser(User user) {
+        // Générer l'apiKey si elle n'est pas déjà définie
+        if (user.getApiKey() == null || user.getApiKey().isEmpty()) {
+            user.setApiKey(UUID.randomUUID().toString());
+        }
+
         logger.info("Creating user: {}", user);
         return userRepository.save(user)
                 .doOnSuccess(savedUser -> logger.info("User created: {}", savedUser))
@@ -43,12 +50,18 @@ public class UserService {
     public Mono<User> updateUser(String id, User user) {
         logger.info("Updating user: {}", user);
         return userRepository.findById(new ObjectId(id)).flatMap(existingUser -> {
-            existingUser.setEmail(user.getEmail());
+            existingUser.setemailOrPhone(user.getemailOrPhone());
             existingUser.setFirstName(user.getFirstName());
             existingUser.setLastName(user.getLastName());
             existingUser.setPosts(user.getPosts());
             existingUser.setNotifications(user.getNotifications());
             existingUser.setConversations(user.getConversations());
+            // Conserver l'apiKey existante ou en générer une nouvelle si nécessaire
+            if (user.getApiKey() == null || user.getApiKey().isEmpty()) {
+                existingUser.setApiKey(UUID.randomUUID().toString());
+            } else {
+                existingUser.setApiKey(user.getApiKey());
+            }
             return userRepository.save(existingUser);
         }).doOnSuccess(updatedUser -> logger.info("User updated: {}", updatedUser))
                 .doOnError(error -> logger.error("Error updating user: {}", error.getMessage()));

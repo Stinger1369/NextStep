@@ -71,9 +71,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void handleUserCreate(WebSocketSession session, JsonNode payload) {
-        if (payload.hasNonNull("email") && payload.hasNonNull("firstName")
+        if (payload.hasNonNull("emailOrPhone") && payload.hasNonNull("firstName")
                 && payload.hasNonNull("lastName")) {
-            User user = new User(payload.get("email").asText(), payload.get("firstName").asText(),
+            User user = new User(payload.get("emailOrPhone").asText(), payload.get("firstName").asText(),
                     payload.get("lastName").asText());
 
             userService.createUser(user).subscribe(createdUser -> {

@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
 import { login } from '../../redux/features/auth/authSlice';
+import { sendCreateUser } from '../../websocket/websocket'; // Importez la fonction sendCreateUser
 import { AxiosError } from 'axios';
 import './LoginComponent.css';
 
@@ -24,13 +25,17 @@ const LoginComponent: React.FC = () => {
     }),
     onSubmit: async (values, { setSubmitting, setErrors }) => {
       try {
-        await dispatch(
+        const resultAction = await dispatch(
           login({
             emailOrPhone: values.emailOrPhone,
             password: values.password
           })
         ).unwrap();
-        navigate('/'); // Rediriger vers la page d'accueil après une connexion réussie
+
+        if (resultAction.user) {
+          sendCreateUser(resultAction.user); // Envoyer les informations de l'utilisateur via WebSocket après un login réussi
+          navigate('/'); // Rediriger vers la page d'accueil après une connexion réussie
+        }
       } catch (error) {
         setSubmitting(false);
         if (isAxiosError(error)) {

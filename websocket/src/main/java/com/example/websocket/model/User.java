@@ -6,24 +6,27 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Document(collection = "usersocket")
 public class User {
     @Id
     private ObjectId id;
-    private String email;
+    private String emailOrPhone;
     private String firstName;
     private String lastName;
+    private String apiKey; // Ajout de l'apiKey
     private List<Post> posts = new ArrayList<>();
     private List<Notification> notifications = new ArrayList<>();
     private List<Conversation> conversations = new ArrayList<>();
 
     public User() {}
 
-    public User(String email, String firstName, String lastName) {
-        this.email = email;
+    public User(String emailOrPhone, String firstName, String lastName) {
+        this.emailOrPhone = emailOrPhone;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.apiKey = UUID.randomUUID().toString(); // Générer l'apiKey lors de la création
     }
 
     // Getters and setters
@@ -36,12 +39,12 @@ public class User {
         this.id = id;
     }
 
-    public String getEmail() {
-        return email;
+    public String getemailOrPhone() {
+        return emailOrPhone;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setemailOrPhone(String emailOrPhone) {
+        this.emailOrPhone = emailOrPhone;
     }
 
     public String getFirstName() {
@@ -58,6 +61,14 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
     public List<Post> getPosts() {

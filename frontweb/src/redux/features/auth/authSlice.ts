@@ -4,8 +4,8 @@ import { RootState } from '../../store';
 import { AxiosError } from 'axios';
 import { ApiError } from '../../../../src/types';
 import { updateUser } from '../user/userSlice';
-import { sendLoginInfo, fetchApiKey } from '../SocketServer/webSocketAuth';
 
+// Définir les types et interfaces nécessaires
 interface Address {
   street?: string;
   city?: string;
@@ -40,20 +40,19 @@ interface User {
   skills?: string[];
   images?: string[];
   videos?: string[];
-  hobbies?: string[];
+  hobbies?: string[]; // Ajouté pour les hobbies
   sex?: string;
   isVerified: boolean;
-  company?: string;
-  companyId?: string;
-  companies?: string[];
-  socialMediaLinks?: socialMediaLinks;
+  company?: string; // Pour les utilisateurs travaillant dans une seule entreprise
+  companyId?: string; // Pour les utilisateurs travaillant dans une seule entreprise
+  companies?: string[]; // Pour les utilisateurs gérant plusieurs entreprises
+  socialMediaLinks?: socialMediaLinks; // Liens de réseaux sociaux
 }
 
 interface AuthState {
   user: User | null;
   token: string | null;
   refreshToken: string | null;
-  apiKey: string | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
@@ -62,7 +61,6 @@ const initialState: AuthState = {
   user: JSON.parse(localStorage.getItem('user') || 'null'),
   token: localStorage.getItem('token'),
   refreshToken: localStorage.getItem('refreshToken'),
-  apiKey: localStorage.getItem('apiKey'),
   status: 'idle',
   error: null
 };
@@ -77,18 +75,13 @@ export const login = createAsyncThunk(
       emailOrPhone: string;
       password: string;
     },
-    { rejectWithValue, dispatch }
+    { rejectWithValue }
   ) => {
     try {
       const response = await axiosInstance.post('/auth/login', {
         emailOrPhone,
         password
       });
-
-      const { user } = response.data;
-      dispatch(fetchApiKey(user._id));
-      sendLoginInfo(user);
-
       return response.data;
     } catch (error) {
       if (isAxiosError(error)) {
@@ -157,17 +150,14 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.refreshToken = null;
-      state.apiKey = null;
       localStorage.removeItem('user');
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
-      localStorage.removeItem('apiKey');
     },
     initializeAuthState: (state) => {
       state.user = JSON.parse(localStorage.getItem('user') || 'null');
       state.token = localStorage.getItem('token');
       state.refreshToken = localStorage.getItem('refreshToken');
-      state.apiKey = localStorage.getItem('apiKey');
     }
   },
   extraReducers: (builder) => {
@@ -264,18 +254,6 @@ const authSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload ? (action.payload as ApiError).message : 'Failed to verify email';
       })
-      .addCase(fetchApiKey.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchApiKey.fulfilled, (state, action: PayloadAction<string>) => {
-        state.status = 'succeeded';
-        state.apiKey = action.payload;
-        localStorage.setItem('apiKey', action.payload);
-      })
-      .addCase(fetchApiKey.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload ? (action.payload as ApiError).message : 'Failed to fetch API key';
-      })
       .addCase(updateUser.fulfilled, (state, action: PayloadAction<User>) => {
         if (state.user && state.user._id === action.payload._id) {
           state.user = action.payload;
@@ -289,6 +267,7 @@ export const { logout, initializeAuthState } = authSlice.actions;
 
 export default authSlice.reducer;
 
+// Helper function to check if an error is an AxiosError
 function isAxiosError(error: unknown): error is AxiosError {
   return (error as AxiosError).isAxiosError !== undefined;
 }

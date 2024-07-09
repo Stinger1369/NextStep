@@ -7,9 +7,6 @@ import userReducer from './features/user/userSlice';
 import imageReducer from './features/image/imageSlice';
 import jobReducer from './features/jobs/jobSlice';
 import themeReducer from './features/theme/themeSlice';
-import conversationReducer from './features/SocketServer/conversationSlice';
-import postReducer from './features/SocketServer/postSlice';
-import commentReducer from './features/SocketServer/commentSlice';
 
 const store = configureStore({
   reducer: {
@@ -18,10 +15,7 @@ const store = configureStore({
     user: userReducer,
     images: imageReducer,
     jobs: jobReducer,
-    theme: themeReducer,
-    conversation: conversationReducer,
-    post: postReducer,
-    comment: commentReducer
+    theme: themeReducer
   }
 });
 
