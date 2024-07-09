@@ -1,0 +1,9 @@
+db.system.users.find().pretty();
+use admin;
+db.system.users.find().pretty();
+use admin;
+db.notifications.find().pretty();
+db.users.find().pretty();
+db.messages.find().pretty();
+show collections;
+use mychatdb;

@@ -1,0 +1,88 @@
+/* Set a vibrant color scheme for the arts theme */
+.user-profile-container {
+  background-color: #f5e8e4; /* Light peach background */
+  color: #4a154b; /* Deep purple text */
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Style headers with a deep purple color */
+.user-profile-container h1,
+.user-profile-container h2,
+.user-profile-container h3,
+.user-profile-container h4,
+.user-profile-container h5,
+.user-profile-container h6 {
+  color: #4a154b; /* Deep purple */
+  font-family: 'Brush Script MT', cursive; /* Artistic font for headers */
+}
+
+/* Style buttons with vibrant colors and rounded edges */
+.user-profile-container button {
+  background-color: #ff477e; /* Bright pink */
+  color: #ffffff; /* White text */
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-family: 'Courier New', Courier, monospace;
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
+  font-weight: bold;
+}
+
+/* Change button color on hover */
+.user-profile-container button:hover {
+  background-color: #d6336c; /* Darker pink */
+}
+
+/* Style links with a pink color and underline */
+.user-profile-container a {
+  color: #ff477e; /* Bright pink */
+  text-decoration: underline;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+}
+
+/* Change link color on hover */
+.user-profile-container a:hover {
+  color: #d6336c; /* Darker pink */
+}
+
+/* Add a border and padding to input fields */
+.user-profile-container input,
+.user-profile-container textarea {
+  border: 2px solid #ff477e; /* Bright pink border */
+  padding: 10px;
+  border-radius: 5px;
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #ffffff; /* Light input background */
+  color: #4a154b; /* Deep purple text */
+}
+
+/* Add some margin to form elements */
+.user-profile-container form .form-group {
+  margin-bottom: 15px;
+}
+
+/* Style for tables to make them look more artistic */
+.user-profile-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.user-profile-container table th,
+.user-profile-container table td {
+  border: 1px solid #ff477e; /* Bright pink border */
+  padding: 10px;
+  text-align: left;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.user-profile-container table th {
+  background-color: #d6336c; /* Darker pink background for headers */
+  color: #ffffff; /* White text */
+}
+
+.user-profile-container table tr:nth-child(even) {
+  background-color: #f5e8e4; /* Light peach background for even rows */
+}

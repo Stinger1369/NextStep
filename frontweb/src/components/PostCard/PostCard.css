@@ -1,0 +1,22 @@
+.post-card {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.post-card__title {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+.post-card__content {
+  margin-bottom: 10px;
+}
+
+.post-card__author {
+  font-size: 0.9em;
+  color: #555;
+}

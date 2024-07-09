@@ -1,0 +1,85 @@
+/* Set a modern and sleek color scheme for the technology theme */
+.user-profile-container {
+  background-color: #1e1e1e; /* Dark background */
+  color: #00ffcc; /* Neon green text */
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Style headers with a bright neon color */
+.user-profile-container h1,
+.user-profile-container h2,
+.user-profile-container h3,
+.user-profile-container h4,
+.user-profile-container h5,
+.user-profile-container h6 {
+  color: #00ffcc; /* Neon green */
+}
+
+/* Style buttons with technology-themed colors and smooth borders */
+.user-profile-container button {
+  background-color: #00ffcc; /* Neon green */
+  color: #1e1e1e; /* Dark background */
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-weight: bold;
+}
+
+/* Change button color on hover */
+.user-profile-container button:hover {
+  background-color: #00bfa5; /* Slightly darker neon green */
+  color: #ffffff; /* White text */
+}
+
+/* Style links with a neon color and underline */
+.user-profile-container a {
+  color: #00ffcc; /* Neon green */
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+/* Change link color on hover */
+.user-profile-container a:hover {
+  color: #00bfa5; /* Slightly darker neon green */
+}
+
+/* Add a border and padding to input fields */
+.user-profile-container input,
+.user-profile-container textarea {
+  border: 2px solid #00ffcc; /* Neon green border */
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #2a2a2a; /* Dark input background */
+  color: #00ffcc; /* Neon green text */
+}
+
+/* Add some margin to form elements */
+.user-profile-container form .form-group {
+  margin-bottom: 15px;
+}
+
+/* Style for tables to make them look more high-tech */
+.user-profile-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  background-color: #2a2a2a; /* Dark background for tables */
+}
+
+.user-profile-container table th,
+.user-profile-container table td {
+  border: 1px solid #00ffcc; /* Neon green border */
+  padding: 10px;
+  text-align: left;
+  color: #00ffcc; /* Neon green text */
+}
+
+.user-profile-container table th {
+  background-color: #1e1e1e; /* Dark background for headers */
+}
+
+.user-profile-container table tr:nth-child(even) {
+  background-color: #2e2e2e; /* Slightly lighter dark background for even rows */
+}

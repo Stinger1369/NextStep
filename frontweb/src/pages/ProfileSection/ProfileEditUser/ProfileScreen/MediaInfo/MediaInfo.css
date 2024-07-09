@@ -1,0 +1,52 @@
+.media-info-container {
+  padding: 20px;
+}
+
+.header-icons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.icon {
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.media-info-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.image-previews img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.image-preview-container {
+  position: relative;
+  display: inline-block;
+}
+
+.delete-icon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+  color: red;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.alert-danger {
+  color: red;
+}

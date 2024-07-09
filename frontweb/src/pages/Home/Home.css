@@ -1,0 +1,58 @@
+.home-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.cards-container {
+  display: grid;
+  grid-template-columns: 1fr 4fr 1fr; /* Trois colonnes : 20% 50% 20% */
+  gap: 20px;
+  margin-top: 20px;
+  height: 100vh; /* Utiliser la hauteur complète de la vue */
+  width: 70vw; /* Utiliser la largeur complète de la vue */
+  margin: 0 auto;
+}
+
+.card {
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.home-login-container {
+  grid-column: 1 / 2; /* Première colonne */
+  grid-row: 1; /* Première rangée */
+  height: 100%;
+}
+
+.skill-development-container {
+  grid-column: 1 / 2; /* Première colonne */
+  grid-row: 2; /* Deuxième rangée */
+  height: 100%;
+}
+
+.home-job-container {
+  grid-column: 2 / 3; /* Deuxième colonne */
+  grid-row: 1 / 4; /* Occupe trois rangées */
+  height: 100%;
+}
+
+.post-job-container {
+  grid-column: 3 / 4; /* Troisième colonne */
+  grid-row: 1; /* Première rangée */
+  height: 100%;
+}
+
+.events-activities-container {
+  grid-column: 3 / 4; /* Troisième colonne */
+  grid-row: 2; /* Deuxième rangée */
+  height: 100%;
+}
+
+.testimonials-container {
+  grid-column: 3 / 4; /* Troisième colonne */
+  grid-row: 3; /* Troisième rangée */
+  height: 100%;
+}

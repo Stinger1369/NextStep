@@ -1,0 +1,52 @@
+/* src/components/ModalUserProfile/ModalUserProfile.css */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  width: 80%;
+  max-width: 800px;
+}
+
+.modal-image {
+  width: 100%;
+  height: auto;
+}
+
+.close-modal,
+.modal-control-prev,
+.modal-control-next {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #fff;
+  cursor: pointer;
+  position: absolute;
+}
+
+.close-modal {
+  right: 10px;
+  top: 10px;
+}
+
+.modal-control-prev {
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.modal-control-next {
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
