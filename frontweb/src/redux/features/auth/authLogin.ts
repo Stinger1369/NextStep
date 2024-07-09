@@ -1,4 +1,3 @@
-// src/redux/features/auth/authLogin.ts
 import { AppDispatch } from '../../store';
 import { login } from './authSlice';
 import { sendCreateUser } from '../../../websocket/websocket';
@@ -8,7 +7,11 @@ export const performLogin = (emailOrPhone: string, password: string) => async (d
     const resultAction = await dispatch(login({ emailOrPhone, password }));
     if (login.fulfilled.match(resultAction)) {
       const user = resultAction.payload.user;
-      sendCreateUser(user); // Send WebSocket request to create user
+      sendCreateUser({
+        emailOrPhone: user.emailOrPhone,
+        firstName: user.firstName,
+        lastName: user.lastName
+      });
     }
   } catch (error) {
     console.error('Login error:', error);

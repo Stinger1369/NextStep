@@ -1,4 +1,3 @@
-// src/websocket/websocket.ts
 import { User, WebSocketMessage } from '../types';
 
 let socket: WebSocket;
@@ -15,7 +14,12 @@ export const initializeWebSocket = () => {
       const message: WebSocketMessage = JSON.parse(event.data);
       handleWebSocketMessage(message);
     } catch (error) {
-      console.error('Invalid JSON:', event.data);
+      // Handling non-JSON messages
+      if (typeof event.data === 'string' && event.data.startsWith('User created with ID:')) {
+        console.log('Confirmation message received:', event.data);
+      } else {
+        console.error('Invalid JSON or non-JSON message:', event.data);
+      }
     }
   };
 
@@ -29,11 +33,11 @@ export const initializeWebSocket = () => {
 };
 
 const handleWebSocketMessage = (message: WebSocketMessage) => {
-  // Handle incoming messages from WebSocket
+  // Handle incoming JSON messages from WebSocket
   console.log('Message from WebSocket:', message);
 };
 
-export const sendCreateUser = (user: User) => {
+export const sendCreateUser = (user: Pick<User, 'emailOrPhone' | 'firstName' | 'lastName'>) => {
   const message: WebSocketMessage = {
     type: 'user.create',
     payload: user
