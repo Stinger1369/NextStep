@@ -43,10 +43,9 @@ public class UserService {
     public Mono<User> updateUser(String id, User user) {
         logger.info("Updating user: {}", user);
         return userRepository.findById(new ObjectId(id)).flatMap(existingUser -> {
-            existingUser.setUsername(user.getUsername());
             existingUser.setEmail(user.getEmail());
-            existingUser.setPassword(user.getPassword());
-            existingUser.setApiKey(user.getApiKey());
+            existingUser.setFirstName(user.getFirstName());
+            existingUser.setLastName(user.getLastName());
             existingUser.setPosts(user.getPosts());
             existingUser.setNotifications(user.getNotifications());
             existingUser.setConversations(user.getConversations());

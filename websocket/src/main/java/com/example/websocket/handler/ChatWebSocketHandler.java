@@ -71,61 +71,79 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void handleUserCreate(WebSocketSession session, JsonNode payload) {
-        User user = new User(payload.get("username").asText(), payload.get("email").asText(),
-                payload.get("password").asText());
+        if (payload.hasNonNull("email") && payload.hasNonNull("firstName")
+                && payload.hasNonNull("lastName")) {
+            User user = new User(payload.get("email").asText(), payload.get("firstName").asText(),
+                    payload.get("lastName").asText());
 
-        userService.createUser(user).subscribe(createdUser -> {
-            try {
-                session.sendMessage(new TextMessage(
-                        String.format("User created with ID: %s", createdUser.getId())));
-                logger.info("User created: {}", createdUser);
-            } catch (IOException e) {
-                logger.error("Error sending creation confirmation", e);
-            }
-        }, error -> sendErrorMessage(session, "Error creating user", error));
+            userService.createUser(user).subscribe(createdUser -> {
+                try {
+                    session.sendMessage(new TextMessage(
+                            String.format("User created with ID: %s", createdUser.getId())));
+                    logger.info("User created: {}", createdUser);
+                } catch (IOException e) {
+                    logger.error("Error sending creation confirmation", e);
+                }
+            }, error -> sendErrorMessage(session, "Error creating user", error));
+        } else {
+            sendErrorMessage(session, "Missing fields in user.create payload", null);
+        }
     }
 
     private void handlePostCreate(WebSocketSession session, JsonNode payload) {
-        Post post = new Post(payload.get("userId").asText(), payload.get("title").asText(),
-                payload.get("content").asText());
+        if (payload.hasNonNull("userId") && payload.hasNonNull("content")) {
+            Post post = new Post(payload.get("userId").asText(),
+                    payload.hasNonNull("title") ? payload.get("title").asText() : "",
+                    payload.get("content").asText());
 
-        postService.createPost(post).subscribe(createdPost -> {
-            try {
-                session.sendMessage(new TextMessage(
-                        String.format("Post created with ID: %s", createdPost.getId())));
-                logger.info("Post created: {}", createdPost);
-            } catch (IOException e) {
-                logger.error("Error sending post creation confirmation", e);
-            }
-        }, error -> sendErrorMessage(session, "Error creating post", error));
+            postService.createPost(post).subscribe(createdPost -> {
+                try {
+                    session.sendMessage(new TextMessage(
+                            String.format("Post created with ID: %s", createdPost.getId())));
+                    logger.info("Post created: {}", createdPost);
+                } catch (IOException e) {
+                    logger.error("Error sending post creation confirmation", e);
+                }
+            }, error -> sendErrorMessage(session, "Error creating post", error));
+        } else {
+            sendErrorMessage(session, "Missing fields in post.create payload", null);
+        }
     }
 
     private void handleCommentCreate(WebSocketSession session, JsonNode payload) {
-        Comment comment = new Comment(payload.get("userId").asText(),
-                payload.get("postId").asText(), payload.get("content").asText());
+        if (payload.hasNonNull("userId") && payload.hasNonNull("postId")
+                && payload.hasNonNull("content")) {
+            Comment comment = new Comment(payload.get("userId").asText(),
+                    payload.get("postId").asText(), payload.get("content").asText());
 
-        logger.info("Creating comment: {}", comment);
+            logger.info("Creating comment: {}", comment);
 
-        commentService.createComment(comment).subscribe(updatedUser -> {
-            try {
-                int numComments = updatedUser.getPosts().stream()
-                        .filter(post -> post.getId().toString().equals(comment.getPostId()))
-                        .findFirst().map(post -> post.getComments().size()).orElse(0);
+            commentService.createComment(comment).subscribe(updatedUser -> {
+                try {
+                    int numComments = updatedUser.getPosts().stream()
+                            .filter(post -> post.getId().toString().equals(comment.getPostId()))
+                            .findFirst().map(post -> post.getComments().size()).orElse(0);
 
-                session.sendMessage(new TextMessage(String.format(
-                        "Comment added to post. Updated post now has %d comments", numComments)));
-                logger.info("Comment added to post: {}", updatedUser);
-            } catch (IOException e) {
-                logger.error("Error sending comment creation confirmation", e);
-            }
-        }, error -> sendErrorMessage(session, "Error creating comment", error));
+                    session.sendMessage(new TextMessage(
+                            String.format("Comment added to post. Updated post now has %d comments",
+                                    numComments)));
+                    logger.info("Comment added to post: {}", updatedUser);
+                } catch (IOException e) {
+                    logger.error("Error sending comment creation confirmation", e);
+                }
+            }, error -> sendErrorMessage(session, "Error creating comment", error));
+        } else {
+            sendErrorMessage(session, "Missing fields in comment.create payload", null);
+        }
     }
 
     private void handleConversationCreate(WebSocketSession session, JsonNode payload) {
-        String senderId = payload.has("senderId") ? payload.get("senderId").asText() : null;
-        String receiverId = payload.has("receiverId") ? payload.get("receiverId").asText() : null;
-        String name = payload.has("name") ? payload.get("name").asText() : null;
-        String initialMessage = payload.has("message") ? payload.get("message").asText() : null;
+        String senderId = payload.hasNonNull("senderId") ? payload.get("senderId").asText() : null;
+        String receiverId =
+                payload.hasNonNull("receiverId") ? payload.get("receiverId").asText() : null;
+        String name = payload.hasNonNull("name") ? payload.get("name").asText() : null;
+        String initialMessage =
+                payload.hasNonNull("message") ? payload.get("message").asText() : null;
 
         if (senderId == null || receiverId == null || name == null || initialMessage == null) {
             sendErrorMessage(session, "Missing fields in conversation.create payload", null);
@@ -147,16 +165,20 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void handleGetPost(WebSocketSession session, JsonNode payload) {
-        String postId = payload.get("postId").asText();
-        postService.getPostById(postId).subscribe(post -> {
-            try {
-                session.sendMessage(new TextMessage(String
-                        .format("Post retrieved. It has %d comments", post.getComments().size())));
-                logger.info("Post retrieved: {}", post);
-            } catch (IOException e) {
-                logger.error("Error sending post retrieval confirmation", e);
-            }
-        }, error -> sendErrorMessage(session, "Error retrieving post", error));
+        if (payload.hasNonNull("postId")) {
+            String postId = payload.get("postId").asText();
+            postService.getPostById(postId).subscribe(post -> {
+                try {
+                    session.sendMessage(new TextMessage(String.format(
+                            "Post retrieved. It has %d comments", post.getComments().size())));
+                    logger.info("Post retrieved: {}", post);
+                } catch (IOException e) {
+                    logger.error("Error sending post retrieval confirmation", e);
+                }
+            }, error -> sendErrorMessage(session, "Error retrieving post", error));
+        } else {
+            sendErrorMessage(session, "Missing postId in post.getById payload", null);
+        }
     }
 
     private void sendErrorMessage(WebSocketSession session, String errorMessage, Throwable error) {
