@@ -122,10 +122,17 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void handleConversationCreate(WebSocketSession session, JsonNode payload) {
-        Conversation conversation = new Conversation(payload.get("senderId").asText(),
-                payload.get("receiverId").asText(), payload.get("name").asText());
+        String senderId = payload.has("senderId") ? payload.get("senderId").asText() : null;
+        String receiverId = payload.has("receiverId") ? payload.get("receiverId").asText() : null;
+        String name = payload.has("name") ? payload.get("name").asText() : null;
+        String initialMessage = payload.has("message") ? payload.get("message").asText() : null;
 
-        String initialMessage = payload.get("message").asText();
+        if (senderId == null || receiverId == null || name == null || initialMessage == null) {
+            sendErrorMessage(session, "Missing fields in conversation.create payload", null);
+            return;
+        }
+
+        Conversation conversation = new Conversation(senderId, receiverId, name);
 
         conversationService.createConversation(conversation, initialMessage)
                 .subscribe(createdConversation -> {
@@ -153,10 +160,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void sendErrorMessage(WebSocketSession session, String errorMessage, Throwable error) {
-        logger.error("{}: {}", errorMessage, error.getMessage(), error);
+        logger.error("{}: {}", errorMessage, error != null ? error.getMessage() : "N/A", error);
         try {
-            session.sendMessage(
-                    new TextMessage(String.format("%s: %s", errorMessage, error.getMessage())));
+            session.sendMessage(new TextMessage(String.format("%s: %s", errorMessage,
+                    error != null ? error.getMessage() : "N/A")));
         } catch (IOException e) {
             logger.error("Error sending error message", e);
         }

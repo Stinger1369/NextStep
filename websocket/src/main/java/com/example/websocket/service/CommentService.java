@@ -1,6 +1,7 @@
 package com.example.websocket.service;
 
 import com.example.websocket.model.Comment;
+import com.example.websocket.model.Notification;
 import com.example.websocket.model.Post;
 import com.example.websocket.model.User;
 import com.example.websocket.repository.CommentRepository;
@@ -20,10 +21,13 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository) {
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository,
+            NotificationService notificationService) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     public Mono<User> createComment(Comment comment) {
@@ -37,8 +41,15 @@ public class CommentService {
                 user.getPosts().stream()
                         .filter(post -> post.getId().toString().equals(comment.getPostId()))
                         .findFirst().ifPresent(post -> post.addComment(savedComment));
-                return userRepository.save(user).doOnSuccess(updatedUser -> logger
-                        .info("User updated with new comment: {}", updatedUser));
+                return userRepository.save(user).flatMap(updatedUser -> {
+                    Notification notification = new Notification(user.getId().toString(),
+                            "New comment added to post: " + savedComment.getContent());
+                    return notificationService.createNotification(notification)
+                            .flatMap(savedNotification -> {
+                                user.addNotification(savedNotification);
+                                return userRepository.save(user).thenReturn(updatedUser);
+                            });
+                });
             });
         }).doOnError(error -> logger.error("Error creating comment: {}", error.getMessage()));
     }
