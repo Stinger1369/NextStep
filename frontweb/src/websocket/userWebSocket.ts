@@ -1,4 +1,3 @@
-// userWebSocket.ts
 import { WebSocketMessage, User } from '../types';
 import { sendMessage, addEventListener, removeEventListener } from './websocket';
 
@@ -14,32 +13,9 @@ export const handleUserMessage = (message: WebSocketMessage) => {
         isCreatingUser = false;
       }
       break;
-    case 'user.check.result':
-      console.log('User check result received:', payload);
-      // Handled by the event listener in checkUserExistence
-      break;
     default:
       console.warn('Unhandled user message type:', type);
   }
-};
-
-export const checkUserExistence = (email: string): Promise<boolean> => {
-  console.log('checkUserExistence called with:', email);
-  return new Promise((resolve) => {
-    const message: WebSocketMessage = {
-      type: 'user.check',
-      payload: { email }
-    };
-
-    const handleUserCheckResult = (data: { exists: boolean }) => {
-      console.log('checkUserExistence result:', data.exists);
-      resolve(data.exists);
-      removeEventListener('user.check.result', handleUserCheckResult);
-    };
-
-    addEventListener('user.check.result', handleUserCheckResult);
-    sendMessage(message);
-  });
 };
 
 export const createUser = (user: Pick<User, 'email' | 'firstName' | 'lastName'>): Promise<string> => {
@@ -51,6 +27,7 @@ export const createUser = (user: Pick<User, 'email' | 'firstName' | 'lastName'>)
     }
 
     isCreatingUser = true;
+    console.log('Sending user.create message');
 
     const message: WebSocketMessage = {
       type: 'user.create',
@@ -58,6 +35,7 @@ export const createUser = (user: Pick<User, 'email' | 'firstName' | 'lastName'>)
     };
 
     const handleUserCreateResult = (data: { userId: string }) => {
+      console.log('Received user.create.success:', data);
       if (data.userId) {
         resolve(data.userId);
       } else {

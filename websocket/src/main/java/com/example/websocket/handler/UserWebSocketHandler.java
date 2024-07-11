@@ -44,52 +44,24 @@ public class UserWebSocketHandler {
         if (payload.hasNonNull(EMAIL) && payload.hasNonNull(FIRST_NAME)
                 && payload.hasNonNull(LAST_NAME)) {
             String email = payload.get(EMAIL).asText();
+            String firstName = payload.get(FIRST_NAME).asText();
+            String lastName = payload.get(LAST_NAME).asText();
             logger.info("Checking if user with email {} exists", email);
-            userService.getUserByEmail(email).flatMap(existingUser -> {
-                if (existingUser != null) {
-                    logger.info("User with email {} already exists", email);
-                    sendUserCheckResult(session, true);
-                    return Mono.empty();
-                } else {
-                    logger.info("Creating new user with email {}", email);
-                    User user = new User(null, email, payload.get(FIRST_NAME).asText(),
-                            payload.get(LAST_NAME).asText());
-                    return userService.createUser(user).flatMap(createdUser -> {
-                        try {
-                            logger.info("User creation successful: {}", createdUser);
-                            session.sendMessage(new TextMessage(String.format(
-                                    "{\"type\":\"user.create.success\",\"payload\":{\"userId\":\"%s\"}}",
-                                    createdUser.getId())));
-                        } catch (IOException e) {
-                            logger.error("Error sending creation confirmation", e);
-                        }
-                        return Mono.just(createdUser);
-                    }).onErrorResume(error -> {
-                        logger.error("Error during user creation: {}", error.getMessage());
-                        sendErrorMessage(session, "Error creating user", error);
-                        return Mono.empty();
-                    });
+            userService.createUserIfNotExists(email, firstName, lastName).flatMap(user -> {
+                try {
+                    logger.info("User creation successful or user already existed: {}", user);
+                    session.sendMessage(new TextMessage(String.format(
+                            "{\"type\":\"user.create.success\",\"payload\":{\"userId\":\"%s\"}}",
+                            user.getId())));
+                } catch (IOException e) {
+                    logger.error("Error sending creation confirmation", e);
                 }
-            }).switchIfEmpty(Mono.defer(() -> {
-                logger.info("User with email {} not found, creating new user", email);
-                User user = new User(null, email, payload.get(FIRST_NAME).asText(),
-                        payload.get(LAST_NAME).asText());
-                return userService.createUser(user).flatMap(createdUser -> {
-                    try {
-                        logger.info("User creation successful: {}", createdUser);
-                        session.sendMessage(new TextMessage(String.format(
-                                "{\"type\":\"user.create.success\",\"payload\":{\"userId\":\"%s\"}}",
-                                createdUser.getId())));
-                    } catch (IOException e) {
-                        logger.error("Error sending creation confirmation", e);
-                    }
-                    return Mono.just(createdUser);
-                }).onErrorResume(error -> {
-                    logger.error("Error during user creation: {}", error.getMessage());
-                    sendErrorMessage(session, "Error creating user", error);
-                    return Mono.empty();
-                });
-            })).subscribe();
+                return Mono.just(user);
+            }).onErrorResume(error -> {
+                logger.error("Error during user creation: {}", error.getMessage());
+                sendErrorMessage(session, "Error creating user", error);
+                return Mono.empty();
+            }).subscribe();
         } else {
             logger.warn("Missing fields in user.create payload");
             sendErrorMessage(session, "Missing fields in user.create payload", null);

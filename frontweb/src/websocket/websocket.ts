@@ -83,6 +83,7 @@ const flushQueue = () => {
     if (message) sendMessage(message);
   }
 };
+
 const handleWebSocketMessage = (message: WebSocketMessage) => {
   const { type } = message;
 

@@ -34,11 +34,12 @@ const LoginComponent: React.FC = () => {
 
         if (resultAction.user) {
           console.log('User ID:', resultAction.user._id);
-          createUser({
+          const userId = await createUser({
             email: resultAction.user.email,
             firstName: resultAction.user.firstName ?? 'DefaultFirstName',
             lastName: resultAction.user.lastName ?? 'DefaultLastName'
           });
+          console.log('User created or already exists:', userId);
           navigate('/'); // Rediriger vers la page d'accueil après une connexion réussie
         }
       } catch (error) {

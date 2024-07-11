@@ -5,6 +5,7 @@ import com.example.websocket.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,6 +16,7 @@ import java.util.UUID;
 public class UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private static final String USER_FETCHED = "User fetched: {}";
 
     private final UserRepository userRepository;
 
@@ -37,7 +39,7 @@ public class UserService {
         logger.info("Fetching user by API key: {}", apiKey);
         return userRepository.findByApiKey(apiKey).doOnSuccess(user -> {
             if (user != null) {
-                logger.info("User fetched: {}", user);
+                logger.info(USER_FETCHED, user);
             } else {
                 logger.warn("No user found with API key: {}", apiKey);
             }
@@ -49,7 +51,7 @@ public class UserService {
         logger.info("Fetching user by ID: {}", id);
         return userRepository.findById(new ObjectId(id)).doOnSuccess(user -> {
             if (user != null) {
-                logger.info("User fetched: {}", user);
+                logger.info(USER_FETCHED, user);
             } else {
                 logger.warn("No user found with ID: {}", id);
             }
@@ -58,13 +60,26 @@ public class UserService {
 
     public Mono<User> getUserByEmail(String email) {
         logger.info("Fetching user by email: {}", email);
-        return userRepository.findByEmail(email).doOnSuccess(user -> {
+        return userRepository.findByEmail(email).flux().next().doOnSuccess(user -> {
             if (user != null) {
-                logger.info("User fetched: {}", user);
+                logger.info(USER_FETCHED, user);
             } else {
                 logger.warn("No user found with email: {}", email);
             }
-        }).doOnError(error -> logger.error("Error fetching user by email: {}", error.getMessage()));
+        }).doOnError(error -> {
+            if (error instanceof IncorrectResultSizeDataAccessException) {
+                logger.error("Multiple users found with email: {}", email);
+            } else {
+                logger.error("Error fetching user by email: {}", error.getMessage());
+            }
+        });
+    }
+
+    public Mono<User> createUserIfNotExists(String email, String firstName, String lastName) {
+        return getUserByEmail(email).switchIfEmpty(Mono.defer(() -> {
+            User newUser = new User(null, email, firstName, lastName);
+            return createUser(newUser);
+        }));
     }
 
     public Flux<User> getAllUsers() {
