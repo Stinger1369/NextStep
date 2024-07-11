@@ -4,14 +4,14 @@ import crypto from "crypto";
 import { sendVerificationEmail } from "../../config/nodemailerConfig";
 
 export const verifyEmail = async (req: Request, res: Response) => {
-  const { emailOrPhone, code } = req.body;
+  const { email, code } = req.body;
 
   try {
-    const user = await User.findOne({ emailOrPhone });
+    const user = await User.findOne({ email });
 
     if (!user || user.verificationCode !== code) {
       console.log(
-        `Email verification failed: Invalid code for user ${emailOrPhone}`
+        `Email verification failed: Invalid code for user ${email}`
       );
       return res.status(400).json({ message: "Invalid verification code" });
     }
@@ -21,7 +21,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
       user.verificationCodeExpiresAt < new Date()
     ) {
       console.log(
-        `Email verification failed: Code expired for user ${emailOrPhone}`
+        `Email verification failed: Code expired for user ${email}`
       );
       return res.status(400).json({ message: "Verification code has expired" });
     }
@@ -41,13 +41,13 @@ export const verifyEmail = async (req: Request, res: Response) => {
 };
 
 export const resendVerificationCode = async (req: Request, res: Response) => {
-  const { emailOrPhone } = req.body;
+  const { email } = req.body;
 
   try {
-    const user = await User.findOne({ emailOrPhone });
+    const user = await User.findOne({ email });
     if (!user) {
       console.log(
-        `Resend verification code failed: User not found with ${emailOrPhone}`
+        `Resend verification code failed: User not found with ${email}`
       );
       return res.status(404).json({ message: "User not found" });
     }
@@ -56,7 +56,7 @@ export const resendVerificationCode = async (req: Request, res: Response) => {
     user.verificationCode = verificationCode;
     user.verificationCodeExpiresAt = new Date(Date.now() + 20 * 60 * 1000); // 20 minutes from now
     await user.save();
-    await sendVerificationEmail(emailOrPhone, verificationCode);
+    await sendVerificationEmail(email, verificationCode);
 
     console.log(`Verification code resent successfully to user: ${user._id}`);
 

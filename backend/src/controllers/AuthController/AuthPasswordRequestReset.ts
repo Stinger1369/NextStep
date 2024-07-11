@@ -7,13 +7,13 @@ import NotificationService from "notiflib";
 const notificationService = new NotificationService();
 
 export const requestPasswordReset = async (req: Request, res: Response) => {
-  const { emailOrPhone } = req.body;
+  const { email } = req.body;
 
   try {
-    const user = await User.findOne({ emailOrPhone });
+    const user = await User.findOne({ email });
     if (!user) {
       console.log(
-        `Password reset request failed: User not found with ${emailOrPhone}`
+        `Password reset request failed: User not found with ${email}`
       );
       return res.status(404).json({ message: "User not found" });
     }
@@ -23,7 +23,7 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
     user.resetPasswordExpiresAt = new Date(Date.now() + 20 * 60 * 1000); // 20 minutes from now
     await user.save();
     await notificationService.sendEmailNotification(
-      emailOrPhone,
+      email,
       "Password Reset",
       "passwordResetEmail",
       { resetCode: resetPasswordCode } // Assurez-vous que la clé est `resetCode`
@@ -39,14 +39,14 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
 };
 
 export const resetPassword = async (req: Request, res: Response) => {
-  const { emailOrPhone, code, newPassword } = req.body;
+  const { email, code, newPassword } = req.body;
 
   try {
-    const user = await User.findOne({ emailOrPhone });
+    const user = await User.findOne({ email });
 
     if (!user || user.resetPasswordCode !== code) {
       console.log(
-        `Password reset failed: Invalid reset code for user ${emailOrPhone}`
+        `Password reset failed: Invalid reset code for user ${email}`
       );
       return res.status(400).json({ message: "Invalid reset code" });
     }
@@ -56,7 +56,7 @@ export const resetPassword = async (req: Request, res: Response) => {
       user.resetPasswordExpiresAt < new Date()
     ) {
       console.log(
-        `Password reset failed: Reset code expired for user ${emailOrPhone}`
+        `Password reset failed: Reset code expired for user ${email}`
       );
       return res.status(400).json({ message: "Reset code has expired" });
     }

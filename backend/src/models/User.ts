@@ -19,7 +19,7 @@ interface SocialMediaLinks {
 export interface IUser extends Document {
   firstName?: string;
   lastName?: string;
-  emailOrPhone: string;
+  email: string;
   password: string;
   userType: "employer" | "recruiter" | "jobSeeker";
   phone?: string;
@@ -50,7 +50,7 @@ export interface IUser extends Document {
 const UserSchema: Schema = new Schema({
   firstName: { type: String, index: true },
   lastName: { type: String, index: true },
-  emailOrPhone: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   userType: {
     type: String,

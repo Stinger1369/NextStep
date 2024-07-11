@@ -7,7 +7,7 @@ export interface ApiError {
 
 export interface User {
   _id: string;
-  emailOrPhone: string;
+  email: string;
   firstName: string;
   lastName: string;
   apiKey: string;
@@ -52,7 +52,6 @@ export interface Conversation {
   createdAt: Date;
   updatedAt: Date;
 }
-
 export interface Message {
   senderId: string;
   content: string;
@@ -88,10 +87,15 @@ export function convertDates(obj: unknown): unknown {
 export function parseUser(userData: unknown): User {
   return convertDates(userData) as User;
 }
-
+export type ErrorPayload = {
+  error: string;
+};
 export type WebSocketMessage =
-  | { type: 'user.create'; payload: User }
-  | { type: 'post.create'; payload: Post }
-  | { type: 'comment.create'; payload: Comment }
-  | { type: 'conversation.create'; payload: Conversation }
+  | { type: 'user.create'; payload: Partial<User> }
+  | { type: 'user.check'; payload: { email: string } }
+  | { type: 'user.check.result'; payload: { exists: boolean } }
+  | { type: 'post.create'; payload: Omit<Post, '_id'> }
+  | { type: 'post.getAll'; payload: {} }
+  | { type: 'post.getAll.success'; payload: { posts: Post[] } }
+  | { type: 'post.getAll.error'; payload: ErrorPayload }
   | { type: string; payload: unknown };

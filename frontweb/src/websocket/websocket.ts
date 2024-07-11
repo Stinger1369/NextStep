@@ -1,95 +1,119 @@
-import { User, WebSocketMessage, Post } from '../types';
+import { WebSocketMessage } from '../types';
+import { handleUserMessage } from './userWebSocket';
+import { handlePostMessage } from './postWebSocket';
 
-let socket: WebSocket;
-let createdUserId: string | null = null;
-let createdUserEmailOrPhone: string | null = null;
-let socketOpen: boolean = false; // New flag to track WebSocket connection state
+const WS_URL = 'ws://localhost:8080/ws/chat';
+const RECONNECT_INTERVAL = 5000;
+const MAX_RECONNECT_ATTEMPTS = 5;
+
+export let socket: WebSocket | null = null;
+let isConnected = false;
+let reconnectAttempts = 0;
+let messageQueue: WebSocketMessage[] = [];
+let eventListeners: { [key: string]: ((data: any) => void)[] } = {};
 
 export const initializeWebSocket = () => {
-  socket = new WebSocket('ws://localhost:8080/ws/chat');
-
-  socket.onopen = () => {
-    console.log('WebSocket connected');
-    socketOpen = true; // Set flag to true when WebSocket is connected
-  };
-
-  socket.onmessage = (event: MessageEvent) => {
-    try {
-      const message: WebSocketMessage = JSON.parse(event.data);
-      handleWebSocketMessage(message);
-    } catch (error) {
-      // Handling non-JSON messages
-      if (typeof event.data === 'string') {
-        if (event.data.startsWith('User created with ID:')) {
-          const userId = event.data.split(': ')[1];
-          console.log('User created with ID:', userId);
-          createdUserId = userId; // Store the created user ID
-        } else if (event.data.startsWith('Post created with ID:')) {
-          console.log('Post creation confirmation received:', event.data);
-        } else {
-          console.error('Invalid JSON or non-JSON message:', event.data);
-        }
-      }
-    }
-  };
-
-  socket.onerror = (error: Event) => {
-    console.error('WebSocket error:', error);
-  };
-
-  socket.onclose = () => {
-    console.log('WebSocket closed');
-    socketOpen = false; // Reset flag when WebSocket is closed
-  };
+  if (socket !== null) {
+    console.log('WebSocket already initialized');
+    return;
+  }
+  connect();
 };
 
+const connect = () => {
+  socket = new WebSocket(WS_URL);
+  socket.onopen = handleOpen;
+  socket.onmessage = handleMessage;
+  socket.onerror = handleError;
+  socket.onclose = handleClose;
+};
+
+const handleOpen = () => {
+  console.log('WebSocket connected');
+  isConnected = true;
+  reconnectAttempts = 0;
+  flushQueue();
+};
+
+const handleError = (event: Event) => {
+  console.error('WebSocket error:', event);
+};
+
+const handleClose = (event: CloseEvent) => {
+  console.log('WebSocket closed:', event.reason);
+  isConnected = false;
+  socket = null;
+
+  if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+    setTimeout(() => {
+      console.log('Attempting to reconnect...');
+      reconnectAttempts++;
+      connect();
+    }, RECONNECT_INTERVAL);
+  } else {
+    console.error('Max reconnect attempts reached');
+  }
+};
+
+export const sendMessage = (message: WebSocketMessage) => {
+  console.log('Sending WebSocket message:', message);
+  if (isConnected && socket) {
+    socket.send(JSON.stringify(message));
+  } else {
+    console.log('WebSocket not connected, queueing message');
+    messageQueue.push(message);
+  }
+};
+
+const handleMessage = (event: MessageEvent) => {
+  console.log('Raw message received:', event.data);
+  try {
+    const message: WebSocketMessage = JSON.parse(event.data);
+    console.log('Parsed message:', message);
+    handleWebSocketMessage(message);
+    triggerEventListeners(message.type, message.payload);
+  } catch (error) {
+    console.error('Error parsing message:', error, 'Message:', event.data);
+  }
+};
+
+const flushQueue = () => {
+  while (messageQueue.length > 0) {
+    const message = messageQueue.shift();
+    if (message) sendMessage(message);
+  }
+};
 const handleWebSocketMessage = (message: WebSocketMessage) => {
-  // Handle incoming JSON messages from WebSocket
-  console.log('Message from WebSocket:', message);
+  const { type } = message;
+
+  if (type.startsWith('user.')) {
+    handleUserMessage(message);
+  } else if (type.startsWith('post.')) {
+    handlePostMessage(message);
+  } else if (type === 'error') {
+    console.error('Error message from server:', message.payload);
+  } else {
+    console.warn('Unhandled message type:', type);
+  }
 };
 
-export const sendCreateUser = (user: Pick<User, 'emailOrPhone' | 'firstName' | 'lastName'>) => {
-  if (createdUserEmailOrPhone === user.emailOrPhone) {
-    console.log('User already exists. Skipping creation.');
-    return;
+export const addEventListener = (type: string, callback: (data: any) => void) => {
+  if (!eventListeners[type]) {
+    eventListeners[type] = [];
   }
-
-  if (!socketOpen) {
-    console.error('WebSocket is not open. Cannot send message.');
-    return;
-  }
-
-  const message: WebSocketMessage = {
-    type: 'user.create',
-    payload: user
-  };
-  socket.send(JSON.stringify(message));
-  createdUserEmailOrPhone = user.emailOrPhone; // Store the created user's email or phone
+  eventListeners[type].push(callback);
 };
 
-export const sendCreatePost = (content: string) => {
-  if (!createdUserId) {
-    console.error('User ID is not set. Cannot create post.');
-    return;
+export const removeEventListener = (type: string, callback: (data: any) => void) => {
+  if (eventListeners[type]) {
+    eventListeners[type] = eventListeners[type].filter((cb) => cb !== callback);
   }
-
-  if (!socketOpen) {
-    console.error('WebSocket is not open. Cannot send message.');
-    return;
-  }
-
-  const post: Omit<Post, '_id'> = {
-    userId: createdUserId,
-    title: '',
-    content,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    comments: []
-  };
-
-  const message: WebSocketMessage = {
-    type: 'post.create',
-    payload: post
-  };
-  socket.send(JSON.stringify(message));
 };
+
+const triggerEventListeners = (type: string, data: any) => {
+  if (eventListeners[type]) {
+    eventListeners[type].forEach((callback) => callback(data));
+  }
+};
+
+export const isSocketOpen = () => isConnected;

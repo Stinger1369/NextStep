@@ -6,7 +6,7 @@ import { registerUser } from '../../redux/features/auth/authRegister';
 import './RegisterComponent.css';
 
 const RegisterComponent: React.FC = () => {
-  const [emailOrPhone, setEmailOrPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
@@ -22,12 +22,12 @@ const RegisterComponent: React.FC = () => {
     }
 
     const formData = new FormData();
-    formData.append('emailOrPhone', emailOrPhone);
+    formData.append('email', email);
     formData.append('password', password);
 
     try {
       await registerUser(formData, dispatch);
-      navigate('/verify-email', { state: { emailOrPhone } });
+      navigate('/verify-email', { state: { email } });
     } catch (error) {
       if (error instanceof Error) {
         console.error('Error registering user:', error.message);
@@ -43,7 +43,7 @@ const RegisterComponent: React.FC = () => {
     <div className="register-container">
       {error && <div className="error">{error}</div>}
       <form onSubmit={handleSubmit} className="register-form">
-        <input type="text" value={emailOrPhone} onChange={(e) => setEmailOrPhone(e.target.value)} placeholder="Email or Phone" className="register-input" required />
+        <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email or Phone" className="register-input" required />
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="register-input" required />
         <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm Password" className="register-input" required />
         <button type="submit" className="register-button">

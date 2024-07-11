@@ -2,23 +2,23 @@ package com.example.websocket.handler;
 
 import com.example.websocket.model.User;
 import com.example.websocket.service.UserService;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 import reactor.core.publisher.Mono;
-import io.netty.channel.ChannelHandler.Sharable;
 
-@Sharable
-@Controller
+import java.io.IOException;
+
+@Component
 public class UserWebSocketHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(UserWebSocketHandler.class);
-    private static final String USER_NOT_FOUND = "User not found";
+    private static final String EMAIL = "email";
+    private static final String FIRST_NAME = "firstName";
+    private static final String LAST_NAME = "lastName";
 
     private final UserService userService;
 
@@ -26,71 +26,117 @@ public class UserWebSocketHandler {
         this.userService = userService;
     }
 
-    @MessageMapping("/user.create")
-    @SendTo("/topic/user")
-    public Mono<User> createUser(User user) {
-        logger.info("Received create user request: {}", user);
-        return userService.createUser(user)
-                .doOnSuccess(
-                        createdUser -> logger.info("Successfully created user: {}", createdUser))
-                .doOnError(error -> {
-                    logger.error("Error creating user: {}", error.getMessage());
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error creating user",
-                            error);
+    public void handleMessage(WebSocketSession session, String messageType, JsonNode payload) {
+        logger.info("Handling message of type: {}", messageType);
+        switch (messageType) {
+            case "user.create":
+                handleUserCreate(session, payload);
+                break;
+            case "user.check":
+                handleUserCheck(session, payload);
+                break;
+            default:
+                sendErrorMessage(session, "Unknown user message type: " + messageType);
+        }
+    }
+
+    private void handleUserCreate(WebSocketSession session, JsonNode payload) {
+        if (payload.hasNonNull(EMAIL) && payload.hasNonNull(FIRST_NAME)
+                && payload.hasNonNull(LAST_NAME)) {
+            String email = payload.get(EMAIL).asText();
+            logger.info("Checking if user with email {} exists", email);
+            userService.getUserByEmail(email).flatMap(existingUser -> {
+                if (existingUser != null) {
+                    logger.info("User with email {} already exists", email);
+                    sendUserCheckResult(session, true);
+                    return Mono.empty();
+                } else {
+                    logger.info("Creating new user with email {}", email);
+                    User user = new User(null, email, payload.get(FIRST_NAME).asText(),
+                            payload.get(LAST_NAME).asText());
+                    return userService.createUser(user).flatMap(createdUser -> {
+                        try {
+                            logger.info("User creation successful: {}", createdUser);
+                            session.sendMessage(new TextMessage(String.format(
+                                    "{\"type\":\"user.create.success\",\"payload\":{\"userId\":\"%s\"}}",
+                                    createdUser.getId())));
+                        } catch (IOException e) {
+                            logger.error("Error sending creation confirmation", e);
+                        }
+                        return Mono.just(createdUser);
+                    }).onErrorResume(error -> {
+                        logger.error("Error during user creation: {}", error.getMessage());
+                        sendErrorMessage(session, "Error creating user", error);
+                        return Mono.empty();
+                    });
+                }
+            }).switchIfEmpty(Mono.defer(() -> {
+                logger.info("User with email {} not found, creating new user", email);
+                User user = new User(null, email, payload.get(FIRST_NAME).asText(),
+                        payload.get(LAST_NAME).asText());
+                return userService.createUser(user).flatMap(createdUser -> {
+                    try {
+                        logger.info("User creation successful: {}", createdUser);
+                        session.sendMessage(new TextMessage(String.format(
+                                "{\"type\":\"user.create.success\",\"payload\":{\"userId\":\"%s\"}}",
+                                createdUser.getId())));
+                    } catch (IOException e) {
+                        logger.error("Error sending creation confirmation", e);
+                    }
+                    return Mono.just(createdUser);
+                }).onErrorResume(error -> {
+                    logger.error("Error during user creation: {}", error.getMessage());
+                    sendErrorMessage(session, "Error creating user", error);
+                    return Mono.empty();
                 });
+            })).subscribe();
+        } else {
+            logger.warn("Missing fields in user.create payload");
+            sendErrorMessage(session, "Missing fields in user.create payload", null);
+        }
     }
 
-    @MessageMapping("/user.getById")
-    @SendTo("/topic/user")
-    public Mono<User> getUserById(String id) {
-        logger.info("Received get user by id request: {}", id);
-        return userService.getUserById(id)
-                .doOnSuccess(user -> logger.info("Successfully retrieved user: {}", user))
-                .doOnError(error -> {
-                    logger.error("Error retrieving user: {}", error.getMessage());
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND, error);
-                }).switchIfEmpty(Mono
-                        .error(new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND)));
+    private void handleUserCheck(WebSocketSession session, JsonNode payload) {
+        if (payload.hasNonNull(EMAIL)) {
+            String email = payload.get(EMAIL).asText();
+            logger.info("Checking if user with email {} exists", email);
+            userService.getUserByEmail(email).subscribe(existingUser -> {
+                boolean userExists = existingUser != null;
+                logger.info("User existence check for {}: {}", email, userExists);
+                sendUserCheckResult(session, userExists);
+            }, error -> {
+                logger.error("Error checking user existence", error);
+                sendUserCheckResult(session, false);
+            });
+        } else {
+            logger.warn("Missing fields in user.check payload");
+            sendErrorMessage(session, "Missing fields in user.check payload", null);
+        }
     }
 
-    @MessageMapping("/user.getAll")
-    @SendTo("/topic/users")
-    public Flux<User> getAllUsers() {
-        logger.info("Received get all users request");
-        return userService.getAllUsers()
-                .doOnComplete(() -> logger.info("Successfully retrieved all users"))
-                .doOnError(error -> {
-                    logger.error("Error fetching users: {}", error.getMessage());
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "Error fetching users", error);
-                });
+    private void sendUserCheckResult(WebSocketSession session, boolean exists) {
+        try {
+            String result = String
+                    .format("{\"type\":\"user.check.result\",\"payload\":{\"exists\":%b}}", exists);
+            session.sendMessage(new TextMessage(result));
+            logger.info("Sent user check result: {}", result);
+        } catch (IOException e) {
+            logger.error("Error sending user check result", e);
+        }
     }
 
-    @MessageMapping("/user.update")
-    @SendTo("/topic/user")
-    public Mono<User> updateUser(User user) {
-        logger.info("Received update user request: {}", user);
-        return userService.updateUser(user.getId().toHexString(), user)
-                .doOnSuccess(
-                        updatedUser -> logger.info("Successfully updated user: {}", updatedUser))
-                .doOnError(error -> {
-                    logger.error("Error updating user: {}", error.getMessage());
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error updating user",
-                            error);
-                }).switchIfEmpty(Mono
-                        .error(new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND)));
+    private void sendErrorMessage(WebSocketSession session, String errorMessage, Throwable error) {
+        logger.error("{}: {}", errorMessage, error != null ? error.getMessage() : "N/A", error);
+        try {
+            session.sendMessage(new TextMessage(
+                    String.format("{\"type\":\"error\",\"payload\":{\"message\":\"%s: %s\"}}",
+                            errorMessage, error != null ? error.getMessage() : "N/A")));
+        } catch (IOException e) {
+            logger.error("Error sending error message", e);
+        }
     }
 
-    @MessageMapping("/user.delete")
-    @SendTo("/topic/user")
-    public Mono<Void> deleteUser(String id) {
-        logger.info("Received delete user request: {}", id);
-        return userService.deleteUser(id)
-                .doOnSuccess(v -> logger.info("Successfully deleted user with id: {}", id))
-                .doOnError(error -> {
-                    logger.error("Error deleting user: {}", error.getMessage());
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error deleting user",
-                            error);
-                });
+    private void sendErrorMessage(WebSocketSession session, String errorMessage) {
+        sendErrorMessage(session, errorMessage, null);
     }
 }

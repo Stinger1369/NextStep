@@ -14,15 +14,15 @@ const PasswordResetRequestComponent: React.FC = () => {
 
   const formik = useFormik({
     initialValues: {
-      emailOrPhone: ''
+      email: ''
     },
     validationSchema: Yup.object({
-      emailOrPhone: Yup.string().required('Required')
+      email: Yup.string().required('Required')
     }),
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        await dispatch(performRequestPasswordReset(values.emailOrPhone));
-        localStorage.setItem('resetEmailOrPhone', values.emailOrPhone); // Store email in local storage
+        await dispatch(performRequestPasswordReset(values.email));
+        localStorage.setItem('resetEmail', values.email); // Store email in local storage
         setMessage('Password reset link sent to your email.');
         navigate('/password-reset'); // Redirect to password reset page
       } catch (error) {
@@ -40,14 +40,8 @@ const PasswordResetRequestComponent: React.FC = () => {
       {message && <div className="message">{message}</div>}
       <form onSubmit={formik.handleSubmit} className="password-reset-request-form">
         <div className="form-field">
-          <input
-            type="text"
-            id="emailOrPhone"
-            {...formik.getFieldProps('emailOrPhone')}
-            placeholder="Email or Phone"
-            className={`input ${formik.touched.emailOrPhone && formik.errors.emailOrPhone ? 'error-input' : ''}`}
-          />
-          {formik.touched.emailOrPhone && formik.errors.emailOrPhone ? <div className="error">{formik.errors.emailOrPhone}</div> : null}
+          <input type="text" id="email" {...formik.getFieldProps('email')} placeholder="Email or Phone" className={`input ${formik.touched.email && formik.errors.email ? 'error-input' : ''}`} />
+          {formik.touched.email && formik.errors.email ? <div className="error">{formik.errors.email}</div> : null}
         </div>
         <button type="submit" className="submit-button" disabled={formik.isSubmitting}>
           {formik.isSubmitting ? 'Submitting...' : 'Submit'}

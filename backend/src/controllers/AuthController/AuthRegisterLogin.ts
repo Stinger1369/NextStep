@@ -17,7 +17,7 @@ import { validateEmailDomain } from "email-domain-validator-bilel"; // Import de
 
 // Middleware de validation
 const validateRegister = [
-  body("emailOrPhone").isEmail().withMessage("Invalid email").normalizeEmail(),
+  body("email").isEmail().withMessage("Invalid email").normalizeEmail(),
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long")
@@ -26,7 +26,7 @@ const validateRegister = [
 ];
 
 const validateLogin = [
-  body("emailOrPhone").isEmail().withMessage("Invalid email").normalizeEmail(),
+  body("email").isEmail().withMessage("Invalid email").normalizeEmail(),
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long")
@@ -57,9 +57,9 @@ export const register = [
     }
 
     console.log("Register validation passed");
-    const { emailOrPhone, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!emailOrPhone || !password) {
+    if (!email || !password) {
       console.log("Missing email or password");
       return res
         .status(400)
@@ -67,8 +67,8 @@ export const register = [
     }
 
     // Vérification du domaine de l'email
-    if (!validateEmailDomain(emailOrPhone)) {
-      console.log(`Invalid email domain: ${emailOrPhone}`);
+    if (!validateEmailDomain(email)) {
+      console.log(`Invalid email domain: ${email}`);
       return res
         .status(400)
         .json({
@@ -78,10 +78,10 @@ export const register = [
     }
 
     try {
-      const existingUser = await User.findOne({ emailOrPhone });
+      const existingUser = await User.findOne({ email });
       if (existingUser) {
         console.log(
-          `Registration failed: User already exists with ${emailOrPhone}`
+          `Registration failed: User already exists with ${email}`
         );
         return res.status(400).json({ message: "User already exists" });
       }
@@ -91,7 +91,7 @@ export const register = [
       const verificationCodeExpiresAt = new Date(Date.now() + 20 * 60 * 1000); // 20 minutes from now
 
       const user = new User({
-        emailOrPhone,
+        email,
         password: hashedPassword,
         images: [],
         videos: [],
@@ -102,7 +102,7 @@ export const register = [
 
       await user.save();
       await notificationService.sendEmailNotification(
-        emailOrPhone,
+        email,
         "Email Verification",
         "verificationEmail",
         { verificationCode }
@@ -132,9 +132,9 @@ export const login = [
     }
 
     console.log("Login validation passed");
-    const { emailOrPhone, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!emailOrPhone || !password) {
+    if (!email || !password) {
       console.log("Missing email or password");
       return res
         .status(400)
@@ -142,15 +142,15 @@ export const login = [
     }
 
     try {
-      const user = await User.findOne({ emailOrPhone });
+      const user = await User.findOne({ email });
       if (!user) {
-        console.log(`Login failed: User not found with ${emailOrPhone}`);
+        console.log(`Login failed: User not found with ${email}`);
         return res.status(404).json({ message: "User not found" });
       }
 
       if (!user.isVerified) {
         console.log(
-          `Login failed: Email not verified for user ${emailOrPhone}`
+          `Login failed: Email not verified for user ${email}`
         );
         return res.status(401).json({ message: "Email not verified" });
       }
@@ -158,7 +158,7 @@ export const login = [
       const isPasswordValid = await verifyPassword(user.password, password);
       if (!isPasswordValid) {
         console.log(
-          `Login failed: Incorrect password for user ${emailOrPhone}`
+          `Login failed: Incorrect password for user ${email}`
         );
         return res.status(400).json({ message: "Incorrect password" });
       }

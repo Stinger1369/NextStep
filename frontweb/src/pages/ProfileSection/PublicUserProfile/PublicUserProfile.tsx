@@ -35,7 +35,7 @@ const PublicUserProfile: React.FC = () => {
       <div className="profile-section">
         <h3>Personal Information</h3>
         <p>
-          <strong>Email:</strong> {user.emailOrPhone}
+          <strong>Email:</strong> {user.email}
         </p>
         <p>
           <strong>Phone:</strong> {user.phone}

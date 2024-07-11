@@ -73,7 +73,7 @@ const Navbar: React.FC = () => {
         ) : (
           <>
             <li className="navbar-user">
-              <span>Welcome, {user.firstName ? user.firstName : user.emailOrPhone}!</span>
+              <span>Welcome, {user.firstName ? user.firstName : user.email}!</span>
               <div className="navbar-dropdown">
                 <button onClick={handleLogout}>
                   <FaSignOutAlt /> Logout

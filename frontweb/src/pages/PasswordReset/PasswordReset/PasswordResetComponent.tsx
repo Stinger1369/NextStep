@@ -10,13 +10,13 @@ import './PasswordResetComponent.css';
 const PasswordResetComponent: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [message, setMessage] = useState<string | null>(null);
-  const [emailOrPhone, setEmailOrPhone] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedEmailOrPhone = localStorage.getItem('resetEmailOrPhone');
-    if (storedEmailOrPhone) {
-      setEmailOrPhone(storedEmailOrPhone);
+    const storedEmail = localStorage.getItem('resetEmai');
+    if (storedEmail) {
+      setEmail(storedEmail);
     } else {
       setMessage('No email found. Please request a password reset first.');
     }
@@ -32,13 +32,13 @@ const PasswordResetComponent: React.FC = () => {
       newPassword: Yup.string().min(6, 'Password must be at least 6 characters').required('Required')
     }),
     onSubmit: async (values, { setSubmitting }) => {
-      if (!emailOrPhone) {
+      if (!email) {
         setMessage('No email found. Please request a password reset first.');
         setSubmitting(false);
         return;
       }
       try {
-        await dispatch(performResetPassword(emailOrPhone, values.code, values.newPassword));
+        await dispatch(performResetPassword(email, values.code, values.newPassword));
         setMessage('Password reset successfully. You will be redirected to the login page.');
         setTimeout(() => {
           navigate('/login');

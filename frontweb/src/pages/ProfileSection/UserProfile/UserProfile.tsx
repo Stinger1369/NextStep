@@ -179,7 +179,7 @@ const UserProfile: React.FC = () => {
         <div className="profile-section">
           <h3 className="text-secondary">Personal Information</h3>
           <p>
-            <strong>Email:</strong> {user.emailOrPhone}
+            <strong>Email:</strong> {user.email}
           </p>
           <p>
             <strong>Phone:</strong> {user.phone}

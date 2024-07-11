@@ -13,7 +13,7 @@ const VerifyEmailComponent: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
-  const emailOrPhone = location.state?.emailOrPhone;
+  const email = location.state?.email;
 
   useEffect(() => {
     const resendTimestamp = localStorage.getItem('resendTimestamp');
@@ -46,7 +46,7 @@ const VerifyEmailComponent: React.FC = () => {
   const handleResendCode = async () => {
     if (canResend) {
       try {
-        await dispatch(performResendVerificationCode(emailOrPhone));
+        await dispatch(performResendVerificationCode(email));
         localStorage.setItem('resendTimestamp', Date.now().toString());
         setCanResend(false);
         setResendTimeout(5 * 60); // 5 minutes
@@ -59,13 +59,13 @@ const VerifyEmailComponent: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!emailOrPhone) {
+    if (!email) {
       setError('No email or phone found for verification.');
       return;
     }
     try {
-      console.log('Submitting verification with emailOrPhone:', emailOrPhone, 'and code:', code);
-      await dispatch(performVerifyEmail(emailOrPhone, code));
+      console.log('Submitting verification with email:', email, 'and code:', code);
+      await dispatch(performVerifyEmail(email, code));
       navigate('/login');
     } catch (err) {
       console.error('Verification failed:', err);

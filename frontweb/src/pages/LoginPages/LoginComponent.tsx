@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
 import { login } from '../../redux/features/auth/authSlice';
-import { sendCreateUser } from '../../websocket/websocket'; // Importez la fonction sendCreateUser
+import { createUser } from '../../websocket/userWebSocket';
 import { AxiosError } from 'axios';
 import './LoginComponent.css';
 
@@ -16,25 +16,26 @@ const LoginComponent: React.FC = () => {
 
   const formik = useFormik({
     initialValues: {
-      emailOrPhone: '',
+      email: '',
       password: ''
     },
     validationSchema: Yup.object({
-      emailOrPhone: Yup.string().required('Required'),
+      email: Yup.string().required('Required'),
       password: Yup.string().min(6, 'Password must be at least 6 characters').required('Required')
     }),
     onSubmit: async (values, { setSubmitting, setErrors }) => {
       try {
         const resultAction = await dispatch(
           login({
-            emailOrPhone: values.emailOrPhone,
+            email: values.email,
             password: values.password
           })
         ).unwrap();
 
         if (resultAction.user) {
-          sendCreateUser({
-            emailOrPhone: resultAction.user.emailOrPhone,
+          console.log('User ID:', resultAction.user._id);
+          createUser({
+            email: resultAction.user.email,
             firstName: resultAction.user.firstName ?? 'DefaultFirstName',
             lastName: resultAction.user.lastName ?? 'DefaultLastName'
           });
@@ -45,7 +46,7 @@ const LoginComponent: React.FC = () => {
         if (isAxiosError(error)) {
           if (error.message === 'Request failed with status code 404') {
             setErrors({
-              emailOrPhone: 'Email or phone does not exist. Would you like to register?'
+              email: 'Email or phone does not exist. Would you like to register?'
             });
           } else if (error.message === 'Request failed with status code 400') {
             setErrors({
@@ -53,16 +54,16 @@ const LoginComponent: React.FC = () => {
             });
           } else if (error.message === 'Request failed with status code 401' && isErrorWithResponseData(error) && error.response!.data.message === 'Email not verified') {
             setErrors({
-              emailOrPhone: 'Your account is not verified. Please verify your account to continue.'
+              email: 'Your account is not verified. Please verify your account to continue.'
             });
             navigate('/verify-email', {
-              state: { emailOrPhone: values.emailOrPhone }
+              state: { email: values.email }
             });
           } else {
-            setErrors({ emailOrPhone: 'An error occurred. Please try again.' });
+            setErrors({ email: 'An error occurred. Please try again.' });
           }
         } else {
-          setErrors({ emailOrPhone: 'An error occurred. Please try again.' });
+          setErrors({ email: 'An error occurred. Please try again.' });
         }
       }
     }
@@ -87,7 +88,7 @@ const LoginComponent: React.FC = () => {
     <div className="login-container">
       {user ? (
         <div>
-          <p>Welcome, {user.firstName ? user.firstName : user.emailOrPhone}!</p>
+          <p>Welcome, {user.firstName ? user.firstName : user.email}!</p>
           <button onClick={() => navigate('/role-selection')}>Complete your profile</button>
         </div>
       ) : (
@@ -95,26 +96,26 @@ const LoginComponent: React.FC = () => {
           <div className="form-field">
             <input
               type="text"
-              id="emailOrPhone"
-              {...formik.getFieldProps('emailOrPhone')}
+              id="email"
+              {...formik.getFieldProps('email')}
               placeholder="Email or Phone"
-              className={`login-input ${formik.touched.emailOrPhone && formik.errors.emailOrPhone ? 'error-input' : ''}`}
+              className={`login-input ${formik.touched.email && formik.errors.email ? 'error-input' : ''}`}
             />
-            {formik.touched.emailOrPhone && formik.errors.emailOrPhone ? (
+            {formik.touched.email && formik.errors.email ? (
               <div className="error">
-                {formik.errors.emailOrPhone}
-                {formik.errors.emailOrPhone.includes('Email or phone does not exist.') && (
+                {formik.errors.email}
+                {formik.errors.email.includes('Email or phone does not exist.') && (
                   <button type="button" className="register-button" onClick={() => navigate('/register')}>
                     Register
                   </button>
                 )}
-                {formik.errors.emailOrPhone.includes('Your account is not verified.') && (
+                {formik.errors.email.includes('Your account is not verified.') && (
                   <button
                     type="button"
                     className="verify-button"
                     onClick={() =>
                       navigate('/verify-email', {
-                        state: { emailOrPhone: formik.values.emailOrPhone }
+                        state: { email: formik.values.email }
                       })
                     }
                   >

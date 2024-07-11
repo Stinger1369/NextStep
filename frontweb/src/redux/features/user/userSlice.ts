@@ -24,7 +24,7 @@ interface User {
   _id: string;
   firstName?: string;
   lastName?: string;
-  emailOrPhone: string;
+  email: string;
   userType?: string;
   phone?: string;
   dateOfBirth?: Date;

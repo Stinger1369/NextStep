@@ -23,7 +23,6 @@ public class UserService {
     }
 
     public Mono<User> createUser(User user) {
-        // Générer l'apiKey si elle n'est pas déjà définie
         if (user.getApiKey() == null || user.getApiKey().isEmpty()) {
             user.setApiKey(UUID.randomUUID().toString());
         }
@@ -34,11 +33,38 @@ public class UserService {
                 .doOnError(error -> logger.error("Error creating user: {}", error.getMessage()));
     }
 
+    public Mono<User> getUserByApiKey(String apiKey) {
+        logger.info("Fetching user by API key: {}", apiKey);
+        return userRepository.findByApiKey(apiKey).doOnSuccess(user -> {
+            if (user != null) {
+                logger.info("User fetched: {}", user);
+            } else {
+                logger.warn("No user found with API key: {}", apiKey);
+            }
+        }).doOnError(
+                error -> logger.error("Error fetching user by API key: {}", error.getMessage()));
+    }
+
     public Mono<User> getUserById(String id) {
-        logger.info("Fetching user by id: {}", id);
-        return userRepository.findById(new ObjectId(id))
-                .doOnSuccess(user -> logger.info("User fetched: {}", user))
-                .doOnError(error -> logger.error("Error fetching user: {}", error.getMessage()));
+        logger.info("Fetching user by ID: {}", id);
+        return userRepository.findById(new ObjectId(id)).doOnSuccess(user -> {
+            if (user != null) {
+                logger.info("User fetched: {}", user);
+            } else {
+                logger.warn("No user found with ID: {}", id);
+            }
+        }).doOnError(error -> logger.error("Error fetching user by ID: {}", error.getMessage()));
+    }
+
+    public Mono<User> getUserByEmail(String email) {
+        logger.info("Fetching user by email: {}", email);
+        return userRepository.findByEmail(email).doOnSuccess(user -> {
+            if (user != null) {
+                logger.info("User fetched: {}", user);
+            } else {
+                logger.warn("No user found with email: {}", email);
+            }
+        }).doOnError(error -> logger.error("Error fetching user by email: {}", error.getMessage()));
     }
 
     public Flux<User> getAllUsers() {
@@ -50,13 +76,12 @@ public class UserService {
     public Mono<User> updateUser(String id, User user) {
         logger.info("Updating user: {}", user);
         return userRepository.findById(new ObjectId(id)).flatMap(existingUser -> {
-            existingUser.setemailOrPhone(user.getemailOrPhone());
+            existingUser.setEmail(user.getEmail());
             existingUser.setFirstName(user.getFirstName());
             existingUser.setLastName(user.getLastName());
             existingUser.setPosts(user.getPosts());
             existingUser.setNotifications(user.getNotifications());
             existingUser.setConversations(user.getConversations());
-            // Conserver l'apiKey existante ou en générer une nouvelle si nécessaire
             if (user.getApiKey() == null || user.getApiKey().isEmpty()) {
                 existingUser.setApiKey(UUID.randomUUID().toString());
             } else {
@@ -68,7 +93,7 @@ public class UserService {
     }
 
     public Mono<Void> deleteUser(String id) {
-        logger.info("Deleting user with id: {}", id);
+        logger.info("Deleting user with ID: {}", id);
         return userRepository.deleteById(new ObjectId(id))
                 .doOnSuccess(unused -> logger.info("User deleted"))
                 .doOnError(error -> logger.error("Error deleting user: {}", error.getMessage()));

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store';
-import { sendCreateUser, sendCreatePost } from '../../../websocket/websocket';
+import { getAllPosts, createPost } from '../../../websocket/postWebSocket';
 import './HomeJob.css';
+import { Post } from '../../../types';
 
 const HomeJob: React.FC = () => {
   const [content, setContent] = useState('');
@@ -11,18 +12,22 @@ const HomeJob: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      // Send create user request when component mounts
-      sendCreateUser({
-        emailOrPhone: user.emailOrPhone,
-        firstName: user.firstName ?? 'DefaultFirstName', // Provide default value
-        lastName: user.lastName ?? 'DefaultLastName' // Provide default value
-      });
+      // Fetch posts when component mounts
+      getAllPosts()
+        .then((posts) => setPosts(posts))
+        .catch((error) => console.error('Error fetching posts:', error));
     }
   }, [user]);
 
   const handleCreatePost = () => {
-    sendCreatePost(content);
-    setContent(''); // Clear the content after sending
+    // Send create post request
+    createPost(content)
+      .then(() => {
+        setContent(''); // Clear the content after sending
+        return getAllPosts(); // Refresh posts
+      })
+      .then((posts) => setPosts(posts))
+      .catch((error) => console.error('Error creating post:', error));
   };
 
   return (
@@ -37,24 +42,18 @@ const HomeJob: React.FC = () => {
   );
 };
 
-interface Post {
-  _id: string;
-  userId: string;
-  title: string;
-  content: string;
-  createdAt: Date;
-  updatedAt: Date;
-  comments: Comment[];
+interface PostListProps {
+  posts: Post[];
 }
 
-const PostList: React.FC<{ posts: Post[] }> = ({ posts }) => {
+const PostList: React.FC<PostListProps> = ({ posts }) => {
   return (
     <div>
       {posts.map((post) => (
         <div key={post._id}>
           <p>{post.content}</p>
           <small>
-            Posted by {post.userId} on {post.createdAt.toLocaleString()}
+            Posted by {post.userId} on {new Date(post.createdAt).toLocaleString()}
           </small>
         </div>
       ))}

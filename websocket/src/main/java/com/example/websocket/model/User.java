@@ -12,21 +12,26 @@ import java.util.UUID;
 public class User {
     @Id
     private ObjectId id;
-    private String emailOrPhone;
+    private String email;
     private String firstName;
     private String lastName;
-    private String apiKey; // Ajout de l'apiKey
+    private String apiKey;
     private List<Post> posts = new ArrayList<>();
     private List<Notification> notifications = new ArrayList<>();
     private List<Conversation> conversations = new ArrayList<>();
 
     public User() {}
 
-    public User(String emailOrPhone, String firstName, String lastName) {
-        this.emailOrPhone = emailOrPhone;
+    public User(String id, String email, String firstName, String lastName) {
+        if (id != null && !id.isEmpty()) {
+            this.id = new ObjectId(id);
+        } else {
+            this.id = new ObjectId();
+        }
+        this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.apiKey = UUID.randomUUID().toString(); // Générer l'apiKey lors de la création
+        this.apiKey = UUID.randomUUID().toString();
     }
 
     // Getters and setters
@@ -39,12 +44,12 @@ public class User {
         this.id = id;
     }
 
-    public String getemailOrPhone() {
-        return emailOrPhone;
+    public String getEmail() {
+        return email;
     }
 
-    public void setemailOrPhone(String emailOrPhone) {
-        this.emailOrPhone = emailOrPhone;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getFirstName() {

@@ -16,7 +16,7 @@ export const verifyPassword = async (
 
 export const generateToken = (user: any): string => {
   return jwt.sign(
-    { id: user._id, email: user.emailOrPhone, userType: user.userType },
+    { id: user._id, email: user.email, userType: user.userType },
     process.env.JWT_SECRET || "defaultSecret",
     { expiresIn: "1h" }
   );
@@ -24,7 +24,7 @@ export const generateToken = (user: any): string => {
 
 export const generateRefreshToken = (user: any): string => {
   return jwt.sign(
-    { id: user._id, email: user.emailOrPhone, userType: user.userType },
+    { id: user._id, email: user.email, userType: user.userType },
     process.env.JWT_REFRESH_SECRET || "defaultRefreshSecret",
     { expiresIn: "7d" } // Token de rafraîchissement valide pendant 7 jours
   );

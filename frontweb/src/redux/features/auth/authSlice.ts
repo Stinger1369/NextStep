@@ -26,7 +26,7 @@ interface User {
   _id: string;
   firstName?: string;
   lastName?: string;
-  emailOrPhone: string;
+  email: string;
   userType: 'employer' | 'recruiter' | 'jobSeeker';
   phone?: string;
   dateOfBirth?: Date;
@@ -69,17 +69,17 @@ export const login = createAsyncThunk(
   'auth/login',
   async (
     {
-      emailOrPhone,
+      email,
       password
     }: {
-      emailOrPhone: string;
+      email: string;
       password: string;
     },
     { rejectWithValue }
   ) => {
     try {
       const response = await axiosInstance.post('/auth/login', {
-        emailOrPhone,
+        email,
         password
       });
       return response.data;
@@ -120,26 +120,26 @@ export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, { ge
   throw new Error('No refresh token available');
 });
 
-export const requestPasswordReset = createAsyncThunk('auth/requestPasswordReset', async (emailOrPhone: string) => {
-  await axiosInstance.post('/auth/request-password-reset', { emailOrPhone });
+export const requestPasswordReset = createAsyncThunk('auth/requestPasswordReset', async (email: string) => {
+  await axiosInstance.post('/auth/request-password-reset', { email });
 });
 
-export const resendVerificationCode = createAsyncThunk('auth/resendVerificationCode', async (emailOrPhone: string) => {
+export const resendVerificationCode = createAsyncThunk('auth/resendVerificationCode', async (email: string) => {
   await axiosInstance.post('/auth/resend-verification-code', {
-    emailOrPhone
+    email
   });
 });
 
-export const resetPassword = createAsyncThunk('auth/resetPassword', async ({ emailOrPhone, code, newPassword }: { emailOrPhone: string; code: string; newPassword: string }) => {
+export const resetPassword = createAsyncThunk('auth/resetPassword', async ({ email, code, newPassword }: { email: string; code: string; newPassword: string }) => {
   await axiosInstance.post('/auth/reset-password', {
-    emailOrPhone,
+    email,
     code,
     newPassword
   });
 });
 
-export const verifyEmail = createAsyncThunk('auth/verifyEmail', async ({ emailOrPhone, code }: { emailOrPhone: string; code: string }) => {
-  await axiosInstance.post('/auth/verify-email', { emailOrPhone, code });
+export const verifyEmail = createAsyncThunk('auth/verifyEmail', async ({ email, code }: { email: string; code: string }) => {
+  await axiosInstance.post('/auth/verify-email', { email, code });
 });
 
 const authSlice = createSlice({
