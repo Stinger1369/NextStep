@@ -46,6 +46,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             switch (messageType) {
                 case "user.create":
                 case "user.check":
+                case "user.getCurrent":
                     userHandler.handleMessage(session, messageType, payload);
                     break;
                 case "post.create":

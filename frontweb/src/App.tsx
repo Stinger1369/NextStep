@@ -5,7 +5,7 @@ import AppRoutes from './routes/AppRoutes';
 import { useDispatch } from 'react-redux';
 import { refreshToken } from './redux/features/auth/authSlice';
 import { AppDispatch } from './redux/store';
-import { initializeWebSocket } from './websocket/websocket';
+//import { initializeWebSocket } from './websocket/websocket';
 
 const App: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,9 +21,9 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, [dispatch]);
 
-  useEffect(() => {
-    initializeWebSocket(); // Initialize WebSocket connection
-  }, []);
+  // useEffect(() => {
+  //   initializeWebSocket(); // Initialize WebSocket connection
+  // }, []);
 
   return (
     <div className="App">

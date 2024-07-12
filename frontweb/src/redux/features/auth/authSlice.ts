@@ -1,10 +1,10 @@
+// src/redux/features/auth/authSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '../../../axiosConfig';
 import { RootState } from '../../store';
 import { AxiosError } from 'axios';
 import { ApiError } from '../../../../src/types';
 import { updateUser } from '../user/userSlice';
-
 // Définir les types et interfaces nécessaires
 interface Address {
   street?: string;

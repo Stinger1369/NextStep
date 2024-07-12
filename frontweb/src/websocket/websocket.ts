@@ -1,120 +1,96 @@
-import { WebSocketMessage } from '../types';
-import { handleUserMessage } from './userWebSocket';
-import { handlePostMessage } from './postWebSocket';
+export interface WebSocketMessage<T = unknown> {
+  type: string;
+  payload: T;
+}
 
-const WS_URL = 'ws://localhost:8080/ws/chat';
-const RECONNECT_INTERVAL = 5000;
-const MAX_RECONNECT_ATTEMPTS = 5;
+let socket: WebSocket | null = null;
 
-export let socket: WebSocket | null = null;
-let isConnected = false;
-let reconnectAttempts = 0;
-let messageQueue: WebSocketMessage[] = [];
-let eventListeners: { [key: string]: ((data: any) => void)[] } = {};
-
-export const initializeWebSocket = () => {
-  if (socket !== null) {
+export const initializeWebSocket = (url: string): void => {
+  if (socket) {
     console.log('WebSocket already initialized');
     return;
   }
-  connect();
+
+  socket = new WebSocket(url);
+
+  socket.onopen = () => {
+    console.log('WebSocket connection established');
+    sendQueuedMessages();
+  };
+
+  socket.onmessage = (event: MessageEvent) => {
+    console.log('Raw message received:', event.data);
+    const message: WebSocketMessage = JSON.parse(event.data);
+    console.log('Parsed message:', message);
+
+    if (message.type === 'error') {
+      console.error('WebSocket error:', (message.payload as { message: string }).message);
+      triggerEventListeners('error', message.payload);
+    } else {
+      triggerEventListeners(message.type, message.payload);
+    }
+  };
+
+  socket.onerror = (event: Event) => {
+    console.error('WebSocket error:', event);
+    triggerEventListeners('error', event);
+  };
+
+  socket.onclose = () => {
+    console.log('WebSocket connection closed');
+    socket = null;
+  };
 };
 
-const connect = () => {
-  socket = new WebSocket(WS_URL);
-  socket.onopen = handleOpen;
-  socket.onmessage = handleMessage;
-  socket.onerror = handleError;
-  socket.onclose = handleClose;
-};
+const messageQueue: WebSocketMessage[] = [];
 
-const handleOpen = () => {
-  console.log('WebSocket connected');
-  isConnected = true;
-  reconnectAttempts = 0;
-  flushQueue();
-};
-
-const handleError = (event: Event) => {
-  console.error('WebSocket error:', event);
-};
-
-const handleClose = (event: CloseEvent) => {
-  console.log('WebSocket closed:', event.reason);
-  isConnected = false;
-  socket = null;
-
-  if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-    setTimeout(() => {
-      console.log('Attempting to reconnect...');
-      reconnectAttempts++;
-      connect();
-    }, RECONNECT_INTERVAL);
+export const sendMessage = (message: WebSocketMessage): void => {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    const messageString = JSON.stringify(message);
+    console.log('Sending WebSocket message:', messageString);
+    socket.send(messageString);
   } else {
-    console.error('Max reconnect attempts reached');
-  }
-};
-
-export const sendMessage = (message: WebSocketMessage) => {
-  console.log('Sending WebSocket message:', message);
-  if (isConnected && socket) {
-    socket.send(JSON.stringify(message));
-  } else {
-    console.log('WebSocket not connected, queueing message');
+    console.log('Queueing message:', message);
     messageQueue.push(message);
   }
 };
 
-const handleMessage = (event: MessageEvent) => {
-  console.log('Raw message received:', event.data);
-  try {
-    const message: WebSocketMessage = JSON.parse(event.data);
-    console.log('Parsed message:', message);
-    handleWebSocketMessage(message);
-    triggerEventListeners(message.type, message.payload);
-  } catch (error) {
-    console.error('Error parsing message:', error, 'Message:', event.data);
-  }
-};
-
-const flushQueue = () => {
+const sendQueuedMessages = (): void => {
   while (messageQueue.length > 0) {
     const message = messageQueue.shift();
-    if (message) sendMessage(message);
+    if (message) {
+      sendMessage(message);
+    }
   }
 };
 
-const handleWebSocketMessage = (message: WebSocketMessage) => {
-  const { type } = message;
+type EventCallback<T = unknown> = (data: T) => void;
 
-  if (type.startsWith('user.')) {
-    handleUserMessage(message);
-  } else if (type.startsWith('post.')) {
-    handlePostMessage(message);
-  } else if (type === 'error') {
-    console.error('Error message from server:', message.payload);
-  } else {
-    console.warn('Unhandled message type:', type);
-  }
-};
+const eventListeners: { [key: string]: EventCallback[] } = {};
 
-export const addEventListener = (type: string, callback: (data: any) => void) => {
+export const addEventListener = <T>(type: string, callback: EventCallback<T>): void => {
+  console.log('Added event listener for type:', type);
   if (!eventListeners[type]) {
     eventListeners[type] = [];
   }
-  eventListeners[type].push(callback);
+  eventListeners[type].push(callback as EventCallback);
 };
 
-export const removeEventListener = (type: string, callback: (data: any) => void) => {
+export const removeEventListener = <T>(type: string, callback: EventCallback<T>): void => {
   if (eventListeners[type]) {
     eventListeners[type] = eventListeners[type].filter((cb) => cb !== callback);
   }
 };
 
-const triggerEventListeners = (type: string, data: any) => {
-  if (eventListeners[type]) {
-    eventListeners[type].forEach((callback) => callback(data));
-  }
+export const addErrorListener = (callback: (error: unknown) => void): void => {
+  addEventListener<unknown>('error', callback);
 };
 
-export const isSocketOpen = () => isConnected;
+const triggerEventListeners = <T>(type: string, data: T): void => {
+  console.log('Triggering event listeners for type:', type);
+  if (eventListeners[type]) {
+    eventListeners[type].forEach((callback) => callback(data));
+  } else {
+    console.log('No event listeners for type:', type);
+  }
+};

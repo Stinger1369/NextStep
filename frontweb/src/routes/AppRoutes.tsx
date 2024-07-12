@@ -34,10 +34,11 @@ const AppRoutes: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    if (status === 'idle') {
+    if (status === 'idle' && user) {
+      // Ajoutez une vérification si l'utilisateur est connecté
       dispatch(getCompanies());
     }
-  }, [dispatch, status]);
+  }, [dispatch, status, user]); // Ajoutez user comme dépendance
 
   return (
     <Router>

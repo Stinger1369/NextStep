@@ -2,66 +2,32 @@
 import { WebSocketMessage, Post } from '../types';
 import { sendMessage, addEventListener, removeEventListener } from './websocket';
 
-export const handlePostMessage = (message: WebSocketMessage) => {
-  const { type, payload } = message;
+export interface PostCreatedSuccessData {
+  postId: string;
+}
 
-  switch (type) {
-    case 'post.getAll.success':
-      if (payload && typeof payload === 'object' && 'posts' in payload && Array.isArray(payload.posts)) {
-        console.log('Posts received:', payload.posts);
-      } else {
-        console.error('Invalid payload format for post.getAll.success:', payload);
-      }
-      break;
-    case 'post.create.success':
-      if (payload && typeof payload === 'object') {
-        console.log('Post created successfully:', payload);
-        triggerEventListeners('post.create.success', payload);
-      } else {
-        console.error('Invalid payload format for post.create.success:', payload);
-      }
-      break;
-    default:
-      console.warn('Unhandled post message type:', type);
-  }
-};
+export interface PostGetAllSuccessData {
+  posts: Post[];
+}
 
-export const getAllPosts = (): Promise<Post[]> => {
-  return new Promise((resolve, reject) => {
-    const message: WebSocketMessage = {
-      type: 'post.getAll',
-      payload: {}
-    };
-
-    const handleGetAllPostsResult = (data: { posts: Post[] }) => {
-      if (Array.isArray(data.posts)) {
-        resolve(data.posts);
-      } else {
-        reject(new Error('Failed to get posts'));
-      }
-      removeEventListener('post.getAll.success', handleGetAllPostsResult);
-    };
-
-    addEventListener('post.getAll.success', handleGetAllPostsResult);
-    sendMessage(message);
-  });
-};
-
-export const createPost = (content: string, userId: string): Promise<string> => {
+export function createPost(content: string, userId: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const message: WebSocketMessage = {
       type: 'post.create',
       payload: {
         userId,
-        title: 'Default Title', // Assuming you want to add a title
+        title: 'Default Title',
         content,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         comments: []
       }
     };
 
-    const handlePostCreateResult = (data: { postId: string }) => {
+    console.log('Sending post.create message:', message);
+
+    const handlePostCreateResult = (data: PostCreatedSuccessData) => {
+      console.log('Received post.create.success message:', data);
       if (data.postId) {
         resolve(data.postId);
       } else {
@@ -73,8 +39,92 @@ export const createPost = (content: string, userId: string): Promise<string> => 
     addEventListener('post.create.success', handlePostCreateResult);
     sendMessage(message);
   });
-};
-function triggerEventListeners(arg0: string, payload: object) {
-  throw new Error('Function not implemented.');
 }
 
+export function getAllPosts(): Promise<Post[]> {
+  return new Promise((resolve, reject) => {
+    const message: WebSocketMessage = {
+      type: 'post.getAll',
+      payload: {}
+    };
+
+    console.log('Sending post.getAll message:', message);
+
+    const handleGetAllPostsResult = (data: PostGetAllSuccessData) => {
+      console.log('Received post.getAll.success message:', data);
+      if (Array.isArray(data.posts)) {
+        resolve(data.posts);
+      } else {
+        reject(new Error('Failed to get posts'));
+      }
+      removeEventListener('post.getAll.success', handleGetAllPostsResult);
+    };
+
+    addEventListener('post.getAll.success', handleGetAllPostsResult);
+    sendMessage(message);
+  });
+}
+
+export function getPostById(postId: string): Promise<Post> {
+  return new Promise((resolve, reject) => {
+    const message: WebSocketMessage = {
+      type: 'post.getById',
+      payload: { postId }
+    };
+
+    console.log('Sending post.getById message:', message);
+
+    const handleGetPostResult = (data: Post) => {
+      console.log('Received post.getById.success message:', data);
+      resolve(data);
+      removeEventListener('post.getById.success', handleGetPostResult);
+    };
+
+    addEventListener('post.getById.success', handleGetPostResult);
+    sendMessage(message);
+  });
+}
+
+export function updatePost(postId: string, content: string): Promise<Post> {
+  return new Promise((resolve, reject) => {
+    const message: WebSocketMessage = {
+      type: 'post.update',
+      payload: { postId, content }
+    };
+
+    console.log('Sending post.update message:', message);
+
+    const handleUpdatePostResult = (data: Post) => {
+      console.log('Received post.update.success message:', data);
+      resolve(data);
+      removeEventListener('post.update.success', handleUpdatePostResult);
+    };
+
+    addEventListener('post.update.success', handleUpdatePostResult);
+    sendMessage(message);
+  });
+}
+
+export function deletePost(postId: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const message: WebSocketMessage = {
+      type: 'post.delete',
+      payload: { postId }
+    };
+
+    console.log('Sending post.delete message:', message);
+
+    const handleDeletePostResult = (data: { success: boolean }) => {
+      console.log('Received post.delete.success message:', data);
+      if (data.success) {
+        resolve();
+      } else {
+        reject(new Error('Failed to delete post'));
+      }
+      removeEventListener('post.delete.success', handleDeletePostResult);
+    };
+
+    addEventListener('post.delete.success', handleDeletePostResult);
+    sendMessage(message);
+  });
+}

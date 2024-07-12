@@ -1,4 +1,23 @@
-// src/types.ts
+export interface Post {
+  _id: string;
+  userId: string;
+  title: string;
+  content: string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  comments: Comment[];
+}
+
+export interface Comment {
+  _id: string;
+  userId: string;
+  postId: string;
+  content: string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
+// Les autres types n'ont pas besoin de changement
 export interface ApiError {
   message: string;
   status?: number;
@@ -14,25 +33,6 @@ export interface User {
   posts: Post[];
   notifications: Notification[];
   conversations: Conversation[];
-}
-
-export interface Post {
-  _id: string;
-  userId: string;
-  title: string;
-  content: string;
-  createdAt: Date;
-  updatedAt: Date;
-  comments: Comment[];
-}
-
-export interface Comment {
-  _id: string;
-  userId: string;
-  postId: string;
-  content: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface Notification {
@@ -92,12 +92,16 @@ export type ErrorPayload = {
 };
 export type WebSocketMessage =
   | { type: 'user.create'; payload: Partial<User> }
+  | { type: 'user.getCurrent'; payload: {} }
+  | { type: 'user.getByEmail'; payload: { email: string } }
+  | { type: 'user.getById'; payload: { userId: string } }
+  | { type: 'user.update'; payload: Partial<User> & { userId: string } }
+  | { type: 'user.delete'; payload: { userId: string } }
   | { type: 'user.check'; payload: { email: string } }
-  | { type: 'user.check.result'; payload: { exists: boolean } }
   | { type: 'post.create'; payload: Omit<Post, '_id'> }
-  | { type: 'post.create.success'; payload: Post }
   | { type: 'post.getAll'; payload: {} }
-  | { type: 'post.getAll.success'; payload: { posts: Post[] } }
-  | { type: 'post.getAll.error'; payload: ErrorPayload }
+  | { type: 'post.getById'; payload: { postId: string } }
+  | { type: 'post.update'; payload: { postId: string; content: string } }
+  | { type: 'post.delete'; payload: { postId: string } }
+  | { type: 'error'; payload: ErrorPayload }
   | { type: string; payload: unknown };
-

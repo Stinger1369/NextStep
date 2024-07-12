@@ -3,6 +3,7 @@ package com.example.websocket.handler;
 import com.example.websocket.model.User;
 import com.example.websocket.service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -19,11 +20,14 @@ public class UserWebSocketHandler {
     private static final String EMAIL = "email";
     private static final String FIRST_NAME = "firstName";
     private static final String LAST_NAME = "lastName";
+    private static final String USER_ID = "userId";
 
     private final UserService userService;
+    private final ObjectMapper objectMapper;
 
-    public UserWebSocketHandler(UserService userService) {
+    public UserWebSocketHandler(UserService userService, ObjectMapper objectMapper) {
         this.userService = userService;
+        this.objectMapper = objectMapper;
     }
 
     public void handleMessage(WebSocketSession session, String messageType, JsonNode payload) {
@@ -35,8 +39,36 @@ public class UserWebSocketHandler {
             case "user.check":
                 handleUserCheck(session, payload);
                 break;
+                case "user.getCurrent": // Add support for user.getCurrent
+                handleGetCurrentUser(session, payload);
+                break;
             default:
                 sendErrorMessage(session, "Unknown user message type: " + messageType);
+        }
+    }
+
+    private void handleGetCurrentUser(WebSocketSession session, JsonNode payload) {
+        if (payload.hasNonNull(USER_ID)) {
+            String userId = payload.get(USER_ID).asText();
+            logger.info("Fetching user with ID {}", userId);
+            userService.getUserById(userId).flatMap(user -> {
+                try {
+                    logger.info("User fetched: {}", user);
+                    String userJson = objectMapper.writeValueAsString(user);
+                    session.sendMessage(new TextMessage(String.format(
+                            "{\"type\":\"user.getCurrent.success\",\"payload\":%s}", userJson)));
+                } catch (IOException e) {
+                    logger.error("Error sending user data", e);
+                }
+                return Mono.just(user);
+            }).onErrorResume(error -> {
+                logger.error("Error fetching user data: {}", error.getMessage());
+                sendErrorMessage(session, "Error fetching user data", error);
+                return Mono.empty();
+            }).subscribe();
+        } else {
+            logger.warn("Missing fields in user.getCurrent payload");
+            sendErrorMessage(session, "Missing fields in user.getCurrent payload", null);
         }
     }
 
