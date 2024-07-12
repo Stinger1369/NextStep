@@ -95,7 +95,9 @@ export type WebSocketMessage =
   | { type: 'user.check'; payload: { email: string } }
   | { type: 'user.check.result'; payload: { exists: boolean } }
   | { type: 'post.create'; payload: Omit<Post, '_id'> }
+  | { type: 'post.create.success'; payload: Post }
   | { type: 'post.getAll'; payload: {} }
   | { type: 'post.getAll.success'; payload: { posts: Post[] } }
   | { type: 'post.getAll.error'; payload: ErrorPayload }
   | { type: string; payload: unknown };
+

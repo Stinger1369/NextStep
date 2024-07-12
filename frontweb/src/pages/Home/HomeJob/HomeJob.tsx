@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+// components/HomeJob/HomeJob.tsx
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store';
 import { getAllPosts, createPost } from '../../../websocket/postWebSocket';
+import { addEventListener, removeEventListener } from '../../../websocket/websocket';
+import { getCurrentUserId } from '../../../websocket/userWebSocket';
 import './HomeJob.css';
 import { Post } from '../../../types';
 
@@ -16,19 +19,31 @@ const HomeJob: React.FC = () => {
       getAllPosts()
         .then((posts) => setPosts(posts))
         .catch((error) => console.error('Error fetching posts:', error));
+
+      // Add listener for post creation success
+      const handlePostCreateSuccess = (data: Post) => {
+        setPosts((prevPosts) => [data, ...prevPosts]);
+      };
+
+      addEventListener('post.create.success', handlePostCreateSuccess);
+
+      return () => {
+        // Remove listener on cleanup
+        removeEventListener('post.create.success', handlePostCreateSuccess);
+      };
     }
   }, [user]);
 
-  const handleCreatePost = () => {
+  const handleCreatePost = useCallback(() => {
+    const userId = getCurrentUserId();
+    if (!userId) return;
     // Send create post request
-    createPost(content)
+    createPost(content, userId)
       .then(() => {
         setContent(''); // Clear the content after sending
-        return getAllPosts(); // Refresh posts
       })
-      .then((posts) => setPosts(posts))
       .catch((error) => console.error('Error creating post:', error));
-  };
+  }, [content]);
 
   return (
     <div className="home-job">

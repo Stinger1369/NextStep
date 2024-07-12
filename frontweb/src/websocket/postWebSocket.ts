@@ -1,3 +1,4 @@
+// src/websocket/postWebSocket.ts
 import { WebSocketMessage, Post } from '../types';
 import { sendMessage, addEventListener, removeEventListener } from './websocket';
 
@@ -13,7 +14,12 @@ export const handlePostMessage = (message: WebSocketMessage) => {
       }
       break;
     case 'post.create.success':
-      console.log('Post created successfully:', payload);
+      if (payload && typeof payload === 'object') {
+        console.log('Post created successfully:', payload);
+        triggerEventListeners('post.create.success', payload);
+      } else {
+        console.error('Invalid payload format for post.create.success:', payload);
+      }
       break;
     default:
       console.warn('Unhandled post message type:', type);
@@ -41,11 +47,18 @@ export const getAllPosts = (): Promise<Post[]> => {
   });
 };
 
-export const createPost = (content: string): Promise<string> => {
+export const createPost = (content: string, userId: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const message: WebSocketMessage = {
       type: 'post.create',
-      payload: { content }
+      payload: {
+        userId,
+        title: 'Default Title', // Assuming you want to add a title
+        content,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        comments: []
+      }
     };
 
     const handlePostCreateResult = (data: { postId: string }) => {
@@ -61,3 +74,7 @@ export const createPost = (content: string): Promise<string> => {
     sendMessage(message);
   });
 };
+function triggerEventListeners(arg0: string, payload: object) {
+  throw new Error('Function not implemented.');
+}
+

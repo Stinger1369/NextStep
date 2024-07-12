@@ -2,6 +2,7 @@ import { WebSocketMessage, User } from '../types';
 import { sendMessage, addEventListener, removeEventListener } from './websocket';
 
 let isCreatingUser = false;
+let currentUserId: string | null = null;
 
 export const handleUserMessage = (message: WebSocketMessage) => {
   const { type, payload } = message;
@@ -10,6 +11,7 @@ export const handleUserMessage = (message: WebSocketMessage) => {
     case 'user.create.success':
       if (payload && typeof payload === 'object' && 'userId' in payload) {
         console.log('User created successfully:', payload.userId);
+        currentUserId = payload.userId as string;
         isCreatingUser = false;
       }
       break;
@@ -37,6 +39,7 @@ export const createUser = (user: Pick<User, 'email' | 'firstName' | 'lastName'>)
     const handleUserCreateResult = (data: { userId: string }) => {
       console.log('Received user.create.success:', data);
       if (data.userId) {
+        currentUserId = data.userId;
         resolve(data.userId);
       } else {
         reject(new Error('User creation failed'));
@@ -48,4 +51,8 @@ export const createUser = (user: Pick<User, 'email' | 'firstName' | 'lastName'>)
     addEventListener('user.create.success', handleUserCreateResult);
     sendMessage(message);
   });
+};
+
+export const getCurrentUserId = (): string | null => {
+  return currentUserId;
 };
