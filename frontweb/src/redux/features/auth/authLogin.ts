@@ -1,36 +1,40 @@
-// import { AppDispatch } from '../../store';
-// import { login } from './authSlice';
-// import { checkUserExistence, createUser } from '../../../websocket/userWebSocket';
-// import { getAllPosts } from '../../../websocket/postWebSocket';
+// src/redux/features/auth/authLogin.ts
 
-// export const performLogin = (email: string, password: string) => async (dispatch: AppDispatch) => {
-//   console.log('performLogin called with:', email, password);
-//   try {
-//     const resultAction = await dispatch(login({ email, password }));
-//     if (login.fulfilled.match(resultAction)) {
-//       const user = resultAction.payload.user;
-//       console.log('Checking if user exists:', user.email);
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import axiosInstance from '../../../axiosConfig';
+import { ApiError } from '../../../../src/types';
+import { AxiosError } from 'axios';
 
-//       const userExists = await checkUserExistence(user.email);
-//       console.log('User exists:', userExists);
+export const login = createAsyncThunk(
+  'auth/login',
+  async (
+    {
+      email,
+      password
+    }: {
+      email: string;
+      password: string;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axiosInstance.post('/auth/login', {
+        email,
+        password
+      });
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        if (error.response) {
+          return rejectWithValue(error.response.data as ApiError);
+        }
+      }
+      throw error;
+    }
+  }
+);
 
-//       if (!userExists) {
-//         const userId = await createUser({
-//           email: user.email,
-//           firstName: user.firstName,
-//           lastName: user.lastName
-//         });
-//         console.log('User created with ID:', userId);
-//       }
-
-//       try {
-//         const posts = await getAllPosts();
-//         console.log('Posts retrieved:', posts);
-//       } catch (error) {
-//         console.error('Error retrieving posts:', error);
-//       }
-//     }
-//   } catch (error) {
-//     console.error('Login error:', error);
-//   }
-// };
+// Helper function to check if an error is an AxiosError
+function isAxiosError(error: unknown): error is AxiosError {
+  return (error as AxiosError).isAxiosError !== undefined;
+}

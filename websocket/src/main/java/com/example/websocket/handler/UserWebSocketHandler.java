@@ -39,6 +39,9 @@ public class UserWebSocketHandler {
             case "user.check":
                 handleUserCheck(session, payload);
                 break;
+                case "user.getById": // Add support for user.getById
+                handleGetUserById(session, payload);
+                break;
             case "user.getCurrent": // Add support for user.getCurrent
                 handleGetCurrentUser(session, payload);
                 break;
@@ -72,6 +75,30 @@ public class UserWebSocketHandler {
         }
     }
 
+    private void handleGetUserById(WebSocketSession session, JsonNode payload) {
+        if (payload.hasNonNull(USER_ID)) {
+            String userId = payload.get(USER_ID).asText();
+            logger.info("Fetching user with ID {}", userId);
+            userService.getUserById(userId).flatMap(user -> {
+                try {
+                    logger.info("User fetched: {}", user);
+                    String userJson = objectMapper.writeValueAsString(user);
+                    session.sendMessage(new TextMessage(String.format(
+                            "{\"type\":\"user.getById.success\",\"payload\":%s}", userJson)));
+                } catch (IOException e) {
+                    logger.error("Error sending user data", e);
+                }
+                return Mono.just(user);
+            }).onErrorResume(error -> {
+                logger.error("Error fetching user data: {}", error.getMessage());
+                sendErrorMessage(session, "Error fetching user data", error);
+                return Mono.empty();
+            }).subscribe();
+        } else {
+            logger.warn("Missing fields in user.getById payload");
+            sendErrorMessage(session, "Missing fields in user.getById payload", null);
+        }
+    }
     private void handleUserCreate(WebSocketSession session, JsonNode payload) {
         if (payload.hasNonNull(EMAIL) && payload.hasNonNull(FIRST_NAME)
                 && payload.hasNonNull(LAST_NAME)) {

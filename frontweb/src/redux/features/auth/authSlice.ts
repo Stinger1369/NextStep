@@ -153,6 +153,7 @@ const authSlice = createSlice({
       localStorage.removeItem('user');
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
+      localStorage.clear();
     },
     initializeAuthState: (state) => {
       state.user = JSON.parse(localStorage.getItem('user') || 'null');

@@ -41,8 +41,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
         userId: data.userId,
         postId: data.postId,
         content: data.content,
-        firstName: data.userFirstName, // Ajouté
-        lastName: data.userLastName, // Ajouté
+        firstName: data.userFirstName,
+        lastName: data.userLastName,
         createdAt: data.createdAt ? new Date(data.createdAt).toISOString() : new Date().toISOString(),
         updatedAt: data.updatedAt ? new Date(data.updatedAt).toISOString() : new Date().toISOString()
       };
@@ -61,8 +61,17 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   }, [dispatch]);
 
   const handleCreateComment = useCallback(() => {
+    const userId = localStorage.getItem('currentUserId');
+    const userFirstName = localStorage.getItem('currentUserFirstName');
+    const userLastName = localStorage.getItem('currentUserLastName');
+
+    if (!userId || !userFirstName || !userLastName) {
+      console.error('User ID, first name, or last name is missing');
+      return;
+    }
+
     console.log('Creating comment...');
-    createComment(content, postId)
+    createComment(content, postId, userId, userFirstName, userLastName)
       .then((commentData) => {
         console.log('Comment created with ID:', commentData.commentId);
         setContent(''); // Clear the content after creating the comment

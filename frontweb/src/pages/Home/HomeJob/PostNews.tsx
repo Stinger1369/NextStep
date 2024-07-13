@@ -2,9 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
 import { createPost, getAllPosts, PostCreatedSuccessData } from '../../../websocket/postWebSocket';
-import { getCurrentUser } from '../../../websocket/userWebSocket';
 import { initializeWebSocket, addEventListener, removeEventListener, addErrorListener } from '../../../websocket/websocket';
 import { fetchPostsRequest, fetchPostsSuccess, fetchPostsFailure, addPost } from '../../../redux/features/websocket/posts/postSlice';
+import { fetchUser } from '../../../redux/features/websocket/users/userWebsocketThunks/userWebsocketThunks';
+import { setCurrentUser } from '../../../redux/features/websocket/users/userWebSocketSlice'; // Import correct ici
 import { selectPostsWithDates } from '../../../redux/selectors';
 import { TextField, Button, Typography, CircularProgress } from '@mui/material';
 import PostList from '../../../components/PostCard/PostList';
@@ -13,10 +14,10 @@ import { Post, User } from '../../../types';
 
 const PostNews: React.FC = () => {
   const [content, setContent] = useState('');
-  const [user, setUser] = useState<User | null>(null);
   const posts = useSelector(selectPostsWithDates);
   const loading = useSelector((state: RootState) => state.posts.loading);
   const error = useSelector((state: RootState) => state.posts.error);
+  const user = useSelector((state: RootState) => state.userWebSocket.currentUser);
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -25,13 +26,20 @@ const PostNews: React.FC = () => {
 
     const storedUserId = localStorage.getItem('currentUserId');
     if (storedUserId) {
-      getCurrentUser(storedUserId).then(setUser).catch(console.error);
+      dispatch(fetchUser(storedUserId)).then((result) => {
+        const user = result.payload as User;
+        if (user && user.id && user.email) {
+          dispatch(setCurrentUser(user));
+        } else {
+          console.error('Invalid user data:', user);
+        }
+      });
     }
 
     addErrorListener((error) => {
       console.error('WebSocket error:', error);
     });
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (user) {
@@ -55,9 +63,9 @@ const PostNews: React.FC = () => {
         console.log('Handling post.create.success event:', data);
         const newPost: Post = {
           id: data.postId,
-          userId: user._id,
-          userFirstName: user.firstName, // Ajouté
-          userLastName: user.lastName, // Ajouté
+          userId: user.id,
+          userFirstName: user.firstName,
+          userLastName: user.lastName,
           title: 'Default Title',
           content,
           createdAt: new Date().toISOString(),
@@ -80,14 +88,18 @@ const PostNews: React.FC = () => {
   }, [user, dispatch, content]);
 
   const handleCreatePost = useCallback(() => {
-    console.log('Creating post...');
-    createPost(content)
-      .then((postId) => {
-        console.log('Post created with ID:', postId);
-        setContent(''); // Clear the content after creating the post
-      })
-      .catch((error) => console.error('Error creating post:', error));
-  }, [content]);
+    if (user) {
+      console.log('Creating post...');
+      createPost(content)
+        .then((postId) => {
+          console.log('Post created with ID:', postId);
+          setContent(''); // Clear the content after creating the post
+        })
+        .catch((error) => console.error('Error creating post:', error));
+    } else {
+      console.error('No user logged in');
+    }
+  }, [content, user]);
 
   let contentToDisplay;
   if (loading) {
@@ -115,7 +127,3 @@ const PostNews: React.FC = () => {
 };
 
 export default PostNews;
-
-const isValidDate = (date: Date | string): boolean => {
-  return !isNaN(new Date(date).getTime());
-};

@@ -3,9 +3,9 @@ import { sendMessage, addEventListener, removeEventListener } from './websocket'
 
 export interface CommentCreatedSuccessData {
   commentId: string;
+  userId: string;
   postId: string;
   content: string;
-  userId: string;
   userFirstName: string;
   userLastName: string;
   createdAt?: string;
@@ -20,12 +20,8 @@ const isValidDate = (date: string): boolean => {
   return !isNaN(new Date(date).getTime());
 };
 
-export function createComment(content: string, postId: string): Promise<CommentCreatedSuccessData> {
+export function createComment(content: string, postId: string, userId: string, userFirstName: string, userLastName: string): Promise<CommentCreatedSuccessData> {
   return new Promise((resolve, reject) => {
-    const userId = localStorage.getItem('currentUserId');
-    const userFirstName = localStorage.getItem('currentUserFirstName');
-    const userLastName = localStorage.getItem('currentUserLastName');
-
     if (!userId || !userFirstName || !userLastName) {
       reject(new Error('User ID, first name, or last name is missing'));
       return;
@@ -46,15 +42,10 @@ export function createComment(content: string, postId: string): Promise<CommentC
 
     const handleCommentCreateResult = (data: CommentCreatedSuccessData) => {
       console.log('Received comment.create.success message:', data);
-      console.log('Checking dates:', data.createdAt, data.updatedAt);
-
-      const createdAt = data.createdAt && isValidDate(data.createdAt) ? data.createdAt : new Date().toISOString();
-      const updatedAt = data.updatedAt && isValidDate(data.updatedAt) ? data.updatedAt : new Date().toISOString();
-
       if (data.commentId) {
-        resolve({ ...data, createdAt, updatedAt });
+        resolve(data);
       } else {
-        reject(new Error('Comment creation failed or invalid dates received'));
+        reject(new Error('Comment creation failed'));
       }
       removeEventListener('comment.create.success', handleCommentCreateResult);
     };
@@ -87,7 +78,6 @@ export function getAllComments(postId: string): Promise<Comment[]> {
     sendMessage(message);
   });
 }
-
 export function updateComment(commentId: string, content: string): Promise<Comment> {
   return new Promise((resolve, reject) => {
     const message: WebSocketMessage = {

@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
 import { login } from '../../redux/features/auth/authSlice';
-import { createUser } from '../../websocket/userWebSocket';
+import { createUserAndSetCurrent } from '../../redux/features/websocket/users/userWebsocketThunks/userWebsocketThunks';
 import { AxiosError } from 'axios';
 import './LoginComponent.css';
 
@@ -15,6 +15,72 @@ const LoginComponent: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
+
+  const handleLogin = async (
+    values: { email: string; password: string },
+    setSubmitting: (isSubmitting: boolean) => void,
+    setErrors: (errors: Partial<{ email?: string; password?: string }>) => void
+  ) => {
+    try {
+      const resultAction = await dispatch(
+        login({
+          email: values.email,
+          password: values.password
+        })
+      ).unwrap();
+
+      if (resultAction.user) {
+        await handleCreateUser(resultAction.user);
+        navigate('/');
+      }
+    } catch (error) {
+      handleLoginError(error, setErrors);
+      setSubmitting(false);
+    }
+  };
+
+  const handleCreateUser = async (user: { email: string; firstName?: string; lastName?: string }) => {
+    const createdUser = await dispatch(
+      createUserAndSetCurrent({
+        email: user.email,
+        firstName: user.firstName ?? 'DefaultFirstName',
+        lastName: user.lastName ?? 'DefaultLastName'
+      })
+    ).unwrap();
+
+    // Stocker les informations utilisateur dans localStorage
+    console.log('createdUser:', createdUser); // Ajouter un log pour vérifier la structure de createdUser
+    localStorage.setItem('currentUserId', createdUser.id); // Utilisez createdUser.id
+    localStorage.setItem('currentUserFirstName', createdUser.firstName);
+    localStorage.setItem('currentUserLastName', createdUser.lastName);
+
+    console.log('User created on the server: Java Websocket', createdUser, 'User ID for already exists:', createdUser.id);
+  };
+
+  const handleLoginError = (error: unknown, setErrors: (errors: Partial<{ email?: string; password?: string }>) => void) => {
+    if (isAxiosError(error)) {
+      if (error.message === 'Request failed with status code 404') {
+        setErrors({
+          email: 'Email or phone does not exist. Would you like to register?'
+        });
+      } else if (error.message === 'Request failed with status code 400') {
+        setErrors({
+          password: 'Incorrect password. Forgot your password?'
+        });
+      } else if (error.message === 'Request failed with status code 401' && isErrorWithResponseData(error) && error.response!.data.message === 'Email not verified') {
+        setErrors({
+          email: 'Your account is not verified. Please verify your account to continue.'
+        });
+        navigate('/verify-email', {
+          state: { email: formik.values.email }
+        });
+      } else {
+        setErrors({ email: 'An error occurred. Please try again.' });
+      }
+    } else {
+      setErrors({ email: 'An error occurred. Please try again.' });
+    }
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -25,47 +91,8 @@ const LoginComponent: React.FC = () => {
       email: Yup.string().required('Required'),
       password: Yup.string().min(6, 'Password must be at least 6 characters').required('Required')
     }),
-    onSubmit: async (values, { setSubmitting, setErrors }) => {
-      try {
-        const resultAction = await dispatch(
-          login({
-            email: values.email,
-            password: values.password
-          })
-        ).unwrap();
-
-        if (resultAction.user) {
-          console.log('User ID:', resultAction.user._id);
-          const createdUser = await createUser(resultAction.user.email, resultAction.user.firstName ?? 'DefaultFirstName', resultAction.user.lastName ?? 'DefaultLastName');
-          console.log('User created on the server: Java Websocket', createdUser, 'User ID for already exists:', createdUser.userId);
-          localStorage.setItem('currentUserId', createdUser.userId);
-          navigate('/'); // Rediriger vers la page d'accueil après une connexion réussie
-        }
-      } catch (error) {
-        setSubmitting(false);
-        if (isAxiosError(error)) {
-          if (error.message === 'Request failed with status code 404') {
-            setErrors({
-              email: 'Email or phone does not exist. Would you like to register?'
-            });
-          } else if (error.message === 'Request failed with status code 400') {
-            setErrors({
-              password: 'Incorrect password. Forgot your password?'
-            });
-          } else if (error.message === 'Request failed with status code 401' && isErrorWithResponseData(error) && error.response!.data.message === 'Email not verified') {
-            setErrors({
-              email: 'Your account is not verified. Please verify your account to continue.'
-            });
-            navigate('/verify-email', {
-              state: { email: values.email }
-            });
-          } else {
-            setErrors({ email: 'An error occurred. Please try again.' });
-          }
-        } else {
-          setErrors({ email: 'An error occurred. Please try again.' });
-        }
-      }
+    onSubmit: (values, { setSubmitting, setErrors }) => {
+      handleLogin(values, setSubmitting, setErrors);
     }
   });
 

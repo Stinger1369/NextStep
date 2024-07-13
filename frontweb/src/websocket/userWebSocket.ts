@@ -27,23 +27,32 @@ export function getCurrentUser(userId: string): Promise<User> {
   });
 }
 
-export function createUser(email: string, firstName: string, lastName: string): Promise<{ userId: string }> {
+export function createUser(email: string, firstName: string, lastName: string): Promise<User> {
   return new Promise((resolve, reject) => {
     const message: WebSocketMessage = {
       type: 'user.create',
       payload: { email, firstName, lastName }
     };
 
-    const handleUserCreateResult = (data: { userId: string }) => {
-      if (data.userId) {
-        resolve(data);
-      } else {
+    const handleUserCreateResult = async (data: { userId: string }) => {
+      try {
+        const user = await getUserById(data.userId); // Fetch the full user details
+        resolve(user);
+      } catch (error) {
         reject(new Error('User creation failed'));
+      } finally {
+        removeEventListener('user.create.success', handleUserCreateResult);
       }
-      removeEventListener('user.create.success', handleUserCreateResult);
+    };
+
+    const handleError = (error: unknown) => {
+      reject(error);
+      removeEventListener('error', handleError);
     };
 
     addEventListener('user.create.success', handleUserCreateResult);
+    addEventListener('error', handleError);
+
     sendMessage(message);
   });
 }
@@ -68,7 +77,7 @@ export function getUserByEmail(email: string): Promise<User> {
 export function getUserById(userId: string): Promise<User> {
   return new Promise((resolve, reject) => {
     const message: WebSocketMessage = {
-      type: 'user.getById',
+      type: 'user.getById', // Ensure the type matches what the server expects
       payload: { userId }
     };
 

@@ -1,5 +1,3 @@
-// src/redux/features/websocket/users/userWebSocketSlice.ts
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../../../../types';
 
@@ -28,6 +26,7 @@ const userWebSocketSlice = createSlice({
     createUserSuccess(state, action: PayloadAction<User>) {
       state.loading = false;
       state.currentUser = action.payload;
+      state.users[action.payload.id] = action.payload;
     },
     createUserFailure(state, action: PayloadAction<string>) {
       state.loading = false;
@@ -39,15 +38,18 @@ const userWebSocketSlice = createSlice({
     },
     fetchUserSuccess(state, action: PayloadAction<User>) {
       state.loading = false;
-      state.users[action.payload._id] = action.payload;
+      state.users[action.payload.id] = action.payload;
     },
     fetchUserFailure(state, action: PayloadAction<string>) {
       state.loading = false;
       state.error = action.payload;
+    },
+    setCurrentUser(state, action: PayloadAction<User | null>) {
+      state.currentUser = action.payload;
     }
   }
 });
 
-export const { createUserRequest, createUserSuccess, createUserFailure, fetchUserRequest, fetchUserSuccess, fetchUserFailure } = userWebSocketSlice.actions;
+export const { createUserRequest, createUserSuccess, createUserFailure, fetchUserRequest, fetchUserSuccess, fetchUserFailure, setCurrentUser } = userWebSocketSlice.actions;
 
 export default userWebSocketSlice.reducer;
