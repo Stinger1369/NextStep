@@ -19,10 +19,6 @@ const initialState: CommentState = {
   error: null
 };
 
-const isValidDate = (date: string | Date): boolean => {
-  return !isNaN(new Date(date).getTime());
-};
-
 const commentSlice = createSlice({
   name: 'comments',
   initialState,
@@ -35,8 +31,8 @@ const commentSlice = createSlice({
       state.loading = false;
       state.comments = action.payload.map((comment) => ({
         ...comment,
-        createdAt: isValidDate(comment.createdAt) ? new Date(comment.createdAt).toISOString() : 'Invalid Date',
-        updatedAt: isValidDate(comment.updatedAt) ? new Date(comment.updatedAt).toISOString() : 'Invalid Date'
+        createdAt: new Date(comment.createdAt).toISOString(),
+        updatedAt: new Date(comment.updatedAt).toISOString()
       }));
       console.log('Comments in fetchCommentsSuccess:', state.comments);
     },
@@ -45,20 +41,25 @@ const commentSlice = createSlice({
       state.error = action.payload;
     },
     addComment(state, action: PayloadAction<Comment>) {
-      state.comments.unshift({
-        ...action.payload,
-        createdAt: isValidDate(action.payload.createdAt) ? new Date(action.payload.createdAt).toISOString() : new Date().toISOString(),
-        updatedAt: isValidDate(action.payload.updatedAt) ? new Date(action.payload.updatedAt).toISOString() : new Date().toISOString()
-      });
-      console.log('Comment added:', action.payload);
+      const exists = state.comments.some((comment) => comment.id === action.payload.id);
+      if (!exists) {
+        state.comments.unshift({
+          ...action.payload,
+          createdAt: new Date(action.payload.createdAt).toISOString(),
+          updatedAt: new Date(action.payload.updatedAt).toISOString()
+        });
+        console.log('Comment added:', action.payload);
+      } else {
+        console.log('Comment already exists:', action.payload);
+      }
     },
     updateComment(state, action: PayloadAction<Comment>) {
       const index = state.comments.findIndex((comment) => comment.id === action.payload.id);
       if (index !== -1) {
         state.comments[index] = {
           ...action.payload,
-          createdAt: isValidDate(action.payload.createdAt) ? new Date(action.payload.createdAt).toISOString() : new Date().toISOString(),
-          updatedAt: isValidDate(action.payload.updatedAt) ? new Date(action.payload.updatedAt).toISOString() : new Date().toISOString()
+          createdAt: new Date(action.payload.createdAt).toISOString(),
+          updatedAt: new Date(action.payload.updatedAt).toISOString()
         };
         console.log('Comment updated:', action.payload);
       }
@@ -74,12 +75,14 @@ export const { fetchCommentsRequest, fetchCommentsSuccess, fetchCommentsFailure,
 
 export default commentSlice.reducer;
 
-export const selectCommentsWithDates = createSelector(
+export const selectCommentsWithDatesByPostId = createSelector(
   (state: RootState) => state.comments.comments,
-  (comments) =>
-    comments.map((comment) => ({
-      ...comment,
-      createdAt: isValidDate(comment.createdAt) ? new Date(comment.createdAt) : 'Invalid Date',
-      updatedAt: isValidDate(comment.updatedAt) ? new Date(comment.updatedAt) : 'Invalid Date'
-    }))
+  (comments) => (postId: string) =>
+    comments
+      .filter((comment) => comment.postId === postId)
+      .map((comment) => ({
+        ...comment,
+        createdAt: new Date(comment.createdAt),
+        updatedAt: new Date(comment.updatedAt)
+      }))
 );

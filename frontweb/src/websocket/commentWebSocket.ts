@@ -6,8 +6,8 @@ export interface CommentCreatedSuccessData {
   postId: string;
   content: string;
   userId: string;
-  createdAt?: string; // Champs optionnels
-  updatedAt?: string; // Champs optionnels
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CommentGetAllSuccessData {
@@ -41,7 +41,6 @@ export function createComment(content: string, postId: string): Promise<CommentC
       console.log('Received comment.create.success message:', data);
       console.log('Checking dates:', data.createdAt, data.updatedAt);
 
-      // Ajout de valeurs par défaut pour les dates
       const createdAt = data.createdAt && isValidDate(data.createdAt) ? data.createdAt : new Date().toISOString();
       const updatedAt = data.updatedAt && isValidDate(data.updatedAt) ? data.updatedAt : new Date().toISOString();
 
