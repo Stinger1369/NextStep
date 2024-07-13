@@ -12,9 +12,7 @@ import org.springframework.web.socket.WebSocketSession;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 public class PostWebSocketHandler {
@@ -34,6 +32,9 @@ public class PostWebSocketHandler {
     }
 
     public void handleMessage(WebSocketSession session, String messageType, JsonNode payload) {
+        logger.info("Received message of type: {}", messageType);
+        logger.info("Payload: {}", payload.toString());
+
         switch (messageType) {
             case "post.create":
                 handlePostCreate(session, payload);
@@ -53,26 +54,29 @@ public class PostWebSocketHandler {
     }
 
     private void handlePostCreate(WebSocketSession session, JsonNode payload) {
-        if (payload.hasNonNull(USER_ID) && payload.hasNonNull(CONTENT)) {
+        logger.info("Handling post.create with payload: {}", payload.toString());
+
+        if (payload.hasNonNull(USER_ID) && payload.hasNonNull(CONTENT) && payload.hasNonNull(TITLE)) {
             String userId = payload.get(USER_ID).asText();
+            String title = payload.get(TITLE).asText();
             String content = payload.get(CONTENT).asText();
-            String title =
-                    payload.hasNonNull(TITLE) ? payload.get(TITLE).asText() : "Default Title";
+
+            logger.info("Creating post with userId: {}, title: {}, content: {}", userId, title, content);
 
             Post post = new Post(userId, title, content);
 
             postService.createPost(post).subscribe(createdPost -> {
                 try {
-                    String response = objectMapper
-                            .writeValueAsString(Map.of("type", "post.create.success", "payload",
-                                    Map.of("postId", createdPost.getId().toHexString())));
-                    session.sendMessage(new TextMessage(response));
+                    session.sendMessage(new TextMessage(
+                            String.format("{\"type\":\"post.create.success\",\"payload\":{\"postId\":\"%s\"}}", createdPost.getId().toHexString())));
                     logger.info("Post created: {}", createdPost);
                 } catch (IOException e) {
                     logger.error("Error sending post creation confirmation", e);
                 }
             }, error -> sendErrorMessage(session, "Error creating post", error));
         } else {
+            logger.error("Missing fields in post.create payload: userId={}, title={}, content={}",
+                    payload.hasNonNull(USER_ID), payload.hasNonNull(TITLE), payload.hasNonNull(CONTENT));
             sendErrorMessage(session, "Missing fields in post.create payload", null);
         }
     }
@@ -80,21 +84,22 @@ public class PostWebSocketHandler {
     private void handleGetAllPosts(WebSocketSession session) {
         postService.getAllPosts().collectList().subscribe(posts -> {
             try {
-                List<Map<String, Object>> postList = posts.stream()
-                        .map(post -> Map.of("_id", post.getId().toHexString(), "userId",
-                                post.getUserId(), "title", post.getTitle(), "content",
-                                post.getContent(), "createdAt", post.getCreatedAt(), "updatedAt",
-                                post.getUpdatedAt(), "comments", post.getComments()))
-                        .collect(Collectors.toList());
-
-                String response = objectMapper.writeValueAsString(Map.of("type",
-                        "post.getAll.success", "payload", Map.of("posts", postList)));
-                session.sendMessage(new TextMessage(response));
-                logger.info("Sent all posts: {}", response);
+                String result = objectMapper.writeValueAsString(
+                        Map.of("type", "post.getAll.success", "payload", Map.of("posts", posts)));
+                session.sendMessage(new TextMessage(result));
+                logger.info("Sent all posts: {}", result);
             } catch (IOException e) {
                 logger.error("Error sending all posts", e);
             }
-        }, error -> sendErrorMessage(session, "Error fetching posts", error));
+        }, error -> {
+            try {
+                session.sendMessage(new TextMessage(
+                        "{\"type\":\"error\",\"payload\":{\"message\":\"Error fetching posts\"}}"));
+                logger.error("Error fetching posts", error);
+            } catch (IOException e) {
+                logger.error("Error sending error message", e);
+            }
+        });
     }
 
     private void handleGetPost(WebSocketSession session, JsonNode payload) {
@@ -102,13 +107,8 @@ public class PostWebSocketHandler {
             String postId = payload.get(POST_ID).asText();
             postService.getPostById(postId).subscribe(post -> {
                 try {
-                    String response = objectMapper.writeValueAsString(Map.of("type",
-                            "post.getById.success", "payload",
-                            Map.of("id", post.getId().toHexString(), "userId", post.getUserId(),
-                                    "title", post.getTitle(), "content", post.getContent(),
-                                    "createdAt", post.getCreatedAt(), "updatedAt",
-                                    post.getUpdatedAt(), "comments", post.getComments())));
-                    session.sendMessage(new TextMessage(response));
+                    session.sendMessage(new TextMessage(String.format(
+                            "Post retrieved. It has %d comments", post.getComments().size())));
                     logger.info("Post retrieved: {}", post);
                 } catch (IOException e) {
                     logger.error("Error sending post retrieval confirmation", e);
@@ -123,14 +123,6 @@ public class PostWebSocketHandler {
         if (payload.hasNonNull(POST_ID)) {
             String postId = payload.get(POST_ID).asText();
             postService.deletePost(postId).subscribe(unused -> {
-                try {
-                    String response = objectMapper.writeValueAsString(Map.of("type",
-                            "post.delete.success", "payload", Map.of("postId", postId)));
-                    session.sendMessage(new TextMessage(response));
-                    logger.info("Post deleted with ID: {}", postId);
-                } catch (IOException e) {
-                    logger.error("Error sending post deletion confirmation", e);
-                }
             }, error -> sendErrorMessage(session, "Error deleting post", error));
         } else {
             sendErrorMessage(session, "Missing postId in post.delete payload", null);
@@ -140,10 +132,9 @@ public class PostWebSocketHandler {
     private void sendErrorMessage(WebSocketSession session, String errorMessage, Throwable error) {
         logger.error("{}: {}", errorMessage, error != null ? error.getMessage() : "N/A", error);
         try {
-            String response = objectMapper
-                    .writeValueAsString(Map.of("type", "error", "payload", Map.of("message",
-                            errorMessage + (error != null ? ": " + error.getMessage() : ""))));
-            session.sendMessage(new TextMessage(response));
+            session.sendMessage(new TextMessage(
+                    String.format("{\"type\":\"error\",\"payload\":{\"message\":\"%s: %s\"}}",
+                            errorMessage, error != null ? error.getMessage() : "N/A")));
         } catch (IOException e) {
             logger.error("Error sending error message", e);
         }

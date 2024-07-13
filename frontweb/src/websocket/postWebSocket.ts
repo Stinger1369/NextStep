@@ -10,17 +10,20 @@ export interface PostGetAllSuccessData {
   posts: Post[];
 }
 
-export function createPost(content: string, userId: string): Promise<string> {
+export function createPost(content: string): Promise<string> {
   return new Promise((resolve, reject) => {
+    const userId = localStorage.getItem('currentUserId');
+    if (!userId) {
+      reject(new Error('User ID is missing'));
+      return;
+    }
+
     const message: WebSocketMessage = {
       type: 'post.create',
       payload: {
         userId,
-        title: 'Default Title',
-        content,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        comments: []
+        title: 'Default Title', // Default title
+        content
       }
     };
 

@@ -1,3 +1,4 @@
+// src/components/HomeJob/HomeJob.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
@@ -50,7 +51,7 @@ const HomeJob: React.FC = () => {
       const handlePostCreateSuccess = (data: PostCreatedSuccessData) => {
         console.log('Handling post.create.success event:', data);
         const newPost: Post = {
-          _id: data.postId,
+          id: data.postId,
           userId: user._id,
           title: 'Default Title',
           content,
@@ -71,15 +72,14 @@ const HomeJob: React.FC = () => {
   }, [user, dispatch, content]);
 
   const handleCreatePost = useCallback(() => {
-    if (!user) return;
-    console.log('Creating post for user:', user._id);
-    createPost(content, user._id)
+    console.log('Creating post...');
+    createPost(content)
       .then((postId) => {
         console.log('Post created with ID:', postId);
         setContent('');
       })
       .catch((error) => console.error('Error creating post:', error));
-  }, [content, user]);
+  }, [content]);
 
   return (
     <div className="home-job">

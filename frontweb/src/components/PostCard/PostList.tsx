@@ -11,7 +11,7 @@ const PostList: React.FC<PostListProps> = ({ posts }) => {
   return (
     <div>
       {posts.map((post) => (
-        <PostCard key={post._id} post={post} />
+        <PostCard key={JSON.stringify(post.id)} post={post} />
       ))}
     </div>
   );

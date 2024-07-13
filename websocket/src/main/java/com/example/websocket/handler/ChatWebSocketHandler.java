@@ -52,6 +52,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 case "post.create":
                 case "post.getById":
                 case "post.getAll":
+                case "post.delete":
                     postHandler.handleMessage(session, messageType, payload);
                     break;
                 case "comment.create":
