@@ -11,6 +11,8 @@ public class Notification {
     @Id
     private String id;
     private String userId;
+    private String firstName;
+    private String lastName;
     private String message;
     private Date createdAt;
     private Date updatedAt;
@@ -21,9 +23,11 @@ public class Notification {
         this.updatedAt = new Date();
     }
 
-    public Notification(String userId, String message) {
+    public Notification(String userId, String firstName, String lastName, String message) {
         this();
         this.userId = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.message = message;
     }
 
@@ -43,6 +47,22 @@ public class Notification {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getMessage() {

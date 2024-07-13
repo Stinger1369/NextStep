@@ -12,7 +12,7 @@ const CommentCard: React.FC<CommentCardProps> = ({ comment }) => {
       <CardContent>
         <Typography variant="body1">{comment.content}</Typography>
         <Typography variant="caption">
-          Commented by {comment.userId} on {new Date(comment.createdAt).toLocaleString()}
+          Commented by {comment.firstName} {comment.lastName} on {new Date(comment.createdAt).toLocaleString()}
         </Typography>
       </CardContent>
     </Card>

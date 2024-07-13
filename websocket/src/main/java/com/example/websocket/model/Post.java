@@ -13,6 +13,8 @@ public class Post {
     @Id
     private String id;
     private String userId;
+    private String userFirstName;
+    private String userLastName;
     private String title;
     private String content;
     private Date createdAt;
@@ -28,14 +30,17 @@ public class Post {
         this.updatedAt = new Date();
     }
 
-    public Post(String userId, String title, String content) {
+    public Post(String userId, String userFirstName, String userLastName, String title,
+            String content) {
         this();
         this.userId = userId;
+        this.userFirstName = userFirstName;
+        this.userLastName = userLastName;
         this.title = title;
         this.content = content;
     }
 
-    // Getters and setters
+    // Getters et setters
 
     public String getId() {
         return id;
@@ -51,6 +56,22 @@ public class Post {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getUserFirstName() {
+        return userFirstName;
+    }
+
+    public void setUserFirstName(String userFirstName) {
+        this.userFirstName = userFirstName;
+    }
+
+    public String getUserLastName() {
+        return userLastName;
+    }
+
+    public void setUserLastName(String userLastName) {
+        this.userLastName = userLastName;
     }
 
     public String getTitle() {

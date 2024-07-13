@@ -13,7 +13,11 @@ public class Conversation {
     @Id
     private String id;
     private String senderId;
+    private String senderFirstName;
+    private String senderLastName;
     private String receiverId;
+    private String receiverFirstName;
+    private String receiverLastName;
     private String name;
     private List<Message> messages = new ArrayList<>();
     private Date createdAt;
@@ -25,12 +29,19 @@ public class Conversation {
         this.updatedAt = new Date();
     }
 
-    public Conversation(String senderId, String receiverId, String name) {
+    public Conversation(String senderId, String senderFirstName, String senderLastName,
+            String receiverId, String receiverFirstName, String receiverLastName, String name) {
         this();
         this.senderId = senderId;
+        this.senderFirstName = senderFirstName;
+        this.senderLastName = senderLastName;
         this.receiverId = receiverId;
+        this.receiverFirstName = receiverFirstName;
+        this.receiverLastName = receiverLastName;
         this.name = name;
     }
+
+    // Getters and setters
 
     public String getId() {
         return id;
@@ -48,12 +59,44 @@ public class Conversation {
         this.senderId = senderId;
     }
 
+    public String getSenderFirstName() {
+        return senderFirstName;
+    }
+
+    public void setSenderFirstName(String senderFirstName) {
+        this.senderFirstName = senderFirstName;
+    }
+
+    public String getSenderLastName() {
+        return senderLastName;
+    }
+
+    public void setSenderLastName(String senderLastName) {
+        this.senderLastName = senderLastName;
+    }
+
     public String getReceiverId() {
         return receiverId;
     }
 
     public void setReceiverId(String receiverId) {
         this.receiverId = receiverId;
+    }
+
+    public String getReceiverFirstName() {
+        return receiverFirstName;
+    }
+
+    public void setReceiverFirstName(String receiverFirstName) {
+        this.receiverFirstName = receiverFirstName;
+    }
+
+    public String getReceiverLastName() {
+        return receiverLastName;
+    }
+
+    public void setReceiverLastName(String receiverLastName) {
+        this.receiverLastName = receiverLastName;
     }
 
     public String getName() {
@@ -105,6 +148,8 @@ public class Conversation {
             this.content = content;
             this.timestamp = new Date();
         }
+
+        // Getters and setters
 
         public String getId() {
             return id;

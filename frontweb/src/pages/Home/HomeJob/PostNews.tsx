@@ -56,6 +56,8 @@ const PostNews: React.FC = () => {
         const newPost: Post = {
           id: data.postId,
           userId: user._id,
+          userFirstName: user.firstName, // Ajouté
+          userLastName: user.lastName, // Ajouté
           title: 'Default Title',
           content,
           createdAt: new Date().toISOString(),

@@ -30,19 +30,20 @@ public class CommentService {
     }
 
     public Mono<Comment> createComment(Comment comment) {
-        return commentRepository.save(comment).flatMap(
-                savedComment -> userRepository.findById(comment.getUserId()).flatMap(user -> {
-                    Post post = user.getPosts().stream()
-                            .filter(p -> p.getId().equals(comment.getPostId())).findFirst()
-                            .orElseThrow(() -> new IllegalArgumentException(POST_NOT_FOUND));
-                    post.addComment(savedComment);
-                    return userRepository.save(user).thenReturn(savedComment);
-                })).doOnSuccess(savedComment -> {
-                    postService.addCommentToPost(savedComment.getPostId(), savedComment)
-                            .subscribe();
-                    logger.info("Comment saved: {}", comment);
-                })
-                .doOnError(error -> logger.error("Error creating comment: {}", error.getMessage()));
+        return userRepository.findById(comment.getUserId()).flatMap(user -> {
+            comment.setFirstName(user.getFirstName());
+            comment.setLastName(user.getLastName());
+            return commentRepository.save(comment).flatMap(savedComment -> {
+                Post post = user.getPosts().stream()
+                        .filter(p -> p.getId().equals(comment.getPostId())).findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException(POST_NOT_FOUND));
+                post.addComment(savedComment);
+                return userRepository.save(user).thenReturn(savedComment);
+            }).doOnSuccess(savedComment -> {
+                postService.addCommentToPost(savedComment.getPostId(), savedComment).subscribe();
+                logger.info("Comment saved: {}", comment);
+            }).doOnError(error -> logger.error("Error creating comment: {}", error.getMessage()));
+        });
     }
 
     public Mono<Comment> updateComment(String commentId, Comment newCommentData) {

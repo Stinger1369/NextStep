@@ -1,4 +1,3 @@
-// src/redux/features/websocket/posts/postSlice.ts
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
 import { Post } from '../../../../types';

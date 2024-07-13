@@ -6,6 +6,8 @@ export interface CommentCreatedSuccessData {
   postId: string;
   content: string;
   userId: string;
+  userFirstName: string;
+  userLastName: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -21,8 +23,11 @@ const isValidDate = (date: string): boolean => {
 export function createComment(content: string, postId: string): Promise<CommentCreatedSuccessData> {
   return new Promise((resolve, reject) => {
     const userId = localStorage.getItem('currentUserId');
-    if (!userId) {
-      reject(new Error('User ID is missing'));
+    const userFirstName = localStorage.getItem('currentUserFirstName');
+    const userLastName = localStorage.getItem('currentUserLastName');
+
+    if (!userId || !userFirstName || !userLastName) {
+      reject(new Error('User ID, first name, or last name is missing'));
       return;
     }
 
@@ -30,6 +35,8 @@ export function createComment(content: string, postId: string): Promise<CommentC
       type: 'comment.create',
       payload: {
         userId,
+        userFirstName,
+        userLastName,
         postId,
         content
       }

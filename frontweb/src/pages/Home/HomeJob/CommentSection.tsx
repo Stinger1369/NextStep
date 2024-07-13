@@ -41,6 +41,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
         userId: data.userId,
         postId: data.postId,
         content: data.content,
+        firstName: data.userFirstName, // Ajouté
+        lastName: data.userLastName, // Ajouté
         createdAt: data.createdAt ? new Date(data.createdAt).toISOString() : new Date().toISOString(),
         updatedAt: data.updatedAt ? new Date(data.updatedAt).toISOString() : new Date().toISOString()
       };

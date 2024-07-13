@@ -2,6 +2,7 @@ package com.example.websocket.handler;
 
 import com.example.websocket.model.Conversation;
 import com.example.websocket.service.ConversationService;
+import com.example.websocket.service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -19,12 +20,17 @@ public class ConversationWebSocketHandler {
     private static final Logger logger =
             LoggerFactory.getLogger(ConversationWebSocketHandler.class);
 
+    private static final String CONVERSATION_ID = "conversationId";
+    private static final String PAYLOAD = "payload";
+
     private final ConversationService conversationService;
+    private final UserService userService;
     private final ObjectMapper objectMapper;
 
     public ConversationWebSocketHandler(ConversationService conversationService,
-            ObjectMapper objectMapper) {
+            UserService userService, ObjectMapper objectMapper) {
         this.conversationService = conversationService;
+        this.userService = userService;
         this.objectMapper = objectMapper;
     }
 
@@ -63,10 +69,13 @@ public class ConversationWebSocketHandler {
             return;
         }
 
-        Conversation conversation = new Conversation(senderId, receiverId, name);
-
-        conversationService.createConversation(conversation, initialMessage)
-                .subscribe(createdConversation -> {
+        userService.getUserById(senderId).zipWith(userService.getUserById(receiverId))
+                .flatMap(tuple -> {
+                    Conversation conversation = new Conversation(senderId,
+                            tuple.getT1().getFirstName(), tuple.getT1().getLastName(), receiverId,
+                            tuple.getT2().getFirstName(), tuple.getT2().getLastName(), name);
+                    return conversationService.createConversation(conversation, initialMessage);
+                }).subscribe(createdConversation -> {
                     try {
                         session.sendMessage(new TextMessage(String.format(
                                 "Conversation created with ID: %s", createdConversation.getId())));
@@ -79,8 +88,7 @@ public class ConversationWebSocketHandler {
 
     private void handleGetConversationById(WebSocketSession session, JsonNode payload) {
         String conversationId =
-                payload.hasNonNull("conversationId") ? payload.get("conversationId").asText()
-                        : null;
+                payload.hasNonNull(CONVERSATION_ID) ? payload.get(CONVERSATION_ID).asText() : null;
 
         if (conversationId == null) {
             sendErrorMessage(session, "Missing conversationId in conversation.getById payload",
@@ -91,7 +99,7 @@ public class ConversationWebSocketHandler {
         conversationService.getConversationById(conversationId).subscribe(conversation -> {
             try {
                 String result = objectMapper.writeValueAsString(
-                        Map.of("type", "conversation.getById.success", "payload", conversation));
+                        Map.of("type", "conversation.getById.success", PAYLOAD, conversation));
                 session.sendMessage(new TextMessage(result));
                 logger.info("Conversation retrieved: {}", conversation);
             } catch (IOException e) {
@@ -104,7 +112,7 @@ public class ConversationWebSocketHandler {
         conversationService.getAllConversations().collectList().subscribe(conversations -> {
             try {
                 String result = objectMapper
-                        .writeValueAsString(Map.of("type", "conversation.getAll.success", "payload",
+                        .writeValueAsString(Map.of("type", "conversation.getAll.success", PAYLOAD,
                                 Map.of("conversations", conversations)));
                 session.sendMessage(new TextMessage(result));
                 logger.info("Sent all conversations: {}", result);
@@ -124,8 +132,7 @@ public class ConversationWebSocketHandler {
 
     private void handleUpdateConversation(WebSocketSession session, JsonNode payload) {
         String conversationId =
-                payload.hasNonNull("conversationId") ? payload.get("conversationId").asText()
-                        : null;
+                payload.hasNonNull(CONVERSATION_ID) ? payload.get(CONVERSATION_ID).asText() : null;
 
         if (conversationId == null) {
             sendErrorMessage(session, "Missing conversationId in conversation.update payload",
@@ -137,7 +144,7 @@ public class ConversationWebSocketHandler {
                 .subscribe(updatedConversation -> {
                     try {
                         String result = objectMapper.writeValueAsString(Map.of("type",
-                                "conversation.update.success", "payload", updatedConversation));
+                                "conversation.update.success", PAYLOAD, updatedConversation));
                         session.sendMessage(new TextMessage(result));
                         logger.info("Conversation updated: {}", updatedConversation);
                     } catch (IOException e) {
@@ -148,8 +155,7 @@ public class ConversationWebSocketHandler {
 
     private void handleDeleteConversation(WebSocketSession session, JsonNode payload) {
         String conversationId =
-                payload.hasNonNull("conversationId") ? payload.get("conversationId").asText()
-                        : null;
+                payload.hasNonNull(CONVERSATION_ID) ? payload.get(CONVERSATION_ID).asText() : null;
 
         if (conversationId == null) {
             sendErrorMessage(session, "Missing conversationId in conversation.delete payload",

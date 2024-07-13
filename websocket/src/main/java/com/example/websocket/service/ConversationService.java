@@ -38,6 +38,7 @@ public class ConversationService {
                     userRepository.findById(savedConversation.getReceiverId()).flatMap(receiver -> {
                         receiver.addConversation(savedConversation);
                         Notification notification = new Notification(receiver.getId(),
+                                receiver.getFirstName(), receiver.getLastName(),
                                 "New conversation started by: " + savedConversation.getSenderId());
                         return notificationService.createNotification(notification)
                                 .flatMap(savedNotification -> {

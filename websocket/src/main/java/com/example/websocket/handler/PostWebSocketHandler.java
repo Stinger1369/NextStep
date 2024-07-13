@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class PostWebSocketHandler {
 
     public void handleMessage(WebSocketSession session, String messageType, JsonNode payload) {
         logger.info("Received message of type: {}", messageType);
-        logger.info("Payload: {}", payload.toString());
+        logger.info("Payload: {}", payload);
 
         switch (messageType) {
             case "post.create":
@@ -65,7 +66,7 @@ public class PostWebSocketHandler {
     }
 
     private void handlePostCreate(WebSocketSession session, JsonNode payload) {
-        logger.info("Handling post.create with payload: {}", payload.toString());
+        logger.info("Handling post.create with payload: {}", payload);
 
         if (payload.hasNonNull(USER_ID) && payload.hasNonNull(CONTENT)
                 && payload.hasNonNull(TITLE)) {
@@ -76,18 +77,17 @@ public class PostWebSocketHandler {
             logger.info("Creating post with userId: {}, title: {}, content: {}", userId, title,
                     content);
 
-            Post post = new Post(userId, title, content);
-
-            postService.createPost(post).subscribe(createdPost -> {
-                try {
-                    session.sendMessage(new TextMessage(String.format(
-                            "{\"type\":\"post.create.success\",\"payload\":{\"postId\":\"%s\"}}",
-                            createdPost.getId().toString())));
-                    logger.info("Post created: {}", createdPost);
-                } catch (IOException e) {
-                    logger.error("Error sending post creation confirmation", e);
-                }
-            }, error -> sendErrorMessage(session, "Error creating post", error));
+            postService.createPost(new Post(userId, null, null, title, content))
+                    .subscribe(createdPost -> {
+                        try {
+                            session.sendMessage(new TextMessage(String.format(
+                                    "{\"type\":\"post.create.success\",\"payload\":{\"postId\":\"%s\"}}",
+                                    createdPost.getId())));
+                            logger.info("Post created: {}", createdPost);
+                        } catch (IOException e) {
+                            logger.error("Error sending post creation confirmation", e);
+                        }
+                    }, error -> sendErrorMessage(session, "Error creating post", error));
         } else {
             logger.error("Missing fields in post.create payload: userId={}, title={}, content={}",
                     payload.hasNonNull(USER_ID), payload.hasNonNull(TITLE),

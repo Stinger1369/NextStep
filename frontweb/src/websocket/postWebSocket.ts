@@ -1,9 +1,10 @@
-// src/websocket/postWebSocket.ts
 import { WebSocketMessage, Post } from '../types';
 import { sendMessage, addEventListener, removeEventListener } from './websocket';
 
 export interface PostCreatedSuccessData {
   postId: string;
+  userFirstName: string;
+  userLastName: string;
 }
 
 export interface PostGetAllSuccessData {
@@ -13,8 +14,11 @@ export interface PostGetAllSuccessData {
 export function createPost(content: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const userId = localStorage.getItem('currentUserId');
-    if (!userId) {
-      reject(new Error('User ID is missing'));
+    const userFirstName = localStorage.getItem('currentUserFirstName');
+    const userLastName = localStorage.getItem('currentUserLastName');
+
+    if (!userId || !userFirstName || !userLastName) {
+      reject(new Error('User ID, first name, or last name is missing'));
       return;
     }
 
@@ -22,6 +26,8 @@ export function createPost(content: string): Promise<string> {
       type: 'post.create',
       payload: {
         userId,
+        userFirstName,
+        userLastName,
         title: 'Default Title', // Default title
         content
       }

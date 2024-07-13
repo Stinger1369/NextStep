@@ -12,6 +12,8 @@ public class Comment {
     private String id;
     private String userId;
     private String postId;
+    private String firstName;
+    private String lastName;
     private String content;
     private Date createdAt;
     private Date updatedAt;
@@ -22,12 +24,17 @@ public class Comment {
         this.updatedAt = new Date();
     }
 
-    public Comment(String userId, String postId, String content) {
+    public Comment(String userId, String postId, String firstName, String lastName,
+            String content) {
         this();
         this.userId = userId;
         this.postId = postId;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.content = content;
     }
+
+    // Getters and setters
 
     public String getId() {
         return id;
@@ -51,6 +58,22 @@ public class Comment {
 
     public void setPostId(String postId) {
         this.postId = postId;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getContent() {

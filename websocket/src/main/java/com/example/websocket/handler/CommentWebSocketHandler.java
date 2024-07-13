@@ -3,6 +3,7 @@ package com.example.websocket.handler;
 import com.example.websocket.model.Comment;
 import com.example.websocket.service.CommentService;
 import com.example.websocket.service.PostService;
+import com.example.websocket.service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Map;
@@ -25,15 +27,19 @@ public class CommentWebSocketHandler {
     private static final String PAYLOAD = "payload";
     private static final String CREATED_AT = "createdAt";
     private static final String UPDATED_AT = "updatedAt";
+    private static final String FIRST_NAME = "firstName";
+    private static final String LAST_NAME = "lastName";
 
     private final CommentService commentService;
-    private final PostService postService; // Ajouter cette ligne
+    private final PostService postService;
+    private final UserService userService;
     private final ObjectMapper objectMapper;
 
     public CommentWebSocketHandler(CommentService commentService, PostService postService,
-            ObjectMapper objectMapper) { // Modifier le constructeur
+            UserService userService, ObjectMapper objectMapper) {
         this.commentService = commentService;
-        this.postService = postService; // Initialiser postService
+        this.postService = postService;
+        this.userService = userService;
         this.objectMapper = objectMapper;
     }
 
@@ -62,34 +68,36 @@ public class CommentWebSocketHandler {
     private void handleCommentCreate(WebSocketSession session, JsonNode payload) {
         if (payload.hasNonNull(USER_ID) && payload.hasNonNull(POST_ID)
                 && payload.hasNonNull(CONTENT)) {
-            Comment comment = new Comment(payload.get(USER_ID).asText(),
-                    payload.get(POST_ID).asText(), payload.get(CONTENT).asText());
+            String userId = payload.get(USER_ID).asText();
+            String postId = payload.get(POST_ID).asText();
+            String content = payload.get(CONTENT).asText();
 
-            logger.info("Creating comment: {}", comment);
+            userService.getUserById(userId).flatMap(user -> {
+                Comment comment = new Comment(userId, postId, user.getFirstName(),
+                        user.getLastName(), content);
 
-            commentService.createComment(comment).subscribe(savedComment -> {
-                // Ajouter le commentaire au post correspondant
-                postService.addCommentToPost(comment.getPostId(), comment)
-                        .subscribe(updatedPost -> {
-                            try {
-                                SimpleDateFormat sdf =
-                                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-                                String createdAt = sdf.format(comment.getCreatedAt());
-                                String updatedAt = sdf.format(comment.getUpdatedAt());
+                logger.info("Creating comment: {}", comment);
 
-                                String result = objectMapper.writeValueAsString(Map.of("type",
-                                        "comment.create.success", PAYLOAD,
-                                        Map.of(COMMENT_ID, comment.getId(), POST_ID,
-                                                comment.getPostId(), USER_ID, comment.getUserId(),
-                                                CONTENT, comment.getContent(), CREATED_AT,
-                                                createdAt, UPDATED_AT, updatedAt)));
-                                session.sendMessage(new TextMessage(result));
-                                logger.info("Comment added to post: {}", updatedPost);
-                            } catch (IOException e) {
-                                logger.error("Error sending comment creation confirmation", e);
-                            }
-                        }, error -> sendErrorMessage(session, "Error updating post with comment",
-                                error));
+                return commentService.createComment(comment).flatMap(savedComment -> postService
+                        .addCommentToPost(postId, savedComment).thenReturn(savedComment));
+            }).subscribe(savedComment -> {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+                    String createdAt = sdf.format(savedComment.getCreatedAt());
+                    String updatedAt = sdf.format(savedComment.getUpdatedAt());
+
+                    String result = objectMapper.writeValueAsString(Map.of("type",
+                            "comment.create.success", PAYLOAD,
+                            Map.of(COMMENT_ID, savedComment.getId(), POST_ID,
+                                    savedComment.getPostId(), USER_ID, savedComment.getUserId(),
+                                    FIRST_NAME, savedComment.getFirstName(), LAST_NAME,
+                                    savedComment.getLastName(), CONTENT, savedComment.getContent(),
+                                    CREATED_AT, createdAt, UPDATED_AT, updatedAt)));
+                    session.sendMessage(new TextMessage(result));
+                    logger.info("Comment created and added to post: {}", savedComment);
+                } catch (IOException e) {
+                    logger.error("Error sending comment creation confirmation", e);
+                }
             }, error -> sendErrorMessage(session, "Error creating comment", error));
         } else {
             sendErrorMessage(session, "Missing fields in comment.create payload", null);
@@ -101,14 +109,19 @@ public class CommentWebSocketHandler {
             String commentId = payload.get(COMMENT_ID).asText();
             String content = payload.get(CONTENT).asText();
 
-            commentService.updateComment(commentId, new Comment(null, null, content))
-                    .subscribe(updatedUser -> {
+            commentService.updateComment(commentId, new Comment(null, null, null, null, content))
+                    .subscribe(updatedComment -> {
                         try {
-                            String result = objectMapper
-                                    .writeValueAsString(Map.of("type", "comment.update.success",
-                                            PAYLOAD, Map.of("user", updatedUser)));
+                            String result = objectMapper.writeValueAsString(
+                                    Map.of("type", "comment.update.success", PAYLOAD,
+                                            Map.of(COMMENT_ID, updatedComment.getId(), USER_ID,
+                                                    updatedComment.getUserId(), POST_ID,
+                                                    updatedComment.getPostId(), CONTENT,
+                                                    updatedComment.getContent(), CREATED_AT,
+                                                    updatedComment.getCreatedAt(), UPDATED_AT,
+                                                    updatedComment.getUpdatedAt())));
                             session.sendMessage(new TextMessage(result));
-                            logger.info("Comment updated: {}", updatedUser);
+                            logger.info("Comment updated: {}", updatedComment);
                         } catch (IOException e) {
                             logger.error("Error sending comment update confirmation", e);
                         }
@@ -125,9 +138,9 @@ public class CommentWebSocketHandler {
             commentService.deleteComment(commentId).subscribe(updatedUser -> {
                 try {
                     String result = objectMapper.writeValueAsString(Map.of("type",
-                            "comment.delete.success", PAYLOAD, Map.of("user", updatedUser)));
+                            "comment.delete.success", PAYLOAD, Map.of(COMMENT_ID, commentId)));
                     session.sendMessage(new TextMessage(result));
-                    logger.info("Comment deleted: {}", updatedUser);
+                    logger.info("Comment deleted: {}", commentId);
                 } catch (IOException e) {
                     logger.error("Error sending comment deletion confirmation", e);
                 }
@@ -148,7 +161,8 @@ public class CommentWebSocketHandler {
                             Map.of(COMMENT_ID, comment.getId(), USER_ID, comment.getUserId(),
                                     POST_ID, comment.getPostId(), CONTENT, comment.getContent(),
                                     CREATED_AT, comment.getCreatedAt(), UPDATED_AT,
-                                    comment.getUpdatedAt())));
+                                    comment.getUpdatedAt(), FIRST_NAME, comment.getFirstName(),
+                                    LAST_NAME, comment.getLastName())));
                     session.sendMessage(new TextMessage(result));
                     logger.info("Comment retrieved: {}", comment);
                 } catch (IOException e) {

@@ -1,6 +1,8 @@
 export interface Post {
   id: string;
   userId: string;
+  userFirstName: string; // Ajouté
+  userLastName: string; // Ajouté
   title: string;
   content: string;
   createdAt: Date | string;
@@ -10,10 +12,11 @@ export interface Post {
   shares: string[];
   repostCount: number;
 }
-
 export interface Comment {
   id: string;
   userId: string;
+  firstName: string; // Ajouté
+  lastName: string; // Ajouté
   postId: string;
   content: string;
   createdAt: Date | string;
@@ -40,6 +43,8 @@ export interface User {
 export interface Notification {
   _id: string;
   userId: string;
+  firstName: string;
+  lastName: string;
   message: string;
   createdAt: Date;
   updatedAt: Date;
@@ -48,7 +53,11 @@ export interface Notification {
 export interface Conversation {
   _id: string;
   senderId: string;
+  senderFirstName: string;
+  senderLastName: string;
   receiverId: string;
+  receiverFirstName: string;
+  receiverLastName: string;
   name: string;
   messages: Message[];
   createdAt: Date;
@@ -105,10 +114,16 @@ export type WebSocketMessage =
   | { type: 'user.update'; payload: Partial<User> & { userId: string } }
   | { type: 'user.delete'; payload: { userId: string } }
   | { type: 'user.check'; payload: { email: string } }
-  | { type: 'post.create'; payload: Omit<Post, '_id'> }
+  | { type: 'post.create'; payload: Omit<Post, 'id'> }
   | { type: 'post.getAll'; payload: Record<string, never> }
   | { type: 'post.getById'; payload: { postId: string } }
   | { type: 'post.update'; payload: { postId: string; content: string } }
   | { type: 'post.delete'; payload: { postId: string } }
+  | { type: 'comment.create'; payload: Omit<Comment, 'id'> }
+  | { type: 'conversation.create'; payload: Omit<Conversation, 'id'> }
+  | { type: 'conversation.getById'; payload: { conversationId: string } }
+  | { type: 'conversation.getAll'; payload: Record<string, never> }
+  | { type: 'conversation.update'; payload: { conversationId: string; name: string } }
+  | { type: 'conversation.delete'; payload: { conversationId: string } }
   | { type: 'error'; payload: ErrorPayload }
   | { type: string; payload: unknown };
