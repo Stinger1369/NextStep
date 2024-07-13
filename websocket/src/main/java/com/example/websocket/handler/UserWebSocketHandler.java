@@ -39,7 +39,7 @@ public class UserWebSocketHandler {
             case "user.check":
                 handleUserCheck(session, payload);
                 break;
-                case "user.getCurrent": // Add support for user.getCurrent
+            case "user.getCurrent": // Add support for user.getCurrent
                 handleGetCurrentUser(session, payload);
                 break;
             default:

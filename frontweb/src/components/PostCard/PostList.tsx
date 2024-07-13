@@ -4,14 +4,14 @@ import { Post } from '../../types';
 
 interface PostListProps {
   posts: Post[];
+  handleCreateComment: (postId: string, content: string) => void;
 }
 
-const PostList: React.FC<PostListProps> = ({ posts }) => {
-  console.log('Posts in PostList:', posts);
+const PostList: React.FC<PostListProps> = ({ posts, handleCreateComment }) => {
   return (
     <div>
       {posts.map((post) => (
-        <PostCard key={JSON.stringify(post.id)} post={post} />
+        <PostCard key={post.id} post={post} handleCreateComment={handleCreateComment} />
       ))}
     </div>
   );

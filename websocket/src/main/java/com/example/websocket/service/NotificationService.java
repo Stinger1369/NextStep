@@ -2,7 +2,6 @@ package com.example.websocket.service;
 
 import com.example.websocket.model.Notification;
 import com.example.websocket.repository.NotificationRepository;
-import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,7 +24,7 @@ public class NotificationService {
     }
 
     public Mono<Notification> getNotificationById(String id) {
-        return notificationRepository.findById(new ObjectId(id));
+        return notificationRepository.findById(id);
     }
 
     public Flux<Notification> getAllNotifications() {
@@ -33,7 +32,7 @@ public class NotificationService {
     }
 
     public Mono<Notification> updateNotification(String id, Notification notification) {
-        return notificationRepository.findById(new ObjectId(id)).flatMap(existingNotification -> {
+        return notificationRepository.findById(id).flatMap(existingNotification -> {
             existingNotification.setMessage(notification.getMessage());
             existingNotification.setUpdatedAt(new Date());
             return notificationRepository.save(existingNotification);
@@ -41,6 +40,6 @@ public class NotificationService {
     }
 
     public Mono<Void> deleteNotification(String id) {
-        return notificationRepository.deleteById(new ObjectId(id));
+        return notificationRepository.deleteById(id);
     }
 }

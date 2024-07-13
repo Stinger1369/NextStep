@@ -1,15 +1,15 @@
 package com.example.websocket.model;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Document(collection = "comments")
 public class Comment {
     @Id
-    private ObjectId id;
+    private String id;
     private String userId;
     private String postId;
     private String content;
@@ -17,6 +17,7 @@ public class Comment {
     private Date updatedAt;
 
     public Comment() {
+        this.id = UUID.randomUUID().toString();
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }
@@ -28,11 +29,11 @@ public class Comment {
         this.content = content;
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 

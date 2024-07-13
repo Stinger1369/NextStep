@@ -1,39 +1,39 @@
 package com.example.websocket.model;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Document(collection = "notifications")
 public class Notification {
     @Id
-    private ObjectId id;
+    private String id;
     private String userId;
     private String message;
     private Date createdAt;
     private Date updatedAt;
 
     public Notification() {
+        this.id = UUID.randomUUID().toString();
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }
 
     public Notification(String userId, String message) {
+        this();
         this.userId = userId;
         this.message = message;
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
     }
 
     // Getters and setters
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 

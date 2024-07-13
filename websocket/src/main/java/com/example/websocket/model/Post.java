@@ -1,25 +1,29 @@
 package com.example.websocket.model;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Document(collection = "posts")
 public class Post {
     @Id
-    private ObjectId id;
+    private String id;
     private String userId;
     private String title;
     private String content;
     private Date createdAt;
     private Date updatedAt;
     private List<Comment> comments = new ArrayList<>();
+    private List<String> likes = new ArrayList<>();
+    private List<String> shares = new ArrayList<>();
+    private int repostCount = 0;
 
     public Post() {
+        this.id = UUID.randomUUID().toString();
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }
@@ -32,11 +36,12 @@ public class Post {
     }
 
     // Getters and setters
-    public ObjectId getId() {
+
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -91,5 +96,41 @@ public class Post {
     public void addComment(Comment comment) {
         this.comments.add(comment);
         this.updatedAt = new Date();
+    }
+
+    public List<String> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<String> likes) {
+        this.likes = likes;
+    }
+
+    public void addLike(String userId) {
+        this.likes.add(userId);
+    }
+
+    public void removeLike(String userId) {
+        this.likes.remove(userId);
+    }
+
+    public List<String> getShares() {
+        return shares;
+    }
+
+    public void setShares(List<String> shares) {
+        this.shares = shares;
+    }
+
+    public void addShare(String email) {
+        this.shares.add(email);
+    }
+
+    public int getRepostCount() {
+        return repostCount;
+    }
+
+    public void incrementRepostCount() {
+        this.repostCount++;
     }
 }

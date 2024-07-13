@@ -2,7 +2,6 @@ package com.example.websocket.service;
 
 import com.example.websocket.model.User;
 import com.example.websocket.repository.UserRepository;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -49,7 +48,7 @@ public class UserService {
 
     public Mono<User> getUserById(String id) {
         logger.info("Fetching user by ID: {}", id);
-        return userRepository.findById(new ObjectId(id)).doOnSuccess(user -> {
+        return userRepository.findById(id).doOnSuccess(user -> {
             if (user != null) {
                 logger.info(USER_FETCHED, user);
             } else {
@@ -90,7 +89,7 @@ public class UserService {
 
     public Mono<User> updateUser(String id, User user) {
         logger.info("Updating user: {}", user);
-        return userRepository.findById(new ObjectId(id)).flatMap(existingUser -> {
+        return userRepository.findById(id).flatMap(existingUser -> {
             existingUser.setEmail(user.getEmail());
             existingUser.setFirstName(user.getFirstName());
             existingUser.setLastName(user.getLastName());
@@ -109,8 +108,7 @@ public class UserService {
 
     public Mono<Void> deleteUser(String id) {
         logger.info("Deleting user with ID: {}", id);
-        return userRepository.deleteById(new ObjectId(id))
-                .doOnSuccess(unused -> logger.info("User deleted"))
+        return userRepository.deleteById(id).doOnSuccess(unused -> logger.info("User deleted"))
                 .doOnError(error -> logger.error("Error deleting user: {}", error.getMessage()));
     }
 }

@@ -1,7 +1,4 @@
-export interface WebSocketMessage<T = unknown> {
-  type: string;
-  payload: T;
-}
+import { WebSocketMessage, parseUser } from '../types';
 
 let socket: WebSocket | null = null;
 
@@ -27,7 +24,11 @@ export const initializeWebSocket = (url: string): void => {
       console.error('WebSocket error:', (message.payload as { message: string }).message);
       triggerEventListeners('error', message.payload);
     } else {
-      triggerEventListeners(message.type, message.payload);
+      if (message.type.startsWith('user.')) {
+        triggerEventListeners(message.type, parseUser(message.payload));
+      } else {
+        triggerEventListeners(message.type, message.payload);
+      }
     }
   };
 

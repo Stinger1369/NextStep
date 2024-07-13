@@ -1,6 +1,6 @@
 import React from 'react';
 import LoginComponent from '../LoginPages/LoginComponent';
-import HomeJob from './HomeJob/HomeJob';
+import HomeJob from './HomeJob/PostNews';
 import PostJob from './PostJob/PostJob';
 import SkillDevelopment from './SkillDevelopment/SkillDevelopment';
 import EventsActivities from './EventsActivities/EventsActivities';

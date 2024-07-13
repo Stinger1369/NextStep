@@ -1,6 +1,5 @@
 package com.example.websocket.model;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,7 +10,7 @@ import java.util.UUID;
 @Document(collection = "usersocket")
 public class User {
     @Id
-    private ObjectId id;
+    private String id;
     private String email;
     private String firstName;
     private String lastName;
@@ -20,14 +19,12 @@ public class User {
     private List<Notification> notifications = new ArrayList<>();
     private List<Conversation> conversations = new ArrayList<>();
 
-    public User() {}
+    public User() {
+        this.id = UUID.randomUUID().toString();
+    }
 
     public User(String id, String email, String firstName, String lastName) {
-        if (id != null && !id.isEmpty()) {
-            this.id = new ObjectId(id);
-        } else {
-            this.id = new ObjectId();
-        }
+        this.id = (id != null && !id.isEmpty()) ? id : UUID.randomUUID().toString();
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -36,11 +33,11 @@ public class User {
 
     // Getters and setters
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 

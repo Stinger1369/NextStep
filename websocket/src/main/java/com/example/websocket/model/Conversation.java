@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Document(collection = "conversations")
 public class Conversation {
@@ -19,6 +20,7 @@ public class Conversation {
     private Date updatedAt;
 
     public Conversation() {
+        this.id = UUID.randomUUID().toString();
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }
@@ -92,14 +94,24 @@ public class Conversation {
     }
 
     public static class Message {
+        private String id;
         private String senderId;
         private String content;
         private Date timestamp;
 
         public Message(String senderId, String content) {
+            this.id = UUID.randomUUID().toString();
             this.senderId = senderId;
             this.content = content;
             this.timestamp = new Date();
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
         }
 
         public String getSenderId() {

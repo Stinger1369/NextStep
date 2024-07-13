@@ -1,4 +1,5 @@
 // src/components/LoginComponent.tsx
+
 import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -36,7 +37,7 @@ const LoginComponent: React.FC = () => {
         if (resultAction.user) {
           console.log('User ID:', resultAction.user._id);
           const createdUser = await createUser(resultAction.user.email, resultAction.user.firstName ?? 'DefaultFirstName', resultAction.user.lastName ?? 'DefaultLastName');
-          console.log('User created on the server:Java Websocket', createdUser, 'User ID for already exists:', createdUser.userId);
+          console.log('User created on the server: Java Websocket', createdUser, 'User ID for already exists:', createdUser.userId);
           localStorage.setItem('currentUserId', createdUser.userId);
           navigate('/'); // Rediriger vers la page d'accueil après une connexion réussie
         }

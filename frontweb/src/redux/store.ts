@@ -8,6 +8,7 @@ import jobReducer from './features/jobs/jobSlice';
 import themeReducer from './features/theme/themeSlice';
 import postReducer, { selectPostsWithDates } from './features/websocket/posts/postSlice';
 import userWebSocketReducer from './features/websocket/users/userWebSocketSlice';
+import commentReducer from './features/websocket/comments/commentSlice';
 
 const store = configureStore({
   reducer: {
@@ -18,7 +19,8 @@ const store = configureStore({
     jobs: jobReducer,
     theme: themeReducer,
     posts: postReducer,
-    userWebSocket: userWebSocketReducer
+    userWebSocket: userWebSocketReducer,
+    comments: commentReducer
   }
 });
 

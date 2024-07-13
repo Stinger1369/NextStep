@@ -3,6 +3,7 @@ package com.example.websocket.handler;
 import com.example.websocket.model.Conversation;
 import com.example.websocket.service.ConversationService;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Component
 public class ConversationWebSocketHandler {
@@ -18,16 +20,33 @@ public class ConversationWebSocketHandler {
             LoggerFactory.getLogger(ConversationWebSocketHandler.class);
 
     private final ConversationService conversationService;
+    private final ObjectMapper objectMapper;
 
-    public ConversationWebSocketHandler(ConversationService conversationService) {
+    public ConversationWebSocketHandler(ConversationService conversationService,
+            ObjectMapper objectMapper) {
         this.conversationService = conversationService;
+        this.objectMapper = objectMapper;
     }
 
     public void handleMessage(WebSocketSession session, String messageType, JsonNode payload) {
-        if ("conversation.create".equals(messageType)) {
-            handleConversationCreate(session, payload);
-        } else {
-            sendErrorMessage(session, "Unknown conversation message type: " + messageType);
+        switch (messageType) {
+            case "conversation.create":
+                handleConversationCreate(session, payload);
+                break;
+            case "conversation.getById":
+                handleGetConversationById(session, payload);
+                break;
+            case "conversation.getAll":
+                handleGetAllConversations(session);
+                break;
+            case "conversation.update":
+                handleUpdateConversation(session, payload);
+                break;
+            case "conversation.delete":
+                handleDeleteConversation(session, payload);
+                break;
+            default:
+                sendErrorMessage(session, "Unknown conversation message type: " + messageType);
         }
     }
 
@@ -56,6 +75,97 @@ public class ConversationWebSocketHandler {
                         logger.error("Error sending conversation creation confirmation", e);
                     }
                 }, error -> sendErrorMessage(session, "Error creating conversation", error));
+    }
+
+    private void handleGetConversationById(WebSocketSession session, JsonNode payload) {
+        String conversationId =
+                payload.hasNonNull("conversationId") ? payload.get("conversationId").asText()
+                        : null;
+
+        if (conversationId == null) {
+            sendErrorMessage(session, "Missing conversationId in conversation.getById payload",
+                    null);
+            return;
+        }
+
+        conversationService.getConversationById(conversationId).subscribe(conversation -> {
+            try {
+                String result = objectMapper.writeValueAsString(
+                        Map.of("type", "conversation.getById.success", "payload", conversation));
+                session.sendMessage(new TextMessage(result));
+                logger.info("Conversation retrieved: {}", conversation);
+            } catch (IOException e) {
+                logger.error("Error sending conversation retrieval confirmation", e);
+            }
+        }, error -> sendErrorMessage(session, "Error retrieving conversation", error));
+    }
+
+    private void handleGetAllConversations(WebSocketSession session) {
+        conversationService.getAllConversations().collectList().subscribe(conversations -> {
+            try {
+                String result = objectMapper
+                        .writeValueAsString(Map.of("type", "conversation.getAll.success", "payload",
+                                Map.of("conversations", conversations)));
+                session.sendMessage(new TextMessage(result));
+                logger.info("Sent all conversations: {}", result);
+            } catch (IOException e) {
+                logger.error("Error sending all conversations", e);
+            }
+        }, error -> {
+            try {
+                session.sendMessage(new TextMessage(
+                        "{\"type\":\"error\",\"payload\":{\"message\":\"Error fetching conversations\"}}"));
+                logger.error("Error fetching conversations", error);
+            } catch (IOException e) {
+                logger.error("Error sending error message", e);
+            }
+        });
+    }
+
+    private void handleUpdateConversation(WebSocketSession session, JsonNode payload) {
+        String conversationId =
+                payload.hasNonNull("conversationId") ? payload.get("conversationId").asText()
+                        : null;
+
+        if (conversationId == null) {
+            sendErrorMessage(session, "Missing conversationId in conversation.update payload",
+                    null);
+            return;
+        }
+
+        conversationService.updateConversation(conversationId, payload)
+                .subscribe(updatedConversation -> {
+                    try {
+                        String result = objectMapper.writeValueAsString(Map.of("type",
+                                "conversation.update.success", "payload", updatedConversation));
+                        session.sendMessage(new TextMessage(result));
+                        logger.info("Conversation updated: {}", updatedConversation);
+                    } catch (IOException e) {
+                        logger.error("Error sending conversation update confirmation", e);
+                    }
+                }, error -> sendErrorMessage(session, "Error updating conversation", error));
+    }
+
+    private void handleDeleteConversation(WebSocketSession session, JsonNode payload) {
+        String conversationId =
+                payload.hasNonNull("conversationId") ? payload.get("conversationId").asText()
+                        : null;
+
+        if (conversationId == null) {
+            sendErrorMessage(session, "Missing conversationId in conversation.delete payload",
+                    null);
+            return;
+        }
+
+        conversationService.deleteConversation(conversationId).subscribe(unused -> {
+            try {
+                session.sendMessage(new TextMessage(String.format(
+                        "{\"type\":\"conversation.delete.success\",\"payload\":{\"conversationId\":\"%s\"}}",
+                        conversationId)));
+            } catch (IOException e) {
+                logger.error("Error sending conversation deletion confirmation", e);
+            }
+        }, error -> sendErrorMessage(session, "Error deleting conversation", error));
     }
 
     private void sendErrorMessage(WebSocketSession session, String errorMessage, Throwable error) {

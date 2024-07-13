@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import reactor.core.publisher.Mono;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -22,6 +20,7 @@ public class PostWebSocketHandler {
     private static final String POST_ID = "postId";
     private static final String CONTENT = "content";
     private static final String TITLE = "title";
+    private static final String EMAIL = "email";
 
     private final PostService postService;
     private final ObjectMapper objectMapper;
@@ -48,6 +47,18 @@ public class PostWebSocketHandler {
             case "post.delete":
                 handleDeletePost(session, payload);
                 break;
+            case "post.like":
+                handleLikePost(session, payload);
+                break;
+            case "post.unlike":
+                handleUnlikePost(session, payload);
+                break;
+            case "post.share":
+                handleSharePost(session, payload);
+                break;
+            case "post.repost":
+                handleRepostPost(session, payload);
+                break;
             default:
                 sendErrorMessage(session, "Unknown post message type: " + messageType);
         }
@@ -56,19 +67,22 @@ public class PostWebSocketHandler {
     private void handlePostCreate(WebSocketSession session, JsonNode payload) {
         logger.info("Handling post.create with payload: {}", payload.toString());
 
-        if (payload.hasNonNull(USER_ID) && payload.hasNonNull(CONTENT) && payload.hasNonNull(TITLE)) {
+        if (payload.hasNonNull(USER_ID) && payload.hasNonNull(CONTENT)
+                && payload.hasNonNull(TITLE)) {
             String userId = payload.get(USER_ID).asText();
             String title = payload.get(TITLE).asText();
             String content = payload.get(CONTENT).asText();
 
-            logger.info("Creating post with userId: {}, title: {}, content: {}", userId, title, content);
+            logger.info("Creating post with userId: {}, title: {}, content: {}", userId, title,
+                    content);
 
             Post post = new Post(userId, title, content);
 
             postService.createPost(post).subscribe(createdPost -> {
                 try {
-                    session.sendMessage(new TextMessage(
-                            String.format("{\"type\":\"post.create.success\",\"payload\":{\"postId\":\"%s\"}}", createdPost.getId().toHexString())));
+                    session.sendMessage(new TextMessage(String.format(
+                            "{\"type\":\"post.create.success\",\"payload\":{\"postId\":\"%s\"}}",
+                            createdPost.getId().toString())));
                     logger.info("Post created: {}", createdPost);
                 } catch (IOException e) {
                     logger.error("Error sending post creation confirmation", e);
@@ -76,7 +90,8 @@ public class PostWebSocketHandler {
             }, error -> sendErrorMessage(session, "Error creating post", error));
         } else {
             logger.error("Missing fields in post.create payload: userId={}, title={}, content={}",
-                    payload.hasNonNull(USER_ID), payload.hasNonNull(TITLE), payload.hasNonNull(CONTENT));
+                    payload.hasNonNull(USER_ID), payload.hasNonNull(TITLE),
+                    payload.hasNonNull(CONTENT));
             sendErrorMessage(session, "Missing fields in post.create payload", null);
         }
     }
@@ -107,8 +122,9 @@ public class PostWebSocketHandler {
             String postId = payload.get(POST_ID).asText();
             postService.getPostById(postId).subscribe(post -> {
                 try {
+                    String postJson = objectMapper.writeValueAsString(post);
                     session.sendMessage(new TextMessage(String.format(
-                            "Post retrieved. It has %d comments", post.getComments().size())));
+                            "{\"type\":\"post.getById.success\",\"payload\":%s}", postJson)));
                     logger.info("Post retrieved: {}", post);
                 } catch (IOException e) {
                     logger.error("Error sending post retrieval confirmation", e);
@@ -123,9 +139,91 @@ public class PostWebSocketHandler {
         if (payload.hasNonNull(POST_ID)) {
             String postId = payload.get(POST_ID).asText();
             postService.deletePost(postId).subscribe(unused -> {
+                try {
+                    session.sendMessage(new TextMessage(String.format(
+                            "{\"type\":\"post.delete.success\",\"payload\":{\"postId\":\"%s\"}}",
+                            postId)));
+                } catch (IOException e) {
+                    logger.error("Error sending post deletion confirmation", e);
+                }
             }, error -> sendErrorMessage(session, "Error deleting post", error));
         } else {
             sendErrorMessage(session, "Missing postId in post.delete payload", null);
+        }
+    }
+
+    private void handleLikePost(WebSocketSession session, JsonNode payload) {
+        if (payload.hasNonNull(POST_ID) && payload.hasNonNull(USER_ID)) {
+            String postId = payload.get(POST_ID).asText();
+            String userId = payload.get(USER_ID).asText();
+            postService.likePost(postId, userId).subscribe(post -> {
+                try {
+                    session.sendMessage(new TextMessage(String.format(
+                            "{\"type\":\"post.like.success\",\"payload\":{\"postId\":\"%s\"}}",
+                            postId)));
+                    logger.info("Post liked: {}", post);
+                } catch (IOException e) {
+                    logger.error("Error sending post like confirmation", e);
+                }
+            }, error -> sendErrorMessage(session, "Error liking post", error));
+        } else {
+            sendErrorMessage(session, "Missing fields in post.like payload", null);
+        }
+    }
+
+    private void handleUnlikePost(WebSocketSession session, JsonNode payload) {
+        if (payload.hasNonNull(POST_ID) && payload.hasNonNull(USER_ID)) {
+            String postId = payload.get(POST_ID).asText();
+            String userId = payload.get(USER_ID).asText();
+            postService.unlikePost(postId, userId).subscribe(post -> {
+                try {
+                    session.sendMessage(new TextMessage(String.format(
+                            "{\"type\":\"post.unlike.success\",\"payload\":{\"postId\":\"%s\"}}",
+                            postId)));
+                    logger.info("Post unliked: {}", post);
+                } catch (IOException e) {
+                    logger.error("Error sending post unlike confirmation", e);
+                }
+            }, error -> sendErrorMessage(session, "Error unliking post", error));
+        } else {
+            sendErrorMessage(session, "Missing fields in post.unlike payload", null);
+        }
+    }
+
+    private void handleSharePost(WebSocketSession session, JsonNode payload) {
+        if (payload.hasNonNull(POST_ID) && payload.hasNonNull(EMAIL)) {
+            String postId = payload.get(POST_ID).asText();
+            String email = payload.get(EMAIL).asText();
+            postService.sharePost(postId, email).subscribe(post -> {
+                try {
+                    session.sendMessage(new TextMessage(String.format(
+                            "{\"type\":\"post.share.success\",\"payload\":{\"postId\":\"%s\"}}",
+                            postId)));
+                    logger.info("Post shared: {}", post);
+                } catch (IOException e) {
+                    logger.error("Error sending post share confirmation", e);
+                }
+            }, error -> sendErrorMessage(session, "Error sharing post", error));
+        } else {
+            sendErrorMessage(session, "Missing fields in post.share payload", null);
+        }
+    }
+
+    private void handleRepostPost(WebSocketSession session, JsonNode payload) {
+        if (payload.hasNonNull(POST_ID)) {
+            String postId = payload.get(POST_ID).asText();
+            postService.repostPost(postId).subscribe(post -> {
+                try {
+                    session.sendMessage(new TextMessage(String.format(
+                            "{\"type\":\"post.repost.success\",\"payload\":{\"postId\":\"%s\"}}",
+                            postId)));
+                    logger.info("Post reposted: {}", post);
+                } catch (IOException e) {
+                    logger.error("Error sending post repost confirmation", e);
+                }
+            }, error -> sendErrorMessage(session, "Error reposting post", error));
+        } else {
+            sendErrorMessage(session, "Missing fields in post.repost payload", null);
         }
     }
 

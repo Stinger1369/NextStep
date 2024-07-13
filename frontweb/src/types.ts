@@ -6,10 +6,13 @@ export interface Post {
   createdAt: Date | string;
   updatedAt: Date | string;
   comments: Comment[];
+  likes: string[];
+  shares: string[];
+  repostCount: number;
 }
 
 export interface Comment {
-  _id: string;
+  id: string;
   userId: string;
   postId: string;
   content: string;
@@ -17,7 +20,6 @@ export interface Comment {
   updatedAt: Date | string;
 }
 
-// Les autres types n'ont pas besoin de changement
 export interface ApiError {
   message: string;
   status?: number;
@@ -52,6 +54,7 @@ export interface Conversation {
   createdAt: Date;
   updatedAt: Date;
 }
+
 export interface Message {
   senderId: string;
   content: string;
@@ -63,6 +66,7 @@ interface DateObject {
   $date: string;
 }
 
+// Function to convert dates from JSON format to Date objects
 export function convertDates(obj: unknown): unknown {
   if (obj === null || typeof obj !== 'object') {
     return obj;
@@ -84,22 +88,25 @@ export function convertDates(obj: unknown): unknown {
   return obj;
 }
 
+// Function to parse User data and convert date fields
 export function parseUser(userData: unknown): User {
   return convertDates(userData) as User;
 }
+
 export type ErrorPayload = {
   error: string;
 };
+
 export type WebSocketMessage =
   | { type: 'user.create'; payload: Partial<User> }
-  | { type: 'user.getCurrent'; payload: {} }
+  | { type: 'user.getCurrent'; payload: Record<string, never> }
   | { type: 'user.getByEmail'; payload: { email: string } }
   | { type: 'user.getById'; payload: { userId: string } }
   | { type: 'user.update'; payload: Partial<User> & { userId: string } }
   | { type: 'user.delete'; payload: { userId: string } }
   | { type: 'user.check'; payload: { email: string } }
   | { type: 'post.create'; payload: Omit<Post, '_id'> }
-  | { type: 'post.getAll'; payload: {} }
+  | { type: 'post.getAll'; payload: Record<string, never> }
   | { type: 'post.getById'; payload: { postId: string } }
   | { type: 'post.update'; payload: { postId: string; content: string } }
   | { type: 'post.delete'; payload: { postId: string } }

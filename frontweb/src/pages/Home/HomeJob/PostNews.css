@@ -27,3 +27,10 @@
 .home-job-container a:hover {
   text-decoration: underline;
 }
+.post-news {
+  padding: 20px;
+}
+
+.create-post {
+  margin-bottom: 20px;
+}

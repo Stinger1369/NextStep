@@ -1,3 +1,5 @@
+// src/websocket/userWebSocket.ts
+
 import { WebSocketMessage, User } from '../types';
 import { sendMessage, addEventListener, removeEventListener } from './websocket';
 

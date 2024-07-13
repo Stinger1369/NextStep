@@ -5,7 +5,7 @@ import com.example.websocket.model.Notification;
 import com.example.websocket.model.User;
 import com.example.websocket.repository.ConversationRepository;
 import com.example.websocket.repository.UserRepository;
-import org.bson.types.ObjectId;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,16 +28,16 @@ public class ConversationService {
     public Mono<Conversation> createConversation(Conversation conversation, String initialMessage) {
         conversation.addMessage(conversation.getSenderId(), initialMessage);
         return conversationRepository.save(conversation).flatMap(savedConversation -> {
-            Mono<User> senderUpdate = userRepository
-                    .findById(new ObjectId(savedConversation.getSenderId())).flatMap(sender -> {
+            Mono<User> senderUpdate =
+                    userRepository.findById(savedConversation.getSenderId()).flatMap(sender -> {
                         sender.addConversation(savedConversation);
                         return userRepository.save(sender);
                     });
 
-            Mono<User> receiverUpdate = userRepository
-                    .findById(new ObjectId(savedConversation.getReceiverId())).flatMap(receiver -> {
+            Mono<User> receiverUpdate =
+                    userRepository.findById(savedConversation.getReceiverId()).flatMap(receiver -> {
                         receiver.addConversation(savedConversation);
-                        Notification notification = new Notification(receiver.getId().toString(),
+                        Notification notification = new Notification(receiver.getId(),
                                 "New conversation started by: " + savedConversation.getSenderId());
                         return notificationService.createNotification(notification)
                                 .flatMap(savedNotification -> {
@@ -58,10 +58,14 @@ public class ConversationService {
         return conversationRepository.findAll();
     }
 
-    public Mono<Conversation> updateConversation(String id, Conversation conversation) {
+    public Mono<Conversation> updateConversation(String id, JsonNode payload) {
         return conversationRepository.findById(id).flatMap(existingConversation -> {
-            existingConversation.setSenderId(conversation.getSenderId());
-            existingConversation.setReceiverId(conversation.getReceiverId());
+            if (payload.hasNonNull("senderId")) {
+                existingConversation.setSenderId(payload.get("senderId").asText());
+            }
+            if (payload.hasNonNull("receiverId")) {
+                existingConversation.setReceiverId(payload.get("receiverId").asText());
+            }
             existingConversation.setUpdatedAt(new Date());
             return conversationRepository.save(existingConversation);
         });
