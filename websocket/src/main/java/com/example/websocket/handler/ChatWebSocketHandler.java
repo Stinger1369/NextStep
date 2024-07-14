@@ -58,6 +58,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 case "post.unlike":
                 case "post.share":
                 case "post.repost":
+                case "post.update":
                     postHandler.handleMessage(session, messageType, payload);
                     break;
                 case "comment.create":
@@ -85,11 +86,15 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void sendErrorMessage(WebSocketSession session, String errorMessage) {
-        try {
-            session.sendMessage(new TextMessage(String.format(
-                    "{\"type\":\"error\",\"payload\":{\"message\":\"%s\"}}", errorMessage)));
-        } catch (IOException e) {
-            logger.error("Error sending error message", e);
+        if (session.isOpen()) {
+            try {
+                session.sendMessage(new TextMessage(String.format(
+                        "{\"type\":\"error\",\"payload\":{\"message\":\"%s\"}}", errorMessage)));
+            } catch (IOException e) {
+                logger.error("Error sending error message", e);
+            }
+        } else {
+            logger.warn("Attempted to send error message to closed session: {}", errorMessage);
         }
     }
 }

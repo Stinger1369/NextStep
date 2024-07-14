@@ -1,15 +1,5 @@
-import { WebSocketMessage, Post } from '../types';
+import { WebSocketMessage, Post, PostCreatedSuccessData, PostGetAllSuccessData } from '../types';
 import { sendMessage, addEventListener, removeEventListener } from './websocket';
-
-export interface PostCreatedSuccessData {
-  postId: string;
-  userFirstName: string;
-  userLastName: string;
-}
-
-export interface PostGetAllSuccessData {
-  posts: Post[];
-}
 
 export function createPost(content: string): Promise<string> {
   return new Promise((resolve, reject) => {

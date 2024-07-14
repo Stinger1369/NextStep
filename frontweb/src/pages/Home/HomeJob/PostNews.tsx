@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
-import { createPost, getAllPosts, PostCreatedSuccessData } from '../../../websocket/postWebSocket';
+import { createPost, getAllPosts } from '../../../websocket/postWebSocket';
 import { initializeWebSocket, addEventListener, removeEventListener, addErrorListener } from '../../../websocket/websocket';
 import { fetchPostsRequest, fetchPostsSuccess, fetchPostsFailure, addPost } from '../../../redux/features/websocket/posts/postSlice';
 import { fetchUser } from '../../../redux/features/websocket/users/userWebsocketThunks/userWebsocketThunks';
-import { setCurrentUser } from '../../../redux/features/websocket/users/userWebSocketSlice'; // Import correct ici
+import { setCurrentUser } from '../../../redux/features/websocket/users/userWebSocketSlice';
 import { selectPostsWithDates } from '../../../redux/selectors';
 import { TextField, Button, Typography, CircularProgress } from '@mui/material';
 import PostList from '../../../components/PostCard/PostList';
 import './PostNews.css';
-import { Post, User } from '../../../types';
+import { Post, User, PostCreatedSuccessData } from '../../../types';
 
 const PostNews: React.FC = () => {
   const [content, setContent] = useState('');
@@ -25,6 +25,9 @@ const PostNews: React.FC = () => {
     initializeWebSocket('ws://localhost:8080/ws/chat');
 
     const storedUserId = localStorage.getItem('currentUserId');
+    const storedFirstName = localStorage.getItem('currentUserFirstName');
+    const storedLastName = localStorage.getItem('currentUserLastName');
+
     if (storedUserId) {
       dispatch(fetchUser(storedUserId)).then((result) => {
         const user = result.payload as User;
@@ -73,7 +76,8 @@ const PostNews: React.FC = () => {
           comments: [],
           likes: [],
           shares: [],
-          repostCount: 0
+          repostCount: 0,
+          reposters: []
         };
         console.log('New post created:', newPost);
         dispatch(addPost(newPost));
@@ -101,13 +105,19 @@ const PostNews: React.FC = () => {
     }
   }, [content, user]);
 
+  const formattedPosts = posts.map((post) => ({
+    ...post,
+    createdAt: new Date(post.createdAt).toISOString(),
+    updatedAt: new Date(post.updatedAt).toISOString()
+  }));
+
   let contentToDisplay;
   if (loading) {
     contentToDisplay = <CircularProgress />;
   } else if (error) {
     contentToDisplay = <Typography color="error">{error}</Typography>;
-  } else if (posts.length > 0) {
-    contentToDisplay = <PostList posts={posts} />;
+  } else if (formattedPosts.length > 0) {
+    contentToDisplay = <PostList posts={formattedPosts} />;
   } else {
     contentToDisplay = <Typography>Aucun post à afficher pour le moment.</Typography>;
   }

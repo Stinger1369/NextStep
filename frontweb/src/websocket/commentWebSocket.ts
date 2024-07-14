@@ -54,7 +54,6 @@ export function createComment(content: string, postId: string, userId: string, u
     sendMessage(message);
   });
 }
-
 export function getAllComments(postId: string): Promise<Comment[]> {
   return new Promise((resolve, reject) => {
     const message: WebSocketMessage = {

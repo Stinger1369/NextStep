@@ -1,26 +1,40 @@
+// types.ts
+
 export interface Post {
   id: string;
   userId: string;
-  userFirstName: string; // Ajouté
-  userLastName: string; // Ajouté
+  userFirstName: string;
+  userLastName: string;
   title: string;
   content: string;
-  createdAt: Date | string;
-  updatedAt: Date | string;
+  createdAt: string;
+  updatedAt: string;
   comments: Comment[];
   likes: string[];
   shares: string[];
   repostCount: number;
+  reposters: string[];
 }
+
 export interface Comment {
   id: string;
   userId: string;
-  firstName: string; // Ajouté
-  lastName: string; // Ajouté
+  firstName: string;
+  lastName: string;
   postId: string;
   content: string;
   createdAt: Date | string;
   updatedAt: Date | string;
+}
+
+export interface PostCreatedSuccessData {
+  postId: string;
+  userFirstName: string;
+  userLastName: string;
+}
+
+export interface PostGetAllSuccessData {
+  posts: Post[];
 }
 
 export interface ApiError {

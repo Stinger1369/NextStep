@@ -1,6 +1,8 @@
-import { WebSocketMessage, parseUser } from '../types';
+import { WebSocketMessage } from '../types';
 
 let socket: WebSocket | null = null;
+const messageQueue: WebSocketMessage[] = [];
+const eventListeners: { [key: string]: EventCallback[] } = {};
 
 export const initializeWebSocket = (url: string): void => {
   if (socket) {
@@ -19,17 +21,7 @@ export const initializeWebSocket = (url: string): void => {
     console.log('Raw message received:', event.data);
     const message: WebSocketMessage = JSON.parse(event.data);
     console.log('Parsed message:', message);
-
-    if (message.type === 'error') {
-      console.error('WebSocket error:', (message.payload as { message: string }).message);
-      triggerEventListeners('error', message.payload);
-    } else {
-      if (message.type.startsWith('user.')) {
-        triggerEventListeners(message.type, parseUser(message.payload));
-      } else {
-        triggerEventListeners(message.type, message.payload);
-      }
-    }
+    triggerEventListeners(message.type, message.payload);
   };
 
   socket.onerror = (event: Event) => {
@@ -42,8 +34,6 @@ export const initializeWebSocket = (url: string): void => {
     socket = null;
   };
 };
-
-const messageQueue: WebSocketMessage[] = [];
 
 export const sendMessage = (message: WebSocketMessage): void => {
   if (socket && socket.readyState === WebSocket.OPEN) {
@@ -66,8 +56,6 @@ const sendQueuedMessages = (): void => {
 };
 
 type EventCallback<T = unknown> = (data: T) => void;
-
-const eventListeners: { [key: string]: EventCallback[] } = {};
 
 export const addEventListener = <T>(type: string, callback: EventCallback<T>): void => {
   console.log('Added event listener for type:', type);

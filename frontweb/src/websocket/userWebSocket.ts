@@ -13,10 +13,12 @@ export function getCurrentUser(userId: string): Promise<User> {
     const handleGetCurrentUserResult = (data: User) => {
       resolve(data);
       removeEventListener('user.getCurrent.success', handleGetCurrentUserResult);
+      removeEventListener('error', handleError);
     };
 
     const handleError = (error: unknown) => {
       reject(error);
+      removeEventListener('user.getCurrent.success', handleGetCurrentUserResult);
       removeEventListener('error', handleError);
     };
 

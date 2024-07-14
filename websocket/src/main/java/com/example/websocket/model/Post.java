@@ -23,6 +23,7 @@ public class Post {
     private List<String> likes = new ArrayList<>();
     private List<String> shares = new ArrayList<>();
     private int repostCount = 0;
+    private List<String> reposters = new ArrayList<>();
 
     public Post() {
         this.id = UUID.randomUUID().toString();
@@ -153,5 +154,21 @@ public class Post {
 
     public void incrementRepostCount() {
         this.repostCount++;
+    }
+
+    public List<String> getReposters() {
+        return reposters;
+    }
+
+    public void setReposters(List<String> reposters) {
+        this.reposters = reposters;
+    }
+
+    public void addReposter(String userId) {
+        this.reposters.add(userId);
+    }
+
+    public boolean hasLiked(String userId) {
+        return this.likes.contains(userId);
     }
 }

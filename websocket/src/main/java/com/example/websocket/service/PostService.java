@@ -59,7 +59,6 @@ public class PostService {
                 post.addComment(comment);
                 post.setUpdatedAt(new Date());
                 return postRepository.save(post).flatMap(updatedPost -> {
-                    // Envoi des notifications à tous les participants du post
                     Set<String> participantIds = new HashSet<>();
                     participantIds.add(post.getUserId());
                     participantIds.addAll(post.getComments().stream().map(Comment::getUserId)
@@ -109,19 +108,37 @@ public class PostService {
         });
     }
 
-    public Mono<Void> deletePost(String id) {
+    public Mono<Void> deletePost(String id, String userId) {
         return postRepository.findById(id).flatMap(post -> {
-            return userRepository.findById(post.getUserId()).flatMap(user -> {
-                user.getPosts().removeIf(p -> p.getId().equals(post.getId()));
-                return userRepository.save(user).then(postRepository.deleteById(id));
-            });
+            if (post.getUserId().equals(userId)) {
+                return userRepository.findById(post.getUserId()).flatMap(user -> {
+                    user.getPosts().removeIf(p -> p.getId().equals(post.getId()));
+                    return userRepository.save(user).then(postRepository.deleteById(id));
+                });
+            } else {
+                return Mono.error(new Exception("You are not the owner of this post"));
+            }
         });
     }
 
     public Mono<Post> likePost(String postId, String userId) {
         return postRepository.findById(postId).flatMap(post -> {
-            post.addLike(userId);
-            return postRepository.save(post);
+            if (!post.getLikes().contains(userId)) {
+                post.addLike(userId);
+                return postRepository.save(post).flatMap(savedPost -> {
+                    Notification notification = new Notification(post.getUserId(),
+                            post.getUserFirstName(), post.getUserLastName(),
+                            "Your post was liked by user: " + userId);
+                    return notificationService.createNotification(notification)
+                            .flatMap(savedNotification -> userRepository.findById(post.getUserId())
+                                    .flatMap(postUser -> {
+                                        postUser.addNotification(savedNotification);
+                                        return userRepository.save(postUser).thenReturn(savedPost);
+                                    }));
+                });
+            } else {
+                return Mono.error(new Exception("You have already liked this post"));
+            }
         });
     }
 
@@ -135,14 +152,35 @@ public class PostService {
     public Mono<Post> sharePost(String postId, String email) {
         return postRepository.findById(postId).flatMap(post -> {
             post.addShare(email);
-            return postRepository.save(post);
+            return postRepository.save(post).flatMap(savedPost -> {
+                Notification notification =
+                        new Notification(post.getUserId(), post.getUserFirstName(),
+                                post.getUserLastName(), "Your post was shared with: " + email);
+                return notificationService.createNotification(notification)
+                        .flatMap(savedNotification -> userRepository.findById(post.getUserId())
+                                .flatMap(postUser -> {
+                                    postUser.addNotification(savedNotification);
+                                    return userRepository.save(postUser).thenReturn(savedPost);
+                                }));
+            });
         });
     }
 
-    public Mono<Post> repostPost(String postId) {
+    public Mono<Post> repostPost(String postId, String userId) {
         return postRepository.findById(postId).flatMap(post -> {
             post.incrementRepostCount();
-            return postRepository.save(post);
+            post.addReposter(userId);
+            return postRepository.save(post).flatMap(savedPost -> {
+                Notification notification = new Notification(post.getUserId(),
+                        post.getUserFirstName(), post.getUserLastName(),
+                        "Your post was reposted by user: " + userId);
+                return notificationService.createNotification(notification)
+                        .flatMap(savedNotification -> userRepository.findById(post.getUserId())
+                                .flatMap(postUser -> {
+                                    postUser.addNotification(savedNotification);
+                                    return userRepository.save(postUser).thenReturn(savedPost);
+                                }));
+            });
         });
     }
 }

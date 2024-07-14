@@ -136,9 +136,10 @@ public class PostWebSocketHandler {
     }
 
     private void handleDeletePost(WebSocketSession session, JsonNode payload) {
-        if (payload.hasNonNull(POST_ID)) {
+        if (payload.hasNonNull(POST_ID) && payload.hasNonNull(USER_ID)) {
             String postId = payload.get(POST_ID).asText();
-            postService.deletePost(postId).subscribe(unused -> {
+            String userId = payload.get(USER_ID).asText();
+            postService.deletePost(postId, userId).subscribe(unused -> {
                 try {
                     session.sendMessage(new TextMessage(String.format(
                             "{\"type\":\"post.delete.success\",\"payload\":{\"postId\":\"%s\"}}",
@@ -148,7 +149,7 @@ public class PostWebSocketHandler {
                 }
             }, error -> sendErrorMessage(session, "Error deleting post", error));
         } else {
-            sendErrorMessage(session, "Missing postId in post.delete payload", null);
+            sendErrorMessage(session, "Missing fields in post.delete payload", null);
         }
     }
 
@@ -210,9 +211,10 @@ public class PostWebSocketHandler {
     }
 
     private void handleRepostPost(WebSocketSession session, JsonNode payload) {
-        if (payload.hasNonNull(POST_ID)) {
+        if (payload.hasNonNull(POST_ID) && payload.hasNonNull(USER_ID)) {
             String postId = payload.get(POST_ID).asText();
-            postService.repostPost(postId).subscribe(post -> {
+            String userId = payload.get(USER_ID).asText();
+            postService.repostPost(postId, userId).subscribe(post -> {
                 try {
                     session.sendMessage(new TextMessage(String.format(
                             "{\"type\":\"post.repost.success\",\"payload\":{\"postId\":\"%s\"}}",

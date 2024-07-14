@@ -1,7 +1,7 @@
 package com.example.websocket.handler;
 
-import com.example.websocket.model.User;
 import com.example.websocket.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -21,6 +21,7 @@ public class UserWebSocketHandler {
     private static final String FIRST_NAME = "firstName";
     private static final String LAST_NAME = "lastName";
     private static final String USER_ID = "userId";
+    private static final String ERROR_PROCESSING_JSON = "Error processing user data to JSON";
 
     private final UserService userService;
     private final ObjectMapper objectMapper;
@@ -39,10 +40,10 @@ public class UserWebSocketHandler {
             case "user.check":
                 handleUserCheck(session, payload);
                 break;
-                case "user.getById": // Add support for user.getById
+            case "user.getById":
                 handleGetUserById(session, payload);
                 break;
-            case "user.getCurrent": // Add support for user.getCurrent
+            case "user.getCurrent":
                 handleGetCurrentUser(session, payload);
                 break;
             default:
@@ -55,14 +56,19 @@ public class UserWebSocketHandler {
             String userId = payload.get(USER_ID).asText();
             logger.info("Fetching user with ID {}", userId);
             userService.getUserById(userId).flatMap(user -> {
+                logger.info("User fetched: {}", user);
+                String userJson;
                 try {
-                    logger.info("User fetched: {}", user);
-                    String userJson = objectMapper.writeValueAsString(user);
-                    session.sendMessage(new TextMessage(String.format(
-                            "{\"type\":\"user.getCurrent.success\",\"payload\":%s}", userJson)));
-                } catch (IOException e) {
-                    logger.error("Error sending user data", e);
+                    userJson = objectMapper.writeValueAsString(user);
+                } catch (JsonProcessingException e) {
+                    logger.error(ERROR_PROCESSING_JSON, e);
+                    sendErrorMessage(session, ERROR_PROCESSING_JSON, e);
+                    return Mono.empty();
                 }
+                sendMessage(session,
+                        new TextMessage(String.format(
+                                "{\"type\":\"user.getCurrent.success\",\"payload\":%s}",
+                                userJson)));
                 return Mono.just(user);
             }).onErrorResume(error -> {
                 logger.error("Error fetching user data: {}", error.getMessage());
@@ -80,14 +86,17 @@ public class UserWebSocketHandler {
             String userId = payload.get(USER_ID).asText();
             logger.info("Fetching user with ID {}", userId);
             userService.getUserById(userId).flatMap(user -> {
+                logger.info("User fetched: {}", user);
+                String userJson;
                 try {
-                    logger.info("User fetched: {}", user);
-                    String userJson = objectMapper.writeValueAsString(user);
-                    session.sendMessage(new TextMessage(String.format(
-                            "{\"type\":\"user.getById.success\",\"payload\":%s}", userJson)));
-                } catch (IOException e) {
-                    logger.error("Error sending user data", e);
+                    userJson = objectMapper.writeValueAsString(user);
+                } catch (JsonProcessingException e) {
+                    logger.error(ERROR_PROCESSING_JSON, e);
+                    sendErrorMessage(session, ERROR_PROCESSING_JSON, e);
+                    return Mono.empty();
                 }
+                sendMessage(session, new TextMessage(String
+                        .format("{\"type\":\"user.getById.success\",\"payload\":%s}", userJson)));
                 return Mono.just(user);
             }).onErrorResume(error -> {
                 logger.error("Error fetching user data: {}", error.getMessage());
@@ -99,6 +108,7 @@ public class UserWebSocketHandler {
             sendErrorMessage(session, "Missing fields in user.getById payload", null);
         }
     }
+
     private void handleUserCreate(WebSocketSession session, JsonNode payload) {
         if (payload.hasNonNull(EMAIL) && payload.hasNonNull(FIRST_NAME)
                 && payload.hasNonNull(LAST_NAME)) {
@@ -107,14 +117,10 @@ public class UserWebSocketHandler {
             String lastName = payload.get(LAST_NAME).asText();
             logger.info("Checking if user with email {} exists", email);
             userService.createUserIfNotExists(email, firstName, lastName).flatMap(user -> {
-                try {
-                    logger.info("User creation successful or user already existed: {}", user);
-                    session.sendMessage(new TextMessage(String.format(
-                            "{\"type\":\"user.create.success\",\"payload\":{\"userId\":\"%s\"}}",
-                            user.getId())));
-                } catch (IOException e) {
-                    logger.error("Error sending creation confirmation", e);
-                }
+                logger.info("User creation successful or user already existed: {}", user);
+                sendMessage(session, new TextMessage(String.format(
+                        "{\"type\":\"user.create.success\",\"payload\":{\"userId\":\"%s\"}}",
+                        user.getId())));
                 return Mono.just(user);
             }).onErrorResume(error -> {
                 logger.error("Error during user creation: {}", error.getMessage());
@@ -146,28 +152,33 @@ public class UserWebSocketHandler {
     }
 
     private void sendUserCheckResult(WebSocketSession session, boolean exists) {
-        try {
-            String result = String
-                    .format("{\"type\":\"user.check.result\",\"payload\":{\"exists\":%b}}", exists);
-            session.sendMessage(new TextMessage(result));
-            logger.info("Sent user check result: {}", result);
-        } catch (IOException e) {
-            logger.error("Error sending user check result", e);
-        }
+        String result = String
+                .format("{\"type\":\"user.check.result\",\"payload\":{\"exists\":%b}}", exists);
+        sendMessage(session, new TextMessage(result));
+        logger.info("Sent user check result: {}", result);
     }
 
     private void sendErrorMessage(WebSocketSession session, String errorMessage, Throwable error) {
         logger.error("{}: {}", errorMessage, error != null ? error.getMessage() : "N/A", error);
-        try {
-            session.sendMessage(new TextMessage(
-                    String.format("{\"type\":\"error\",\"payload\":{\"message\":\"%s: %s\"}}",
-                            errorMessage, error != null ? error.getMessage() : "N/A")));
-        } catch (IOException e) {
-            logger.error("Error sending error message", e);
-        }
+        sendMessage(session,
+                new TextMessage(
+                        String.format("{\"type\":\"error\",\"payload\":{\"message\":\"%s: %s\"}}",
+                                errorMessage, error != null ? error.getMessage() : "N/A")));
     }
 
     private void sendErrorMessage(WebSocketSession session, String errorMessage) {
         sendErrorMessage(session, errorMessage, null);
+    }
+
+    private void sendMessage(WebSocketSession session, TextMessage message) {
+        if (session.isOpen()) {
+            try {
+                session.sendMessage(message);
+            } catch (IOException e) {
+                logger.error("Error sending message", e);
+            }
+        } else {
+            logger.warn("Attempted to send message to closed session: {}", message.getPayload());
+        }
     }
 }
