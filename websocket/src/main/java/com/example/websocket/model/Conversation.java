@@ -20,6 +20,7 @@ public class Conversation {
     private String receiverLastName;
     private String name;
     private List<Message> messages = new ArrayList<>();
+    private List<Like> likes = new ArrayList<>();
     private Date createdAt;
     private Date updatedAt;
 
@@ -115,6 +116,14 @@ public class Conversation {
         this.messages = messages;
     }
 
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -131,21 +140,35 @@ public class Conversation {
         this.updatedAt = updatedAt;
     }
 
-    public void addMessage(String senderId, String content) {
-        this.messages.add(new Message(senderId, content));
+    public void addMessage(String senderId, String senderFirstName, String senderLastName,
+            String content) {
+        this.messages.add(new Message(senderId, senderFirstName, senderLastName, content));
         this.updatedAt = new Date();
+    }
+
+    public void addLike(Like like) {
+        this.likes.add(like);
+    }
+
+    public void removeLike(String userId) {
+        this.likes.removeIf(like -> like.getUserId().equals(userId));
     }
 
     public static class Message {
         private String id;
         private String senderId;
+        private String senderFirstName;
+        private String senderLastName;
         private String content;
         private Date timestamp;
         private List<Like> likes = new ArrayList<>();
 
-        public Message(String senderId, String content) {
+        public Message(String senderId, String senderFirstName, String senderLastName,
+                String content) {
             this.id = UUID.randomUUID().toString();
             this.senderId = senderId;
+            this.senderFirstName = senderFirstName;
+            this.senderLastName = senderLastName;
             this.content = content;
             this.timestamp = new Date();
         }
@@ -166,6 +189,22 @@ public class Conversation {
 
         public void setSenderId(String senderId) {
             this.senderId = senderId;
+        }
+
+        public String getSenderFirstName() {
+            return senderFirstName;
+        }
+
+        public void setSenderFirstName(String senderFirstName) {
+            this.senderFirstName = senderFirstName;
+        }
+
+        public String getSenderLastName() {
+            return senderLastName;
+        }
+
+        public void setSenderLastName(String senderLastName) {
+            this.senderLastName = senderLastName;
         }
 
         public String getContent() {

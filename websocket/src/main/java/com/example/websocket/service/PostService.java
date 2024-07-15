@@ -131,9 +131,9 @@ public class PostService {
                             return userRepository.save(likeUser).thenReturn(savedPost);
                         });
                     }).flatMap(savedPost -> {
-                        return userRepository.findById(postId).flatMap(postOwner -> {
+                        return userRepository.findById(savedPost.getUserId()).flatMap(postOwner -> {
                             Notification notification =
-                                    new Notification(postId, user.getFirstName(),
+                                    new Notification(savedPost.getUserId(), user.getFirstName(),
                                             user.getLastName(),
                                             String.format("%s %s liked your post.",
                                                     user.getFirstName(), user.getLastName()),
@@ -161,7 +161,7 @@ public class PostService {
                             return userRepository.save(likeUser).thenReturn(savedPost);
                         });
                     }).flatMap(savedPost -> {
-                        return userRepository.findById(postId).flatMap(postOwner -> {
+                        return userRepository.findById(savedPost.getUserId()).flatMap(postOwner -> {
                             Notification notification =
                                     new Notification(postId, user.getFirstName(),
                                             user.getLastName(),
@@ -177,6 +177,7 @@ public class PostService {
                     }));
         });
     }
+
     public Mono<Post> sharePost(String postId, String email) {
         return postRepository.findById(postId).flatMap(post -> {
             post.addShare(email);

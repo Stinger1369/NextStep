@@ -22,17 +22,20 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final PostWebSocketHandler postHandler;
     private final CommentWebSocketHandler commentHandler;
     private final ConversationWebSocketHandler conversationHandler;
-    private final LikeWebSocketHandler likeHandler; // Added LikeWebSocketHandler
+    private final LikeWebSocketHandler likeHandler;
+    private final MessageWebSocketHandler messageHandler;
 
     public ChatWebSocketHandler(ObjectMapper objectMapper, UserWebSocketHandler userHandler,
             PostWebSocketHandler postHandler, CommentWebSocketHandler commentHandler,
-            ConversationWebSocketHandler conversationHandler, LikeWebSocketHandler likeHandler) {
+            ConversationWebSocketHandler conversationHandler, LikeWebSocketHandler likeHandler,
+            MessageWebSocketHandler messageHandler) {
         this.objectMapper = objectMapper;
         this.userHandler = userHandler;
         this.postHandler = postHandler;
         this.commentHandler = commentHandler;
         this.conversationHandler = conversationHandler;
-        this.likeHandler = likeHandler; // Initialize LikeWebSocketHandler
+        this.likeHandler = likeHandler;
+        this.messageHandler = messageHandler;
     }
 
     @Override
@@ -79,34 +82,31 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 case "conversation.getAll":
                 case "conversation.update":
                 case "conversation.delete":
+                case "conversation.like":
+                case "conversation.unlike":
+                    conversationHandler.handleMessage(session, messageType, payload);
+                    break;
+                case "message.create":
                 case "message.like":
                 case "message.unlike":
-                    conversationHandler.handleMessage(session, messageType, payload);
+                case "message.get":
+                case "message.getByConversationId":
+                case "message.getAll":
+                case "message.update":
+                case "message.delete":
+                    messageHandler.handleMessage(session, messageType, payload);
                     break;
                 case "like.create":
                 case "like.delete":
                     likeHandler.handleMessage(session, messageType, payload);
                     break;
                 default:
-                    sendErrorMessage(session,
+                    WebSocketErrorHandler.sendErrorMessage(session,
                             String.format("Unknown message type: %s", messageType));
             }
         } catch (IOException e) {
             logger.error("Error processing message", e);
-            sendErrorMessage(session, "Invalid JSON format");
-        }
-    }
-
-    private void sendErrorMessage(WebSocketSession session, String errorMessage) {
-        if (session.isOpen()) {
-            try {
-                session.sendMessage(new TextMessage(String.format(
-                        "{\"type\":\"error\",\"payload\":{\"message\":\"%s\"}}", errorMessage)));
-            } catch (IOException e) {
-                logger.error("Error sending error message", e);
-            }
-        } else {
-            logger.warn("Attempted to send error message to closed session: {}", errorMessage);
+            WebSocketErrorHandler.sendErrorMessage(session, "Invalid JSON format");
         }
     }
 }

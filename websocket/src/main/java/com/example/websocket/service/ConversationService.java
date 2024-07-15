@@ -1,7 +1,6 @@
 package com.example.websocket.service;
 
 import com.example.websocket.model.Conversation;
-import com.example.websocket.model.Conversation.Message;
 import com.example.websocket.model.Like;
 import com.example.websocket.model.Notification;
 import com.example.websocket.model.User;
@@ -33,7 +32,8 @@ public class ConversationService {
     }
 
     public Mono<Conversation> createConversation(Conversation conversation, String initialMessage) {
-        conversation.addMessage(conversation.getSenderId(), initialMessage);
+        conversation.addMessage(conversation.getSenderId(), conversation.getSenderFirstName(),
+                conversation.getSenderLastName(), initialMessage);
         return conversationRepository.save(conversation).flatMap(savedConversation -> {
             Mono<User> senderUpdate =
                     userRepository.findById(savedConversation.getSenderId()).flatMap(sender -> {
@@ -84,11 +84,47 @@ public class ConversationService {
         return conversationRepository.deleteById(id);
     }
 
-    public Mono<Message> likeMessage(String conversationId, String messageId, String userId) {
+    public Mono<Conversation> likeConversation(String conversationId, String userId) {
         return userRepository.findById(userId).flatMap(user -> {
             return conversationRepository.findById(conversationId).flatMap(conversation -> {
-                List<Message> messages = conversation.getMessages();
-                for (Message message : messages) {
+                Like like = new Like(userId, conversationId, "conversation", user.getFirstName(),
+                        user.getLastName());
+                conversation.addLike(like);
+                return likeRepository.save(like).then(conversationRepository.save(conversation))
+                        .flatMap(savedConversation -> {
+                            Notification notification = new Notification(conversationId, "System",
+                                    "System", "Your conversation was liked by "
+                                            + user.getFirstName() + " " + user.getLastName(),
+                                    conversation.getName());
+                            return notificationService.createNotification(notification)
+                                    .thenReturn(savedConversation);
+                        });
+            });
+        });
+    }
+
+    public Mono<Conversation> unlikeConversation(String conversationId, String userId) {
+        return userRepository.findById(userId).flatMap(user -> {
+            return conversationRepository.findById(conversationId).flatMap(conversation -> {
+                conversation.removeLike(userId);
+                return conversationRepository.save(conversation).flatMap(savedConversation -> {
+                    Notification notification = new Notification(
+                            conversationId, "System", "System", "Your conversation was unliked by "
+                                    + user.getFirstName() + " " + user.getLastName(),
+                            conversation.getName());
+                    return notificationService.createNotification(notification)
+                            .thenReturn(savedConversation);
+                });
+            });
+        });
+    }
+
+    public Mono<Conversation.Message> likeMessage(String conversationId, String messageId,
+            String userId) {
+        return userRepository.findById(userId).flatMap(user -> {
+            return conversationRepository.findById(conversationId).flatMap(conversation -> {
+                List<Conversation.Message> messages = conversation.getMessages();
+                for (Conversation.Message message : messages) {
                     if (message.getId().equals(messageId)) {
                         Like like = new Like(userId, messageId, "message", user.getFirstName(),
                                 user.getLastName());
@@ -96,12 +132,11 @@ public class ConversationService {
                         return likeRepository.save(like)
                                 .then(conversationRepository.save(conversation))
                                 .flatMap(savedConversation -> {
-                                    Notification notification =
-                                            new Notification(messageId, "System", "System",
-                                                    "Your message was liked by "
-                                                            + user.getFirstName() + " "
-                                                            + user.getLastName(),
-                                                    messageId);
+                                    Notification notification = new Notification(messageId,
+                                            "System", "System",
+                                            "Your message was liked by " + user.getFirstName() + " "
+                                                    + user.getLastName(),
+                                            message.getContent());
                                     return notificationService.createNotification(notification)
                                             .thenReturn(message);
                                 });
@@ -112,23 +147,21 @@ public class ConversationService {
         });
     }
 
-    public Mono<Message> unlikeMessage(String conversationId, String messageId, String userId) {
+    public Mono<Conversation.Message> unlikeMessage(String conversationId, String messageId,
+            String userId) {
         return userRepository.findById(userId).flatMap(user -> {
             return conversationRepository.findById(conversationId).flatMap(conversation -> {
-                List<Message> messages = conversation.getMessages();
-                for (Message message : messages) {
+                List<Conversation.Message> messages = conversation.getMessages();
+                for (Conversation.Message message : messages) {
                     if (message.getId().equals(messageId)) {
-                        Like like = new Like(userId, messageId, "message", user.getFirstName(),
-                                user.getLastName());
                         message.removeLike(userId);
                         return conversationRepository.save(conversation)
                                 .flatMap(savedConversation -> {
-                                    Notification notification =
-                                            new Notification(messageId, "System", "System",
-                                                    "Your message was unliked by "
-                                                            + user.getFirstName() + " "
-                                                            + user.getLastName(),
-                                                    messageId);
+                                    Notification notification = new Notification(messageId,
+                                            "System", "System",
+                                            "Your message was unliked by " + user.getFirstName()
+                                                    + " " + user.getLastName(),
+                                            message.getContent());
                                     return notificationService.createNotification(notification)
                                             .thenReturn(message);
                                 });

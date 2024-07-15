@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
@@ -16,6 +15,10 @@ import java.io.IOException;
 public class LikeWebSocketHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(LikeWebSocketHandler.class);
+    private static final String USER_ID = "userId";
+    private static final String ENTITY_ID = "entityId";
+    private static final String ENTITY_TYPE = "entityType";
+
     private final UserService userService;
     private final ObjectMapper objectMapper;
 
@@ -25,6 +28,7 @@ public class LikeWebSocketHandler {
     }
 
     public void handleMessage(WebSocketSession session, String messageType, JsonNode payload) {
+        logger.info("Handling message of type: {}", messageType);
         switch (messageType) {
             case "like.create":
                 handleLikeCreate(session, payload);
@@ -33,16 +37,17 @@ public class LikeWebSocketHandler {
                 handleLikeDelete(session, payload);
                 break;
             default:
-                sendErrorMessage(session, "Unknown like message type: " + messageType);
+                WebSocketErrorHandler.sendErrorMessage(session,
+                        "Unknown like message type: " + messageType);
         }
     }
 
     private void handleLikeCreate(WebSocketSession session, JsonNode payload) {
-        if (payload.hasNonNull("userId") && payload.hasNonNull("entityId")
-                && payload.hasNonNull("entityType")) {
-            String userId = payload.get("userId").asText();
-            String entityId = payload.get("entityId").asText();
-            String entityType = payload.get("entityType").asText();
+        if (payload.hasNonNull(USER_ID) && payload.hasNonNull(ENTITY_ID)
+                && payload.hasNonNull(ENTITY_TYPE)) {
+            String userId = payload.get(USER_ID).asText();
+            String entityId = payload.get(ENTITY_ID).asText();
+            String entityType = payload.get(ENTITY_TYPE).asText();
 
             userService.likeEntity(userId, entityId, entityType).subscribe(savedLike -> {
                 try {
@@ -51,18 +56,20 @@ public class LikeWebSocketHandler {
                 } catch (IOException e) {
                     logger.error("Error sending like creation response", e);
                 }
-            }, error -> sendErrorMessage(session, "Error creating like", error));
+            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error creating like",
+                    error));
         } else {
-            sendErrorMessage(session, "Missing fields in like.create payload");
+            WebSocketErrorHandler.sendErrorMessage(session,
+                    "Missing fields in like.create payload");
         }
     }
 
     private void handleLikeDelete(WebSocketSession session, JsonNode payload) {
-        if (payload.hasNonNull("userId") && payload.hasNonNull("entityId")
-                && payload.hasNonNull("entityType")) {
-            String userId = payload.get("userId").asText();
-            String entityId = payload.get("entityId").asText();
-            String entityType = payload.get("entityType").asText();
+        if (payload.hasNonNull(USER_ID) && payload.hasNonNull(ENTITY_ID)
+                && payload.hasNonNull(ENTITY_TYPE)) {
+            String userId = payload.get(USER_ID).asText();
+            String entityId = payload.get(ENTITY_ID).asText();
+            String entityType = payload.get(ENTITY_TYPE).asText();
 
             userService.unlikeEntity(userId, entityId, entityType).subscribe(unused -> {
                 try {
@@ -71,36 +78,11 @@ public class LikeWebSocketHandler {
                 } catch (IOException e) {
                     logger.error("Error sending like deletion response", e);
                 }
-            }, error -> sendErrorMessage(session, "Error deleting like", error));
+            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error deleting like",
+                    error));
         } else {
-            sendErrorMessage(session, "Missing fields in like.delete payload");
+            WebSocketErrorHandler.sendErrorMessage(session,
+                    "Missing fields in like.delete payload");
         }
-    }
-
-    private void sendErrorMessage(WebSocketSession session, String errorMessage, Throwable error) {
-        logger.error("{}: {}", errorMessage, error != null ? error.getMessage() : "N/A", error);
-        try {
-            String result =
-                    objectMapper.writeValueAsString(new WebSocketResponse("error", errorMessage));
-            session.sendMessage(new TextMessage(result));
-        } catch (IOException e) {
-            logger.error("Error sending error message", e);
-        }
-    }
-
-    private void sendErrorMessage(WebSocketSession session, String errorMessage) {
-        sendErrorMessage(session, errorMessage, null);
-    }
-
-    static class WebSocketResponse {
-        private String type;
-        private String payload;
-
-        public WebSocketResponse(String type, String payload) {
-            this.type = type;
-            this.payload = payload;
-        }
-
-        // Getters and setters
     }
 }

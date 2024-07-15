@@ -115,6 +115,10 @@ public class UserService {
     }
 
     public Mono<Like> likeEntity(String userId, String entityId, String entityType) {
+        if ("user".equals(entityType) && userId.equals(entityId)) {
+            return Mono.error(new Exception("Users cannot like themselves."));
+        }
+
         return userRepository.findById(userId).flatMap(user -> {
             return likeService.hasLikedEntity(userId, entityId, entityType).flatMap(hasLiked -> {
                 if (hasLiked) {
@@ -122,17 +126,17 @@ public class UserService {
                 } else {
                     Like like = new Like(userId, entityId, entityType, user.getFirstName(),
                             user.getLastName());
-                    return likeService.likeEntity(like).flatMap(
-                            savedLike -> userRepository.findById(userId).flatMap(likeUser -> {
-                                likeUser.addLike(savedLike);
-                                return userRepository.save(likeUser);
-                            }).flatMap(updatedUser -> {
-                                String message =
-                                        String.format("User %s liked entity %s of type %s.",
-                                                user.getFirstName(), entityId, entityType);
-                                return sendNotification(entityId, message, entityId)
-                                        .thenReturn(savedLike);
-                            }));
+                    return likeService.likeEntity(like).flatMap(savedLike -> {
+                        return userRepository.findById(userId).flatMap(likeUser -> {
+                            likeUser.addLike(savedLike);
+                            return userRepository.save(likeUser);
+                        }).flatMap(updatedUser -> {
+                            String message = String.format("User %s liked entity %s of type %s.",
+                                    user.getFirstName(), entityId, entityType);
+                            return sendNotification(entityId, message, entityId)
+                                    .thenReturn(savedLike);
+                        });
+                    });
                 }
             });
         });
