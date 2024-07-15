@@ -3,20 +3,23 @@ package com.example.websocket.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Document(collection = "comments")
 public class Comment {
     @Id
     private String id;
-    private String userId;
     private String postId;
+    private String userId;
     private String firstName;
     private String lastName;
     private String content;
     private Date createdAt;
     private Date updatedAt;
+    private List<Like> likes = new ArrayList<>();
 
     public Comment() {
         this.id = UUID.randomUUID().toString();
@@ -44,20 +47,20 @@ public class Comment {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public String getPostId() {
         return postId;
     }
 
     public void setPostId(String postId) {
         this.postId = postId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getFirstName() {
@@ -98,5 +101,27 @@ public class Comment {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
+    }
+
+    public void addLike(Like like) {
+        this.likes.add(like);
+        this.updatedAt = new Date();
+    }
+
+    public void removeLike(Like like2) {
+        this.likes.removeIf(like -> like.getUserId().equals(like2));
+        this.updatedAt = new Date();
+    }
+
+    public boolean hasLiked(String userId) {
+        return this.likes.stream().anyMatch(like -> like.getUserId().equals(userId));
     }
 }

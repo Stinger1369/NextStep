@@ -18,6 +18,7 @@ public class User {
     private List<Post> posts = new ArrayList<>();
     private List<Notification> notifications = new ArrayList<>();
     private List<Conversation> conversations = new ArrayList<>();
+    private List<Like> likes = new ArrayList<>();
 
     public User() {
         this.id = UUID.randomUUID().toString();
@@ -95,6 +96,24 @@ public class User {
 
     public void setConversations(List<Conversation> conversations) {
         this.conversations = conversations;
+    }
+
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
+    }
+
+    public void addLike(Like like) {
+        this.likes.add(like);
+    }
+
+    public void removeLike(Like like) {
+        this.likes.removeIf(existingLike -> existingLike.getUserId().equals(like.getUserId())
+                && existingLike.getEntityId().equals(like.getEntityId())
+                && existingLike.getEntityType().equals(like.getEntityType()));
     }
 
     public void addPost(Post post) {

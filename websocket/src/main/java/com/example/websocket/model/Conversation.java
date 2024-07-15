@@ -141,6 +141,7 @@ public class Conversation {
         private String senderId;
         private String content;
         private Date timestamp;
+        private List<Like> likes = new ArrayList<>();
 
         public Message(String senderId, String content) {
             this.id = UUID.randomUUID().toString();
@@ -181,6 +182,22 @@ public class Conversation {
 
         public void setTimestamp(Date timestamp) {
             this.timestamp = timestamp;
+        }
+
+        public List<Like> getLikes() {
+            return likes;
+        }
+
+        public void setLikes(List<Like> likes) {
+            this.likes = likes;
+        }
+
+        public void addLike(Like like) {
+            this.likes.add(like);
+        }
+
+        public void removeLike(String userId) {
+            this.likes.removeIf(like -> like.getUserId().equals(userId));
         }
     }
 }

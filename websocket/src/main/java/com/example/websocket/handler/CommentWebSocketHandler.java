@@ -21,9 +21,9 @@ public class CommentWebSocketHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(CommentWebSocketHandler.class);
     private static final String USER_ID = "userId";
-    private static final String POST_ID = "postId";
-    private static final String CONTENT = "content";
     private static final String COMMENT_ID = "commentId";
+    private static final String CONTENT = "content";
+    private static final String POST_ID = "postId";
     private static final String PAYLOAD = "payload";
     private static final String CREATED_AT = "createdAt";
     private static final String UPDATED_AT = "updatedAt";
@@ -53,6 +53,12 @@ public class CommentWebSocketHandler {
                 break;
             case "comment.delete":
                 handleCommentDelete(session, payload);
+                break;
+            case "comment.like":
+                handleCommentLike(session, payload);
+                break;
+            case "comment.unlike":
+                handleCommentUnlike(session, payload);
                 break;
             case "comment.getById":
                 handleGetCommentById(session, payload);
@@ -128,6 +134,48 @@ public class CommentWebSocketHandler {
                     }, error -> sendErrorMessage(session, "Error updating comment", error));
         } else {
             sendErrorMessage(session, "Missing fields in comment.update payload", null);
+        }
+    }
+
+    private void handleCommentLike(WebSocketSession session, JsonNode payload) {
+        if (payload.hasNonNull(USER_ID) && payload.hasNonNull(COMMENT_ID)) {
+            String userId = payload.get(USER_ID).asText();
+            String commentId = payload.get(COMMENT_ID).asText();
+
+            commentService.likeComment(commentId, userId).subscribe(likedComment -> {
+                try {
+                    String result = objectMapper
+                            .writeValueAsString(Map.of("type", "comment.like.success", PAYLOAD,
+                                    Map.of(COMMENT_ID, likedComment.getId(), USER_ID, userId)));
+                    session.sendMessage(new TextMessage(result));
+                    logger.info("Comment liked: {}", likedComment);
+                } catch (IOException e) {
+                    logger.error("Error sending comment like confirmation", e);
+                }
+            }, error -> sendErrorMessage(session, "Error liking comment", error));
+        } else {
+            sendErrorMessage(session, "Missing fields in comment.like payload", null);
+        }
+    }
+
+    private void handleCommentUnlike(WebSocketSession session, JsonNode payload) {
+        if (payload.hasNonNull(USER_ID) && payload.hasNonNull(COMMENT_ID)) {
+            String userId = payload.get(USER_ID).asText();
+            String commentId = payload.get(COMMENT_ID).asText();
+
+            commentService.unlikeComment(commentId, userId).subscribe(unlikedComment -> {
+                try {
+                    String result = objectMapper
+                            .writeValueAsString(Map.of("type", "comment.unlike.success", PAYLOAD,
+                                    Map.of(COMMENT_ID, unlikedComment.getId(), USER_ID, userId)));
+                    session.sendMessage(new TextMessage(result));
+                    logger.info("Comment unliked: {}", unlikedComment);
+                } catch (IOException e) {
+                    logger.error("Error sending comment unlike confirmation", e);
+                }
+            }, error -> sendErrorMessage(session, "Error unliking comment", error));
+        } else {
+            sendErrorMessage(session, "Missing fields in comment.unlike payload", null);
         }
     }
 

@@ -22,15 +22,17 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final PostWebSocketHandler postHandler;
     private final CommentWebSocketHandler commentHandler;
     private final ConversationWebSocketHandler conversationHandler;
+    private final LikeWebSocketHandler likeHandler; // Added LikeWebSocketHandler
 
     public ChatWebSocketHandler(ObjectMapper objectMapper, UserWebSocketHandler userHandler,
             PostWebSocketHandler postHandler, CommentWebSocketHandler commentHandler,
-            ConversationWebSocketHandler conversationHandler) {
+            ConversationWebSocketHandler conversationHandler, LikeWebSocketHandler likeHandler) {
         this.objectMapper = objectMapper;
         this.userHandler = userHandler;
         this.postHandler = postHandler;
         this.commentHandler = commentHandler;
         this.conversationHandler = conversationHandler;
+        this.likeHandler = likeHandler; // Initialize LikeWebSocketHandler
     }
 
     @Override
@@ -48,6 +50,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 case "user.check":
                 case "user.getCurrent":
                 case "user.getById":
+                case "user.like":
+                case "user.unlike":
                     userHandler.handleMessage(session, messageType, payload);
                     break;
                 case "post.create":
@@ -64,6 +68,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 case "comment.create":
                 case "comment.update":
                 case "comment.delete":
+                case "comment.like":
+                case "comment.unlike":
                 case "comment.getById":
                 case "comment.getAll":
                     commentHandler.handleMessage(session, messageType, payload);
@@ -73,7 +79,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 case "conversation.getAll":
                 case "conversation.update":
                 case "conversation.delete":
+                case "message.like":
+                case "message.unlike":
                     conversationHandler.handleMessage(session, messageType, payload);
+                    break;
+                case "like.create":
+                case "like.delete":
+                    likeHandler.handleMessage(session, messageType, payload);
                     break;
                 default:
                     sendErrorMessage(session,

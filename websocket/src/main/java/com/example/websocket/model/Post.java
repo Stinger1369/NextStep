@@ -20,7 +20,7 @@ public class Post {
     private Date createdAt;
     private Date updatedAt;
     private List<Comment> comments = new ArrayList<>();
-    private List<String> likes = new ArrayList<>();
+    private List<Like> likes = new ArrayList<>();
     private List<String> shares = new ArrayList<>();
     private int repostCount = 0;
     private List<String> reposters = new ArrayList<>();
@@ -120,20 +120,23 @@ public class Post {
         this.updatedAt = new Date();
     }
 
-    public List<String> getLikes() {
+    public List<Like> getLikes() {
         return likes;
     }
 
-    public void setLikes(List<String> likes) {
+    public void setLikes(List<Like> likes) {
         this.likes = likes;
     }
 
-    public void addLike(String userId) {
-        this.likes.add(userId);
+    public void addLike(Like like) {
+        this.likes.add(like);
+        this.updatedAt = new Date();
     }
 
-    public void removeLike(String userId) {
-        this.likes.remove(userId);
+    public void removeLike(Like like) {
+        this.likes.removeIf(existingLike -> existingLike.getUserId().equals(like.getUserId())
+                && existingLike.getEntityId().equals(like.getEntityId())
+                && existingLike.getEntityType().equals(like.getEntityType()));
     }
 
     public List<String> getShares() {
@@ -169,6 +172,6 @@ public class Post {
     }
 
     public boolean hasLiked(String userId) {
-        return this.likes.contains(userId);
+        return this.likes.stream().anyMatch(like -> like.getUserId().equals(userId));
     }
 }

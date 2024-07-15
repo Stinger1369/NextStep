@@ -27,7 +27,10 @@ public class NotificationService {
             notification.setLastName(user.getLastName());
             notification.setCreatedAt(new Date());
             notification.setUpdatedAt(new Date());
-            return notificationRepository.save(notification);
+            return notificationRepository.save(notification).flatMap(savedNotification -> {
+                user.addNotification(savedNotification);
+                return userRepository.save(user).thenReturn(savedNotification);
+            });
         });
     }
 

@@ -14,6 +14,7 @@ public class Notification {
     private String firstName;
     private String lastName;
     private String message;
+    private String content;
     private Date createdAt;
     private Date updatedAt;
 
@@ -23,12 +24,14 @@ public class Notification {
         this.updatedAt = new Date();
     }
 
-    public Notification(String userId, String firstName, String lastName, String message) {
+    public Notification(String userId, String firstName, String lastName, String message,
+            String content) {
         this();
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.message = message;
+        this.content = content;
     }
 
     // Getters and setters
@@ -71,6 +74,14 @@ public class Notification {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public Date getCreatedAt() {

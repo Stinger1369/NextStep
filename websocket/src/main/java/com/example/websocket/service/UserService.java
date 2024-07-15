@@ -1,6 +1,8 @@
 package com.example.websocket.service;
 
+import com.example.websocket.model.Like;
 import com.example.websocket.model.User;
+import com.example.websocket.model.Notification;
 import com.example.websocket.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +20,14 @@ public class UserService {
     private static final String USER_FETCHED = "User fetched: {}";
 
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
+    private final LikeService likeService;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, NotificationService notificationService,
+            LikeService likeService) {
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
+        this.likeService = likeService;
     }
 
     public Mono<User> createUser(User user) {
@@ -96,6 +103,7 @@ public class UserService {
             existingUser.setPosts(user.getPosts());
             existingUser.setNotifications(user.getNotifications());
             existingUser.setConversations(user.getConversations());
+            existingUser.setLikes(user.getLikes());
             if (user.getApiKey() == null || user.getApiKey().isEmpty()) {
                 existingUser.setApiKey(UUID.randomUUID().toString());
             } else {
@@ -104,6 +112,59 @@ public class UserService {
             return userRepository.save(existingUser);
         }).doOnSuccess(updatedUser -> logger.info("User updated: {}", updatedUser))
                 .doOnError(error -> logger.error("Error updating user: {}", error.getMessage()));
+    }
+
+    public Mono<Like> likeEntity(String userId, String entityId, String entityType) {
+        return userRepository.findById(userId).flatMap(user -> {
+            return likeService.hasLikedEntity(userId, entityId, entityType).flatMap(hasLiked -> {
+                if (hasLiked) {
+                    return Mono.error(new Exception("User has already liked this entity."));
+                } else {
+                    Like like = new Like(userId, entityId, entityType, user.getFirstName(),
+                            user.getLastName());
+                    return likeService.likeEntity(like).flatMap(
+                            savedLike -> userRepository.findById(userId).flatMap(likeUser -> {
+                                likeUser.addLike(savedLike);
+                                return userRepository.save(likeUser);
+                            }).flatMap(updatedUser -> {
+                                String message =
+                                        String.format("User %s liked entity %s of type %s.",
+                                                user.getFirstName(), entityId, entityType);
+                                return sendNotification(entityId, message, entityId)
+                                        .thenReturn(savedLike);
+                            }));
+                }
+            });
+        });
+    }
+
+    public Mono<Void> unlikeEntity(String userId, String entityId, String entityType) {
+        return userRepository.findById(userId).flatMap(user -> {
+            Like like =
+                    new Like(userId, entityId, entityType, user.getFirstName(), user.getLastName());
+            return likeService.unlikeEntity(userId, entityId, entityType)
+                    .flatMap(unused -> userRepository.findById(userId).flatMap(likeUser -> {
+                        likeUser.removeLike(like);
+                        return userRepository.save(likeUser);
+                    }).flatMap(updatedUser -> {
+                        String message = String.format("User %s unliked entity %s of type %s.",
+                                user.getFirstName(), entityId, entityType);
+                        return sendNotification(entityId, message, entityId).then();
+                    }));
+        });
+    }
+
+    private Mono<Void> sendNotification(String userId, String message, String entityId) {
+        return userRepository.findById(entityId).flatMap(likedUser -> {
+            Notification notification = new Notification(likedUser.getId(),
+                    likedUser.getFirstName(), likedUser.getLastName(), message, entityId);
+            return notificationService.createNotification(notification)
+                    .flatMap(savedNotification -> {
+                        likedUser.addNotification(savedNotification);
+                        return userRepository.save(likedUser)
+                                .doOnSuccess(saved -> logger.info("Notification sent: {}", saved));
+                    });
+        }).then();
     }
 
     public Mono<Void> deleteUser(String id) {
