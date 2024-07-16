@@ -23,21 +23,29 @@ public class PostLikeHandler {
     }
 
     public void handleLikePost(WebSocketSession session, JsonNode payload) {
+        logger.info("Handling post.like with payload: {}", payload);
+
         if (payload.hasNonNull(POST_ID) && payload.hasNonNull(USER_ID)) {
             String postId = payload.get(POST_ID).asText();
             String userId = payload.get(USER_ID).asText();
+            logger.info("Liking post with postId: {} by userId: {}", postId, userId);
             postService.likePost(postId, userId).subscribe(post -> {
                 try {
                     session.sendMessage(new TextMessage(String.format(
                             "{\"type\":\"post.like.success\",\"payload\":{\"postId\":\"%s\"}}",
                             postId)));
-                    logger.info("Post liked: {}", post);
+                    logger.info("Post liked successfully: {}", post);
                 } catch (IOException e) {
                     logger.error("Error sending post like confirmation", e);
                 }
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error liking post",
-                    error));
+            }, error -> {
+                logger.error("Error liking post with postId: {} by userId: {}", postId, userId,
+                        error);
+                WebSocketErrorHandler.sendErrorMessage(session, error.getMessage(), error);
+            });
         } else {
+            logger.error("Missing fields in post.like payload: postId={}, userId={}",
+                    payload.hasNonNull(POST_ID), payload.hasNonNull(USER_ID));
             WebSocketErrorHandler.sendErrorMessage(session, "Missing fields in post.like payload",
                     null);
         }

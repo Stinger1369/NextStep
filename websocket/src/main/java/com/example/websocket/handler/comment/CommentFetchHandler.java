@@ -27,6 +27,8 @@ public class CommentFetchHandler {
     }
 
     public void handleFetchComment(WebSocketSession session, String messageType, JsonNode payload) {
+        logger.info("handleFetchComment called with messageType: {} and payload: {}", messageType,
+                payload);
         switch (messageType) {
             case "comment.getById":
                 handleGetCommentById(session, payload);
@@ -35,14 +37,17 @@ public class CommentFetchHandler {
                 handleGetAllComments(session);
                 break;
             default:
+                logger.warn("Unknown comment fetch message type: {}", messageType);
                 WebSocketErrorHandler.sendErrorMessage(session,
                         "Unknown comment fetch message type: " + messageType);
         }
     }
 
     private void handleGetCommentById(WebSocketSession session, JsonNode payload) {
+        logger.info("handleGetCommentById called with payload: {}", payload);
         if (payload.hasNonNull(COMMENT_ID)) {
             String commentId = payload.get(COMMENT_ID).asText();
+            logger.info("Fetching comment with commentId: {}", commentId);
 
             commentService.getCommentById(commentId).subscribe(comment -> {
                 try {
@@ -58,15 +63,19 @@ public class CommentFetchHandler {
                 } catch (IOException e) {
                     logger.error("Error sending comment retrieval confirmation", e);
                 }
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error retrieving comment",
-                    error));
+            }, error -> {
+                logger.error("Error retrieving comment with commentId: {}", commentId, error);
+                WebSocketErrorHandler.sendErrorMessage(session, "Error retrieving comment", error);
+            });
         } else {
+            logger.warn("Missing fields in comment.getById payload: {}", payload);
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in comment.getById payload");
         }
     }
 
     private void handleGetAllComments(WebSocketSession session) {
+        logger.info("handleGetAllComments called");
         commentService.getAllComments().collectList().subscribe(comments -> {
             try {
                 String result = objectMapper.writeValueAsString(Map.of("type",
@@ -76,7 +85,9 @@ public class CommentFetchHandler {
             } catch (IOException e) {
                 logger.error("Error sending all comments", e);
             }
-        }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error fetching comments",
-                error));
+        }, error -> {
+            logger.error("Error fetching all comments", error);
+            WebSocketErrorHandler.sendErrorMessage(session, "Error fetching comments", error);
+        });
     }
 }

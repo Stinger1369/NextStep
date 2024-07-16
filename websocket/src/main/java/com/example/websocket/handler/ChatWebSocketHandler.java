@@ -48,6 +48,12 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             String messageType = jsonNode.get("type").asText();
             JsonNode payload = jsonNode.get("payload");
 
+            if (payload == null) {
+                logger.error("Payload is missing in the message: {}", message.getPayload());
+                WebSocketErrorHandler.sendErrorMessage(session, "Missing payload in message", null);
+                return;
+            }
+
             switch (messageType) {
                 case "user.create":
                 case "user.check":
@@ -55,6 +61,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 case "user.getById":
                 case "user.like":
                 case "user.unlike":
+                case "friend.request":
+                case "friend.request.accept":
+                case "friend.request.decline":
+                case "friend.remove":
+                case "profile.visit":
+                case "user.follow":
+                case "user.unfollow":
                     userHandler.handleMessage(session, messageType, payload);
                     break;
                 case "post.create":

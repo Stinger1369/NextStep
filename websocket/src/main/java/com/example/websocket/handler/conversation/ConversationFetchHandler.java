@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage; // Import this
+import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
@@ -30,6 +30,8 @@ public class ConversationFetchHandler {
 
     public void handleFetchConversation(WebSocketSession session, String messageType,
             JsonNode payload) {
+        logger.info("Handling fetch conversation message of type: {}", messageType);
+
         switch (messageType) {
             case "conversation.getById":
                 handleGetConversationById(session, payload);
@@ -38,20 +40,26 @@ public class ConversationFetchHandler {
                 handleGetAllConversations(session);
                 break;
             default:
+                logger.warn("Unknown fetch conversation message type: {}", messageType);
                 WebSocketErrorHandler.sendErrorMessage(session,
                         "Unknown fetch conversation message type: " + messageType);
         }
     }
 
     private void handleGetConversationById(WebSocketSession session, JsonNode payload) {
+        logger.info("Handling get conversation by ID with payload: {}", payload);
+
         String conversationId =
                 payload.hasNonNull(CONVERSATION_ID) ? payload.get(CONVERSATION_ID).asText() : null;
 
         if (conversationId == null) {
+            logger.error("Missing conversationId in conversation.getById payload");
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing conversationId in conversation.getById payload");
             return;
         }
+
+        logger.info("Fetching conversation with ID: {}", conversationId);
 
         conversationService.getConversationById(conversationId).subscribe(conversation -> {
             try {
@@ -62,11 +70,15 @@ public class ConversationFetchHandler {
             } catch (IOException e) {
                 logger.error("Error sending conversation retrieval confirmation", e);
             }
-        }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error retrieving conversation",
-                error));
+        }, error -> {
+            logger.error("Error retrieving conversation with ID: {}", conversationId, error);
+            WebSocketErrorHandler.sendErrorMessage(session, "Error retrieving conversation", error);
+        });
     }
 
     private void handleGetAllConversations(WebSocketSession session) {
+        logger.info("Fetching all conversations");
+
         conversationService.getAllConversations().collectList().subscribe(conversations -> {
             try {
                 String result = objectMapper
@@ -77,7 +89,9 @@ public class ConversationFetchHandler {
             } catch (IOException e) {
                 logger.error("Error sending all conversations", e);
             }
-        }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error fetching conversations",
-                error));
+        }, error -> {
+            logger.error("Error fetching all conversations", error);
+            WebSocketErrorHandler.sendErrorMessage(session, "Error fetching conversations", error);
+        });
     }
 }

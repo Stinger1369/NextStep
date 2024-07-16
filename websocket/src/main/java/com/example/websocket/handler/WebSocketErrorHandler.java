@@ -23,6 +23,7 @@ public class WebSocketErrorHandler {
             try {
                 session.sendMessage(new TextMessage(String.format(
                         "{\"type\":\"error\",\"payload\":{\"message\":\"%s\"}}", errorMessage)));
+                logger.info("Sent error message: {}", errorMessage);
             } catch (IOException e) {
                 logger.error("Error sending error message", e);
             }
@@ -37,6 +38,7 @@ public class WebSocketErrorHandler {
         try {
             session.sendMessage(new TextMessage(String.format(
                     "{\"type\":\"error\",\"payload\":{\"message\":\"%s\"}}", errorMessage)));
+            logger.info("Sent error message: {}", errorMessage);
         } catch (IOException e) {
             logger.error("Error sending error message", e);
         }
@@ -49,6 +51,7 @@ public class WebSocketErrorHandler {
                 String result = objectMapper
                         .writeValueAsString(new WebSocketResponse(messageType, payload));
                 session.sendMessage(new TextMessage(result));
+                logger.info("Sent message of type: {}, payload: {}", messageType, payload);
             } catch (IOException e) {
                 logger.error("Error sending message", e);
             }

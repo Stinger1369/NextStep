@@ -2,11 +2,15 @@ package com.example.websocket.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.UUID;
 
 @Document(collection = "notifications")
+@Data
+@NoArgsConstructor
 public class Notification {
     @Id
     private String id;
@@ -17,86 +21,31 @@ public class Notification {
     private String content;
     private Date createdAt;
     private Date updatedAt;
-
-    public Notification() {
-        this.id = UUID.randomUUID().toString();
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
-    }
+    private String type;
 
     public Notification(String userId, String firstName, String lastName, String message,
             String content) {
-        this();
+        this.id = UUID.randomUUID().toString();
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.message = message;
         this.content = content;
+        this.type = "follow"; // Default type for follow notifications
     }
 
-    // Getters and setters
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
+    public Notification(String userId, String firstName, String lastName, String message,
+            String content, String type) {
+        this.id = UUID.randomUUID().toString();
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
         this.userId = userId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
         this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
         this.message = message;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
         this.content = content;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
+        this.type = type;
     }
 }

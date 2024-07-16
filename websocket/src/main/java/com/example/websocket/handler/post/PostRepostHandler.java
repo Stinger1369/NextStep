@@ -23,21 +23,29 @@ public class PostRepostHandler {
     }
 
     public void handleRepostPost(WebSocketSession session, JsonNode payload) {
+        logger.info("Handling post.repost with payload: {}", payload);
+
         if (payload.hasNonNull(POST_ID) && payload.hasNonNull(USER_ID)) {
             String postId = payload.get(POST_ID).asText();
             String userId = payload.get(USER_ID).asText();
+            logger.info("Reposting post with postId: {} by userId: {}", postId, userId);
             postService.repostPost(postId, userId).subscribe(post -> {
                 try {
                     session.sendMessage(new TextMessage(String.format(
                             "{\"type\":\"post.repost.success\",\"payload\":{\"postId\":\"%s\"}}",
                             postId)));
-                    logger.info("Post reposted: {}", post);
+                    logger.info("Post reposted successfully: {}", post);
                 } catch (IOException e) {
                     logger.error("Error sending post repost confirmation", e);
                 }
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error reposting post",
-                    error));
+            }, error -> {
+                logger.error("Error reposting post with postId: {} by userId: {}", postId, userId,
+                        error);
+                WebSocketErrorHandler.sendErrorMessage(session, "Error reposting post", error);
+            });
         } else {
+            logger.error("Missing fields in post.repost payload: postId={}, userId={}",
+                    payload.hasNonNull(POST_ID), payload.hasNonNull(USER_ID));
             WebSocketErrorHandler.sendErrorMessage(session, "Missing fields in post.repost payload",
                     null);
         }

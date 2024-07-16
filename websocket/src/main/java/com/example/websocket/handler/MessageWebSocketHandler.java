@@ -35,26 +35,33 @@ public class MessageWebSocketHandler {
         logger.info("Handling message of type: {}", messageType);
         switch (messageType) {
             case "message.create":
+                logger.info("Invoking create message handler");
                 messageCreateHandler.handleCreateMessage(session, payload);
                 break;
             case "message.like":
+                logger.info("Invoking like message handler");
                 messageLikeHandler.handleLikeMessage(session, payload);
                 break;
             case "message.unlike":
+                logger.info("Invoking unlike message handler");
                 messageUnlikeHandler.handleUnlikeMessage(session, payload);
                 break;
             case "message.get":
             case "message.getByConversationId":
             case "message.getAll":
+                logger.info("Invoking fetch message handler for type: {}", messageType);
                 messageFetchHandler.handleFetchMessage(session, messageType, payload);
                 break;
             case "message.update":
+                logger.info("Invoking update message handler");
                 messageUpdateHandler.handleUpdateMessage(session, payload);
                 break;
             case "message.delete":
+                logger.info("Invoking delete message handler");
                 messageDeleteHandler.handleDeleteMessage(session, payload);
                 break;
             default:
+                logger.warn("Unknown message type: {}", messageType);
                 WebSocketErrorHandler.sendErrorMessage(session,
                         "Unknown message type: " + messageType);
         }

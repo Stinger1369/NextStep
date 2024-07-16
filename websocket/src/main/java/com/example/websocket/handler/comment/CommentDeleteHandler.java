@@ -27,21 +27,27 @@ public class CommentDeleteHandler {
     }
 
     public void handleCommentDelete(WebSocketSession session, JsonNode payload) {
+        logger.info("handleCommentDelete called with payload: {}", payload);
+
         if (payload.hasNonNull(COMMENT_ID)) {
             String commentId = payload.get(COMMENT_ID).asText();
+            logger.info("Deleting comment with commentId: {}", commentId);
 
             commentService.deleteComment(commentId).subscribe(unused -> {
                 try {
                     String result = objectMapper.writeValueAsString(Map.of("type",
                             "comment.delete.success", PAYLOAD, Map.of(COMMENT_ID, commentId)));
                     session.sendMessage(new TextMessage(result));
-                    logger.info("Comment deleted: {}", commentId);
+                    logger.info("Comment deleted and confirmation sent: {}", commentId);
                 } catch (IOException e) {
                     logger.error("Error sending comment deletion confirmation", e);
                 }
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error deleting comment",
-                    error));
+            }, error -> {
+                logger.error("Error deleting comment", error);
+                WebSocketErrorHandler.sendErrorMessage(session, "Error deleting comment", error);
+            });
         } else {
+            logger.warn("Missing commentId in comment.delete payload: {}", payload);
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing commentId in comment.delete payload");
         }

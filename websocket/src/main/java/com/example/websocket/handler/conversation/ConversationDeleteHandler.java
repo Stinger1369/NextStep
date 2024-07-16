@@ -23,24 +23,29 @@ public class ConversationDeleteHandler {
     }
 
     public void handleDeleteConversation(WebSocketSession session, JsonNode payload) {
-        String conversationId =
-                payload.hasNonNull(CONVERSATION_ID) ? payload.get(CONVERSATION_ID).asText() : null;
+        logger.info("Received conversation.delete request with payload: {}", payload);
+
+        String conversationId = payload.hasNonNull(CONVERSATION_ID) ? payload.get(CONVERSATION_ID).asText() : null;
 
         if (conversationId == null) {
-            WebSocketErrorHandler.sendErrorMessage(session,
-                    "Missing conversationId in conversation.delete payload");
+            logger.error("Missing conversationId in conversation.delete payload");
+            WebSocketErrorHandler.sendErrorMessage(session, "Missing conversationId in conversation.delete payload");
             return;
         }
 
+        logger.info("Deleting conversation with ID: {}", conversationId);
         conversationService.deleteConversation(conversationId).subscribe(unused -> {
             try {
                 session.sendMessage(new TextMessage(String.format(
-                        "{\"type\":\"conversation.delete.success\",\"payload\":{\"conversationId\":\"%s\"}}",
-                        conversationId)));
+                    "{\"type\":\"conversation.delete.success\",\"payload\":{\"conversationId\":\"%s\"}}",
+                    conversationId)));
+                logger.info("Conversation deleted: {}", conversationId);
             } catch (IOException e) {
                 logger.error("Error sending conversation deletion confirmation", e);
             }
-        }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error deleting conversation",
-                error));
+        }, error -> {
+            logger.error("Error deleting conversation", error);
+            WebSocketErrorHandler.sendErrorMessage(session, "Error deleting conversation", error);
+        });
     }
 }

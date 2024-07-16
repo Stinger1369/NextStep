@@ -25,11 +25,16 @@ public class PostUpdateHandler {
     }
 
     public void handleUpdatePost(WebSocketSession session, JsonNode payload) {
+        logger.info("Handling post.update with payload: {}", payload);
+
         if (payload.hasNonNull(POST_ID) && payload.hasNonNull(TITLE)
                 && payload.hasNonNull(CONTENT)) {
             String postId = payload.get(POST_ID).asText();
             String title = payload.get(TITLE).asText();
             String content = payload.get(CONTENT).asText();
+
+            logger.info("Updating post with postId: {}, title: {}, content: {}", postId, title,
+                    content);
 
             Post post = new Post();
             post.setTitle(title);
@@ -40,13 +45,18 @@ public class PostUpdateHandler {
                     session.sendMessage(new TextMessage(String.format(
                             "{\"type\":\"post.update.success\",\"payload\":{\"postId\":\"%s\"}}",
                             updatedPost.getId())));
-                    logger.info("Post updated: {}", updatedPost);
+                    logger.info("Post updated successfully: {}", updatedPost);
                 } catch (IOException e) {
                     logger.error("Error sending post update confirmation", e);
                 }
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error updating post",
-                    error));
+            }, error -> {
+                logger.error("Error updating post with postId: {}", postId, error);
+                WebSocketErrorHandler.sendErrorMessage(session, "Error updating post", error);
+            });
         } else {
+            logger.error("Missing fields in post.update payload: postId={}, title={}, content={}",
+                    payload.hasNonNull(POST_ID), payload.hasNonNull(TITLE),
+                    payload.hasNonNull(CONTENT));
             WebSocketErrorHandler.sendErrorMessage(session, "Missing fields in post.update payload",
                     null);
         }

@@ -30,15 +30,20 @@ public class ConversationUnlikeHandler {
     }
 
     public void handleUnlikeConversation(WebSocketSession session, JsonNode payload) {
+        logger.info("Handling unlike conversation with payload: {}", payload);
+
         String conversationId =
                 payload.hasNonNull(CONVERSATION_ID) ? payload.get(CONVERSATION_ID).asText() : null;
         String userId = payload.hasNonNull(USER_ID) ? payload.get(USER_ID).asText() : null;
 
         if (conversationId == null || userId == null) {
+            logger.error("Missing fields in conversation.unlike payload");
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in conversation.unlike payload");
             return;
         }
+
+        logger.info("Unliking conversation with ID: {} by user ID: {}", conversationId, userId);
 
         conversationService.unlikeConversation(conversationId, userId)
                 .subscribe(unlikedConversation -> {
@@ -51,7 +56,11 @@ public class ConversationUnlikeHandler {
                     } catch (IOException e) {
                         logger.error("Error sending conversation unlike confirmation", e);
                     }
-                }, error -> WebSocketErrorHandler.sendErrorMessage(session,
-                        "Error unliking conversation", error));
+                }, error -> {
+                    logger.error("Error unliking conversation with ID: {} by user ID: {}",
+                            conversationId, userId, error);
+                    WebSocketErrorHandler.sendErrorMessage(session, "Error unliking conversation",
+                            error);
+                });
     }
 }

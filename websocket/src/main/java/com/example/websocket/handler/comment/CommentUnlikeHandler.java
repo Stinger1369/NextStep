@@ -28,9 +28,11 @@ public class CommentUnlikeHandler {
     }
 
     public void handleCommentUnlike(WebSocketSession session, JsonNode payload) {
+        logger.info("handleCommentUnlike called with payload: {}", payload);
         if (payload.hasNonNull(USER_ID) && payload.hasNonNull(COMMENT_ID)) {
             String userId = payload.get(USER_ID).asText();
             String commentId = payload.get(COMMENT_ID).asText();
+            logger.info("Unliking comment with commentId: {} by userId: {}", commentId, userId);
 
             commentService.unlikeComment(commentId, userId).subscribe(unlikedComment -> {
                 try {
@@ -42,9 +44,13 @@ public class CommentUnlikeHandler {
                 } catch (IOException e) {
                     logger.error("Error sending comment unlike confirmation", e);
                 }
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error unliking comment",
-                    error));
+            }, error -> {
+                logger.error("Error unliking comment with commentId: {} by userId: {}", commentId,
+                        userId, error);
+                WebSocketErrorHandler.sendErrorMessage(session, "Error unliking comment", error);
+            });
         } else {
+            logger.warn("Missing fields in comment.unlike payload: {}", payload);
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in comment.unlike payload");
         }

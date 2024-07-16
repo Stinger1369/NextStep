@@ -56,8 +56,14 @@ public class LikeWebSocketHandler {
                 } catch (IOException e) {
                     logger.error("Error sending like creation response", e);
                 }
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error creating like",
-                    error));
+            }, error -> {
+                if ("User has already liked this entity.".equals(error.getMessage())) {
+                    WebSocketErrorHandler.sendErrorMessage(session,
+                            "You have already liked this entity.");
+                } else {
+                    WebSocketErrorHandler.sendErrorMessage(session, "Error creating like", error);
+                }
+            });
         } else {
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in like.create payload");

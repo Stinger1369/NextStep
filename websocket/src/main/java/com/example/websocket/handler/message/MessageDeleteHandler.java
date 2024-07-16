@@ -24,21 +24,31 @@ public class MessageDeleteHandler {
     }
 
     public void handleDeleteMessage(WebSocketSession session, JsonNode payload) {
+        logger.info("Received message.delete payload: {}", payload);
+
         if (payload.hasNonNull(MESSAGE_ID) && payload.hasNonNull(USER_ID)) {
             String messageId = payload.get(MESSAGE_ID).asText();
             String userId = payload.get(USER_ID).asText();
+
+            logger.info("Attempting to delete message with ID: {} for user ID: {}", messageId,
+                    userId);
+
             messageService.deleteMessage(messageId, userId).subscribe(unused -> {
                 try {
-                    session.sendMessage(new TextMessage(String.format(
+                    String response = String.format(
                             "{\"type\":\"message.delete.success\",\"payload\":{\"messageId\":\"%s\"}}",
-                            messageId)));
+                            messageId);
+                    session.sendMessage(new TextMessage(response));
                     logger.info("Message deleted: {}", messageId);
                 } catch (IOException e) {
                     logger.error("Error sending message deletion confirmation", e);
                 }
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error deleting message",
-                    error));
+            }, error -> {
+                logger.error("Error deleting message with ID: {}", messageId, error);
+                WebSocketErrorHandler.sendErrorMessage(session, "Error deleting message", error);
+            });
         } else {
+            logger.warn("Missing fields in message.delete payload");
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in message.delete payload");
         }

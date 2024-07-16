@@ -44,20 +44,26 @@ public class CommentCreateHandler {
     }
 
     public void handleCommentCreate(WebSocketSession session, JsonNode payload) {
+        logger.info("handleCommentCreate called with payload: {}", payload);
+
         if (payload.hasNonNull(USER_ID) && payload.hasNonNull(POST_ID)
                 && payload.hasNonNull(CONTENT)) {
             String userId = payload.get(USER_ID).asText();
             String postId = payload.get(POST_ID).asText();
             String content = payload.get(CONTENT).asText();
 
+            logger.info("Creating comment for userId: {}, postId: {}", userId, postId);
+
             userService.getUserById(userId).flatMap(user -> {
                 Comment comment = new Comment(userId, postId, user.getFirstName(),
                         user.getLastName(), content);
 
-                logger.info("Creating comment: {}", comment);
+                logger.info("Generated comment: {}", comment);
 
-                return commentService.createComment(comment).flatMap(savedComment -> postService
-                        .addCommentToPost(postId, savedComment).thenReturn(savedComment));
+                return commentService.createComment(comment).flatMap(savedComment -> {
+                    logger.info("Comment created: {}. Adding to postId: {}", savedComment, postId);
+                    return postService.addCommentToPost(postId, savedComment).thenReturn(savedComment);
+                });
             }).subscribe(savedComment -> {
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
@@ -72,13 +78,16 @@ public class CommentCreateHandler {
                                     savedComment.getLastName(), CONTENT, savedComment.getContent(),
                                     CREATED_AT, createdAt, UPDATED_AT, updatedAt)));
                     session.sendMessage(new TextMessage(result));
-                    logger.info("Comment created and added to post: {}", savedComment);
+                    logger.info("Comment creation message sent: {}", savedComment);
                 } catch (IOException e) {
                     logger.error("Error sending comment creation confirmation", e);
                 }
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error creating comment",
-                    error));
+            }, error -> {
+                logger.error("Error creating comment", error);
+                WebSocketErrorHandler.sendErrorMessage(session, "Error creating comment", error);
+            });
         } else {
+            logger.warn("Missing fields in comment.create payload: {}", payload);
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in comment.create payload");
         }

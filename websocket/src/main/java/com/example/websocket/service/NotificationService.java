@@ -46,6 +46,7 @@ public class NotificationService {
         return notificationRepository.findById(id).flatMap(existingNotification -> {
             existingNotification.setMessage(notification.getMessage());
             existingNotification.setUpdatedAt(new Date());
+            existingNotification.setType(notification.getType()); // Ajout de la mise à jour du type
             return notificationRepository.save(existingNotification);
         });
     }

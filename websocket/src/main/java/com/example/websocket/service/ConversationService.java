@@ -17,6 +17,7 @@ import java.util.List;
 
 @Service
 public class ConversationService {
+    private static final String SYSTEM = "System";
     private final ConversationRepository conversationRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
@@ -69,12 +70,10 @@ public class ConversationService {
 
     public Mono<Conversation> updateConversation(String id, JsonNode payload) {
         return conversationRepository.findById(id).flatMap(existingConversation -> {
-            if (payload.hasNonNull("senderId")) {
+            if (payload.hasNonNull("senderId"))
                 existingConversation.setSenderId(payload.get("senderId").asText());
-            }
-            if (payload.hasNonNull("receiverId")) {
+            if (payload.hasNonNull("receiverId"))
                 existingConversation.setReceiverId(payload.get("receiverId").asText());
-            }
             existingConversation.setUpdatedAt(new Date());
             return conversationRepository.save(existingConversation);
         });
@@ -92,10 +91,11 @@ public class ConversationService {
                 conversation.addLike(like);
                 return likeRepository.save(like).then(conversationRepository.save(conversation))
                         .flatMap(savedConversation -> {
-                            Notification notification = new Notification(conversationId, "System",
-                                    "System", "Your conversation was liked by "
-                                            + user.getFirstName() + " " + user.getLastName(),
-                                    conversation.getName());
+                            Notification notification =
+                                    new Notification(conversationId, SYSTEM, SYSTEM,
+                                            "Your conversation was liked by " + user.getFirstName()
+                                                    + " " + user.getLastName(),
+                                            conversation.getName());
                             return notificationService.createNotification(notification)
                                     .thenReturn(savedConversation);
                         });
@@ -109,7 +109,7 @@ public class ConversationService {
                 conversation.removeLike(userId);
                 return conversationRepository.save(conversation).flatMap(savedConversation -> {
                     Notification notification = new Notification(
-                            conversationId, "System", "System", "Your conversation was unliked by "
+                            conversationId, SYSTEM, SYSTEM, "Your conversation was unliked by "
                                     + user.getFirstName() + " " + user.getLastName(),
                             conversation.getName());
                     return notificationService.createNotification(notification)
@@ -132,8 +132,8 @@ public class ConversationService {
                         return likeRepository.save(like)
                                 .then(conversationRepository.save(conversation))
                                 .flatMap(savedConversation -> {
-                                    Notification notification = new Notification(messageId,
-                                            "System", "System",
+                                    Notification notification = new Notification(messageId, SYSTEM,
+                                            SYSTEM,
                                             "Your message was liked by " + user.getFirstName() + " "
                                                     + user.getLastName(),
                                             message.getContent());
@@ -157,8 +157,8 @@ public class ConversationService {
                         message.removeLike(userId);
                         return conversationRepository.save(conversation)
                                 .flatMap(savedConversation -> {
-                                    Notification notification = new Notification(messageId,
-                                            "System", "System",
+                                    Notification notification = new Notification(messageId, SYSTEM,
+                                            SYSTEM,
                                             "Your message was unliked by " + user.getFirstName()
                                                     + " " + user.getLastName(),
                                             message.getContent());

@@ -27,6 +27,8 @@ public class UserFetchHandler {
     }
 
     public void handleGetUserById(WebSocketSession session, JsonNode payload) {
+        logger.info("Received user.getById request with payload: {}", payload);
+
         if (payload.hasNonNull(USER_ID)) {
             String userId = payload.get(USER_ID).asText();
             logger.info("Fetching user with ID {}", userId);
@@ -41,25 +43,29 @@ public class UserFetchHandler {
                     return Mono.empty();
                 }
                 WebSocketErrorHandler.sendMessage(session, "user.getById.success", userJson);
+                logger.info("Sent user.getById.success for userId {}", userId);
                 return Mono.just(user);
             }).onErrorResume(error -> {
-                logger.error("Error fetching user data: {}", error.getMessage());
+                logger.error("Error fetching user data for userId {}: {}", userId,
+                        error.getMessage());
                 WebSocketErrorHandler.sendErrorMessage(session, "Error fetching user data", error);
                 return Mono.empty();
             }).subscribe();
         } else {
-            logger.warn("Missing fields in user.getById payload");
+            logger.warn("Missing fields in user.getById payload: {}", payload);
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in user.getById payload");
         }
     }
 
     public void handleGetCurrentUser(WebSocketSession session, JsonNode payload) {
+        logger.info("Received user.getCurrent request with payload: {}", payload);
+
         if (payload.hasNonNull(USER_ID)) {
             String userId = payload.get(USER_ID).asText();
-            logger.info("Fetching user with ID {}", userId);
+            logger.info("Fetching current user with ID {}", userId);
             userService.getUserById(userId).flatMap(user -> {
-                logger.info("User fetched: {}", user);
+                logger.info("Current user fetched: {}", user);
                 String userJson;
                 try {
                     userJson = objectMapper.writeValueAsString(user);
@@ -69,14 +75,16 @@ public class UserFetchHandler {
                     return Mono.empty();
                 }
                 WebSocketErrorHandler.sendMessage(session, "user.getCurrent.success", userJson);
+                logger.info("Sent user.getCurrent.success for userId {}", userId);
                 return Mono.just(user);
             }).onErrorResume(error -> {
-                logger.error("Error fetching user data: {}", error.getMessage());
+                logger.error("Error fetching current user data for userId {}: {}", userId,
+                        error.getMessage());
                 WebSocketErrorHandler.sendErrorMessage(session, "Error fetching user data", error);
                 return Mono.empty();
             }).subscribe();
         } else {
-            logger.warn("Missing fields in user.getCurrent payload");
+            logger.warn("Missing fields in user.getCurrent payload: {}", payload);
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in user.getCurrent payload");
         }

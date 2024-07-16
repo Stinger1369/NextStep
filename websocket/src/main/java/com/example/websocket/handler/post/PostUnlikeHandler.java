@@ -23,21 +23,29 @@ public class PostUnlikeHandler {
     }
 
     public void handleUnlikePost(WebSocketSession session, JsonNode payload) {
+        logger.info("Handling post.unlike with payload: {}", payload);
+
         if (payload.hasNonNull(POST_ID) && payload.hasNonNull(USER_ID)) {
             String postId = payload.get(POST_ID).asText();
             String userId = payload.get(USER_ID).asText();
+            logger.info("Unliking post with postId: {} by userId: {}", postId, userId);
             postService.unlikePost(postId, userId).subscribe(post -> {
                 try {
                     session.sendMessage(new TextMessage(String.format(
                             "{\"type\":\"post.unlike.success\",\"payload\":{\"postId\":\"%s\"}}",
                             postId)));
-                    logger.info("Post unliked: {}", post);
+                    logger.info("Post unliked successfully: {}", post);
                 } catch (IOException e) {
                     logger.error("Error sending post unlike confirmation", e);
                 }
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error unliking post",
-                    error));
+            }, error -> {
+                logger.error("Error unliking post with postId: {} by userId: {}", postId, userId,
+                        error);
+                WebSocketErrorHandler.sendErrorMessage(session, error.getMessage(), error);
+            });
         } else {
+            logger.error("Missing fields in post.unlike payload: postId={}, userId={}",
+                    payload.hasNonNull(POST_ID), payload.hasNonNull(USER_ID));
             WebSocketErrorHandler.sendErrorMessage(session, "Missing fields in post.unlike payload",
                     null);
         }

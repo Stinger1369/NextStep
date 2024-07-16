@@ -34,10 +34,13 @@ public class MessageUpdateHandler {
         String content = payload.hasNonNull(CONTENT) ? payload.get(CONTENT).asText() : null;
 
         if (messageId == null || content == null) {
+            logger.warn("Missing fields in message.update payload");
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in message.update payload");
             return;
         }
+
+        logger.info("Updating message with ID: {} with new content: {}", messageId, content);
 
         Message newMessageData = new Message();
         newMessageData.setContent(content);
@@ -47,11 +50,13 @@ public class MessageUpdateHandler {
                 String result = objectMapper.writeValueAsString(
                         Map.of("type", "message.update.success", PAYLOAD, updatedMessage));
                 session.sendMessage(new TextMessage(result));
-                logger.info("Message updated: {}", updatedMessage);
+                logger.info("Message updated successfully: {}", updatedMessage);
             } catch (IOException e) {
                 logger.error("Error sending message update confirmation", e);
             }
-        }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error updating message",
-                error));
+        }, error -> {
+            logger.error("Error updating message with ID: {}", messageId, error);
+            WebSocketErrorHandler.sendErrorMessage(session, "Error updating message", error);
+        });
     }
 }

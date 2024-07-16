@@ -29,9 +29,11 @@ public class CommentUpdateHandler {
     }
 
     public void handleCommentUpdate(WebSocketSession session, JsonNode payload) {
+        logger.info("handleCommentUpdate called with payload: {}", payload);
         if (payload.hasNonNull(COMMENT_ID) && payload.hasNonNull(CONTENT)) {
             String commentId = payload.get(COMMENT_ID).asText();
             String content = payload.get(CONTENT).asText();
+            logger.info("Updating comment with commentId: {} with new content", commentId);
 
             commentService.updateComment(commentId, new Comment(null, null, null, null, content))
                     .subscribe(updatedComment -> {
@@ -45,9 +47,13 @@ public class CommentUpdateHandler {
                         } catch (IOException e) {
                             logger.error("Error sending comment update confirmation", e);
                         }
-                    }, error -> WebSocketErrorHandler.sendErrorMessage(session,
-                            "Error updating comment", error));
+                    }, error -> {
+                        logger.error("Error updating comment with commentId: {}", commentId, error);
+                        WebSocketErrorHandler.sendErrorMessage(session, "Error updating comment",
+                                error);
+                    });
         } else {
+            logger.warn("Missing fields in comment.update payload: {}", payload);
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in comment.update payload");
         }

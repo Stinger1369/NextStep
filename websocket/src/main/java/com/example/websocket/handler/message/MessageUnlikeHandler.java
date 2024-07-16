@@ -39,10 +39,14 @@ public class MessageUnlikeHandler {
                 payload.hasNonNull(USER_LAST_NAME) ? payload.get(USER_LAST_NAME).asText() : null;
 
         if (messageId == null || userId == null || userFirstName == null || userLastName == null) {
+            logger.warn("Missing fields in message.unlike payload");
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in message.unlike payload");
             return;
         }
+
+        logger.info("Unliking message with ID: {} by user: {} {} ({})", messageId, userFirstName,
+                userLastName, userId);
 
         messageService.unlikeMessage(messageId, userId, userFirstName, userLastName)
                 .subscribe(unlikedMessage -> {
@@ -51,11 +55,14 @@ public class MessageUnlikeHandler {
                                 .writeValueAsString(Map.of("type", "message.unlike.success",
                                         PAYLOAD, Map.of(MESSAGE_ID, unlikedMessage.getId())));
                         session.sendMessage(new TextMessage(result));
-                        logger.info("Message unliked: {}", unlikedMessage);
+                        logger.info("Message unliked successfully: {}", unlikedMessage);
                     } catch (IOException e) {
                         logger.error("Error sending message unlike confirmation", e);
                     }
-                }, error -> WebSocketErrorHandler.sendErrorMessage(session,
-                        "Error unliking message", error));
+                }, error -> {
+                    logger.error("Error unliking message with ID: {}", messageId, error);
+                    WebSocketErrorHandler.sendErrorMessage(session, "Error unliking message",
+                            error);
+                });
     }
 }

@@ -3,7 +3,6 @@ package com.example.websocket.service;
 import com.example.websocket.model.Comment;
 import com.example.websocket.model.Like;
 import com.example.websocket.model.Notification;
-import com.example.websocket.model.Post;
 import com.example.websocket.repository.CommentRepository;
 import com.example.websocket.repository.PostRepository;
 import com.example.websocket.repository.UserRepository;
@@ -23,6 +22,8 @@ public class CommentService {
 
     private static final Logger logger = LoggerFactory.getLogger(CommentService.class);
     private static final String POST_NOT_FOUND = "Post not found";
+    private static final String COMMENT = "comment";
+    private static final String SYSTEM = "System";
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
@@ -92,60 +93,54 @@ public class CommentService {
     public Mono<Comment> likeComment(String commentId, String userId) {
         return userRepository.findById(userId).flatMap(user -> {
             Like like =
-                    new Like(userId, commentId, "comment", user.getFirstName(), user.getLastName());
+                    new Like(userId, commentId, COMMENT, user.getFirstName(), user.getLastName());
             return likeService.likeEntity(like)
                     .flatMap(savedLike -> commentRepository.findById(commentId).flatMap(comment -> {
                         comment.addLike(savedLike);
                         return commentRepository.save(comment);
-                    }).flatMap(savedComment -> {
-                        return userRepository.findById(userId).flatMap(likeUser -> {
-                            likeUser.addLike(savedLike);
-                            return userRepository.save(likeUser).thenReturn(savedComment);
-                        });
-                    }).flatMap(savedComment -> {
-                        return postRepository.findById(savedComment.getPostId()).flatMap(post -> {
-                            post.getComments().stream().filter(c -> c.getId().equals(commentId))
-                                    .forEach(c -> c.setLikes(savedComment.getLikes()));
-                            return postRepository.save(post).thenReturn(savedComment);
-                        });
-                    }).flatMap(savedComment -> {
-                        Notification notification = new Notification(
-                                commentId, "System", "System", "Your comment was liked by "
-                                        + user.getFirstName() + " " + user.getLastName(),
-                                commentId);
-                        return notificationService.createNotification(notification)
-                                .thenReturn(savedComment);
-                    }));
+                    }).flatMap(savedComment -> userRepository.findById(userId).flatMap(likeUser -> {
+                        likeUser.addLike(savedLike);
+                        return userRepository.save(likeUser).thenReturn(savedComment);
+                    })).flatMap(savedComment -> postRepository.findById(savedComment.getPostId())
+                            .flatMap(post -> {
+                                post.getComments().stream().filter(c -> c.getId().equals(commentId))
+                                        .forEach(c -> c.setLikes(savedComment.getLikes()));
+                                return postRepository.save(post).thenReturn(savedComment);
+                            })).flatMap(savedComment -> {
+                                Notification notification = new Notification(
+                                        commentId, SYSTEM, SYSTEM, "Your comment was liked by "
+                                                + user.getFirstName() + " " + user.getLastName(),
+                                        commentId);
+                                return notificationService.createNotification(notification)
+                                        .thenReturn(savedComment);
+                            }));
         });
     }
 
     public Mono<Comment> unlikeComment(String commentId, String userId) {
         return userRepository.findById(userId).flatMap(user -> {
             Like like =
-                    new Like(userId, commentId, "comment", user.getFirstName(), user.getLastName());
-            return likeService.unlikeEntity(userId, commentId, "comment")
+                    new Like(userId, commentId, COMMENT, user.getFirstName(), user.getLastName());
+            return likeService.unlikeEntity(userId, commentId, COMMENT)
                     .flatMap(unused -> commentRepository.findById(commentId).flatMap(comment -> {
                         comment.removeLike(like);
                         return commentRepository.save(comment);
-                    }).flatMap(savedComment -> {
-                        return userRepository.findById(userId).flatMap(likeUser -> {
-                            likeUser.removeLike(like);
-                            return userRepository.save(likeUser).thenReturn(savedComment);
-                        });
-                    }).flatMap(savedComment -> {
-                        return postRepository.findById(savedComment.getPostId()).flatMap(post -> {
-                            post.getComments().stream().filter(c -> c.getId().equals(commentId))
-                                    .forEach(c -> c.setLikes(savedComment.getLikes()));
-                            return postRepository.save(post).thenReturn(savedComment);
-                        });
-                    }).flatMap(savedComment -> {
-                        Notification notification = new Notification(
-                                commentId, "System", "System", "Your comment was unliked by "
-                                        + user.getFirstName() + " " + user.getLastName(),
-                                commentId);
-                        return notificationService.createNotification(notification)
-                                .thenReturn(savedComment);
-                    }));
+                    }).flatMap(savedComment -> userRepository.findById(userId).flatMap(likeUser -> {
+                        likeUser.removeLike(like);
+                        return userRepository.save(likeUser).thenReturn(savedComment);
+                    })).flatMap(savedComment -> postRepository.findById(savedComment.getPostId())
+                            .flatMap(post -> {
+                                post.getComments().stream().filter(c -> c.getId().equals(commentId))
+                                        .forEach(c -> c.setLikes(savedComment.getLikes()));
+                                return postRepository.save(post).thenReturn(savedComment);
+                            })).flatMap(savedComment -> {
+                                Notification notification = new Notification(
+                                        commentId, SYSTEM, SYSTEM, "Your comment was unliked by "
+                                                + user.getFirstName() + " " + user.getLastName(),
+                                        commentId);
+                                return notificationService.createNotification(notification)
+                                        .thenReturn(savedComment);
+                            }));
         });
     }
 
@@ -154,7 +149,7 @@ public class CommentService {
             existingComment.setContent(newCommentData.getContent());
             existingComment.setUpdatedAt(new Date());
             return commentRepository.save(existingComment).flatMap(updatedComment -> {
-                Notification notification = new Notification(commentId, "System", "System",
+                Notification notification = new Notification(commentId, SYSTEM, SYSTEM,
                         "Your comment was updated", newCommentData.getContent());
                 return notificationService.createNotification(notification)
                         .thenReturn(updatedComment);
@@ -177,7 +172,7 @@ public class CommentService {
                                         .then(commentRepository.deleteById(commentId))
                                         .then(Mono.defer(() -> {
                                             Notification notification = new Notification(
-                                                    comment.getId(), "System", "System",
+                                                    comment.getId(), SYSTEM, SYSTEM,
                                                     "Your comment was deleted", commentId);
                                             return notificationService
                                                     .createNotification(notification).then();

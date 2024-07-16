@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
-
 @Component
 public class UserWebSocketHandler {
 
@@ -18,15 +17,23 @@ public class UserWebSocketHandler {
     private final UserLikeHandler userLikeHandler;
     private final UserUnlikeHandler userUnlikeHandler;
     private final UserFetchHandler userFetchHandler;
+    private final FriendRequestHandler friendRequestHandler;
+    private final ProfileVisitHandler profileVisitHandler;
+    private final FollowHandler followHandler;
 
     public UserWebSocketHandler(UserCreationHandler userCreationHandler,
             UserCheckHandler userCheckHandler, UserLikeHandler userLikeHandler,
-            UserUnlikeHandler userUnlikeHandler, UserFetchHandler userFetchHandler) {
+            UserUnlikeHandler userUnlikeHandler, UserFetchHandler userFetchHandler,
+            FriendRequestHandler friendRequestHandler, ProfileVisitHandler profileVisitHandler,
+            FollowHandler followHandler) {
         this.userCreationHandler = userCreationHandler;
         this.userCheckHandler = userCheckHandler;
         this.userLikeHandler = userLikeHandler;
         this.userUnlikeHandler = userUnlikeHandler;
         this.userFetchHandler = userFetchHandler;
+        this.friendRequestHandler = friendRequestHandler;
+        this.profileVisitHandler = profileVisitHandler;
+        this.followHandler = followHandler;
     }
 
     public void handleMessage(WebSocketSession session, String messageType, JsonNode payload) {
@@ -49,6 +56,27 @@ public class UserWebSocketHandler {
                 break;
             case "user.unlike":
                 userUnlikeHandler.handleUserUnlike(session, payload);
+                break;
+            case "friend.request":
+                friendRequestHandler.handleSendFriendRequest(session, payload);
+                break;
+            case "friend.request.accept":
+                friendRequestHandler.handleAcceptFriendRequest(session, payload);
+                break;
+            case "friend.request.decline":
+                friendRequestHandler.handleDeclineFriendRequest(session, payload);
+                break;
+            case "friend.remove":
+                friendRequestHandler.handleRemoveFriend(session, payload);
+                break;
+            case "profile.visit":
+                profileVisitHandler.handleProfileVisit(session, payload);
+                break;
+            case "user.follow":
+                followHandler.handleFollowUser(session, payload);
+                break;
+            case "user.unfollow":
+                followHandler.handleUnfollowUser(session, payload);
                 break;
             default:
                 WebSocketErrorHandler.sendErrorMessage(session,

@@ -28,9 +28,11 @@ public class CommentLikeHandler {
     }
 
     public void handleCommentLike(WebSocketSession session, JsonNode payload) {
+        logger.info("handleCommentLike called with payload: {}", payload);
         if (payload.hasNonNull(USER_ID) && payload.hasNonNull(COMMENT_ID)) {
             String userId = payload.get(USER_ID).asText();
             String commentId = payload.get(COMMENT_ID).asText();
+            logger.info("Liking comment with commentId: {} by userId: {}", commentId, userId);
 
             commentService.likeComment(commentId, userId).subscribe(likedComment -> {
                 try {
@@ -42,9 +44,13 @@ public class CommentLikeHandler {
                 } catch (IOException e) {
                     logger.error("Error sending comment like confirmation", e);
                 }
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error liking comment",
-                    error));
+            }, error -> {
+                logger.error("Error liking comment with commentId: {} by userId: {}", commentId,
+                        userId, error);
+                WebSocketErrorHandler.sendErrorMessage(session, "Error liking comment", error);
+            });
         } else {
+            logger.warn("Missing fields in comment.like payload: {}", payload);
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in comment.like payload");
         }

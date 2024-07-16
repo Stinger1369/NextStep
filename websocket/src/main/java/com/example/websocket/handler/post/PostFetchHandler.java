@@ -26,6 +26,8 @@ public class PostFetchHandler {
     }
 
     public void handleGetAllPosts(WebSocketSession session) {
+        logger.info("Handling post.getAll request");
+
         postService.getAllPosts().collectList().subscribe(posts -> {
             try {
                 String result = objectMapper.writeValueAsString(
@@ -36,19 +38,17 @@ public class PostFetchHandler {
                 logger.error("Error sending all posts", e);
             }
         }, error -> {
-            try {
-                session.sendMessage(new TextMessage(
-                        "{\"type\":\"error\",\"payload\":{\"message\":\"Error fetching posts\"}}"));
-                logger.error("Error fetching posts", error);
-            } catch (IOException e) {
-                logger.error("Error sending error message", e);
-            }
+            logger.error("Error fetching all posts", error);
+            WebSocketErrorHandler.sendErrorMessage(session, "Error fetching posts", error);
         });
     }
 
     public void handleGetPost(WebSocketSession session, JsonNode payload) {
+        logger.info("Handling post.getById with payload: {}", payload);
+
         if (payload.hasNonNull(POST_ID)) {
             String postId = payload.get(POST_ID).asText();
+            logger.info("Fetching post with postId: {}", postId);
             postService.getPostById(postId).subscribe(post -> {
                 try {
                     String postJson = objectMapper.writeValueAsString(post);
@@ -58,9 +58,12 @@ public class PostFetchHandler {
                 } catch (IOException e) {
                     logger.error("Error sending post retrieval confirmation", e);
                 }
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error retrieving post",
-                    error));
+            }, error -> {
+                logger.error("Error retrieving post with postId: {}", postId, error);
+                WebSocketErrorHandler.sendErrorMessage(session, "Error retrieving post", error);
+            });
         } else {
+            logger.error("Missing postId in post.getById payload");
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing postId in post.getById payload", null);
         }

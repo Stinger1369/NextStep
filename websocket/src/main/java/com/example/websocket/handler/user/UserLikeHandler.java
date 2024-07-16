@@ -2,16 +2,11 @@ package com.example.websocket.handler.user;
 
 import com.example.websocket.handler.WebSocketErrorHandler;
 import com.example.websocket.service.UserService;
-import com.example.websocket.service.NotificationService;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.example.websocket.model.Notification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
-import reactor.core.publisher.Mono;
 
 @Component
 public class UserLikeHandler {
@@ -20,20 +15,16 @@ public class UserLikeHandler {
     private static final String USER_ID = "userId";
     private static final String ENTITY_ID = "entityId";
     private static final String ENTITY_TYPE = "entityType";
-    private static final String ERROR_PROCESSING_JSON = "Error processing user data to JSON";
 
     private final UserService userService;
-    private final NotificationService notificationService;
-    private final ObjectMapper objectMapper;
 
-    public UserLikeHandler(UserService userService, NotificationService notificationService,
-            ObjectMapper objectMapper) {
+    public UserLikeHandler(UserService userService) {
         this.userService = userService;
-        this.notificationService = notificationService;
-        this.objectMapper = objectMapper;
     }
 
     public void handleUserLike(WebSocketSession session, JsonNode payload) {
+        logger.info("Received user.like request with payload: {}", payload);
+
         if (payload.hasNonNull(USER_ID) && payload.hasNonNull(ENTITY_ID)
                 && payload.hasNonNull(ENTITY_TYPE)) {
             String userId = payload.get(USER_ID).asText();
@@ -45,37 +36,20 @@ public class UserLikeHandler {
                 return;
             }
 
-            userService.getUserById(userId).flatMap(user -> {
-                return userService.likeEntity(userId, entityId, entityType).flatMap(savedLike -> {
-                    String message = String.format("User %s %s liked your %s.", user.getFirstName(),
-                            user.getLastName(), entityType);
-                    return sendNotification(userId, user.getFirstName(), user.getLastName(),
-                            message, entityId, session);
-                });
-            }).subscribe(savedLike -> {
+            userService.likeEntity(userId, entityId, entityType).subscribe(savedLike -> {
                 WebSocketErrorHandler.sendMessage(session, "user.like.success", savedLike);
                 logger.info("Entity liked by user: {}", userId);
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error liking entity",
-                    error));
+            }, error -> {
+                if ("User has already liked this entity.".equals(error.getMessage())) {
+                    WebSocketErrorHandler.sendErrorMessage(session,
+                            "You have already liked this entity.");
+                } else {
+                    WebSocketErrorHandler.sendErrorMessage(session, "Error liking entity", error);
+                }
+            });
         } else {
+            logger.warn("Missing fields in user.like payload: {}", payload);
             WebSocketErrorHandler.sendErrorMessage(session, "Missing fields in user.like payload");
         }
-    }
-
-    private Mono<Void> sendNotification(String userId, String firstName, String lastName,
-            String message, String content, WebSocketSession session) {
-        Notification notification = new Notification(userId, firstName, lastName, message, content);
-        return notificationService.createNotification(notification).flatMap(savedNotification -> {
-            String notificationJson;
-            try {
-                notificationJson = objectMapper.writeValueAsString(savedNotification);
-            } catch (JsonProcessingException e) {
-                logger.error(ERROR_PROCESSING_JSON, e);
-                WebSocketErrorHandler.sendErrorMessage(session, ERROR_PROCESSING_JSON, e);
-                return Mono.empty();
-            }
-            WebSocketErrorHandler.sendMessage(session, "notification.new", savedNotification);
-            return Mono.empty();
-        });
     }
 }

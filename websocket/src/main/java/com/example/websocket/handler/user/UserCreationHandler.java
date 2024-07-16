@@ -25,6 +25,8 @@ public class UserCreationHandler {
     }
 
     public void handleUserCreate(WebSocketSession session, JsonNode payload) {
+        logger.info("Received user.create request with payload: {}", payload);
+
         if (payload.hasNonNull(EMAIL) && payload.hasNonNull(FIRST_NAME)
                 && payload.hasNonNull(LAST_NAME)) {
             String email = payload.get(EMAIL).asText();
@@ -42,7 +44,7 @@ public class UserCreationHandler {
                 return Mono.empty();
             }).subscribe();
         } else {
-            logger.warn("Missing fields in user.create payload");
+            logger.warn("Missing fields in user.create payload: {}", payload);
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in user.create payload");
         }

@@ -1,5 +1,7 @@
 package com.example.websocket.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -8,6 +10,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Document(collection = "usersocket")
+@Data
+@NoArgsConstructor
 public class User {
     @Id
     private String id;
@@ -19,10 +23,11 @@ public class User {
     private List<Notification> notifications = new ArrayList<>();
     private List<Conversation> conversations = new ArrayList<>();
     private List<Like> likes = new ArrayList<>();
-
-    public User() {
-        this.id = UUID.randomUUID().toString();
-    }
+    private List<FriendInfo> friends = new ArrayList<>();
+    private List<FriendInfo> friendRequests = new ArrayList<>();
+    private List<Follow> following = new ArrayList<>();
+    private List<Follow> followers = new ArrayList<>();
+    private List<String> profileVisits = new ArrayList<>(); // Ajouter cette ligne
 
     public User(String id, String email, String firstName, String lastName) {
         this.id = (id != null && !id.isEmpty()) ? id : UUID.randomUUID().toString();
@@ -32,80 +37,7 @@ public class User {
         this.apiKey = UUID.randomUUID().toString();
     }
 
-    // Getters and setters
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
-    }
-
-    public List<Post> getPosts() {
-        return posts;
-    }
-
-    public void setPosts(List<Post> posts) {
-        this.posts = posts;
-    }
-
-    public List<Notification> getNotifications() {
-        return notifications;
-    }
-
-    public void setNotifications(List<Notification> notifications) {
-        this.notifications = notifications;
-    }
-
-    public List<Conversation> getConversations() {
-        return conversations;
-    }
-
-    public void setConversations(List<Conversation> conversations) {
-        this.conversations = conversations;
-    }
-
-    public List<Like> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(List<Like> likes) {
-        this.likes = likes;
-    }
-
+    // Methods for managing likes
     public void addLike(Like like) {
         this.likes.add(like);
     }
@@ -116,15 +48,67 @@ public class User {
                 && existingLike.getEntityType().equals(like.getEntityType()));
     }
 
+    // Methods for managing posts
     public void addPost(Post post) {
         this.posts.add(post);
     }
 
+    // Methods for managing notifications
     public void addNotification(Notification notification) {
         this.notifications.add(notification);
     }
 
+    // Methods for managing conversations
     public void addConversation(Conversation conversation) {
         this.conversations.add(conversation);
+    }
+
+    // Methods for managing friends
+    public void addFriend(FriendInfo friendInfo) {
+        if (!this.friends.contains(friendInfo)) {
+            this.friends.add(friendInfo);
+        }
+    }
+
+    public void removeFriend(FriendInfo friendInfo) {
+        this.friends.remove(friendInfo);
+    }
+
+    // Methods for managing friend requests
+    public void addFriendRequest(FriendInfo friendInfo) {
+        if (!this.friendRequests.contains(friendInfo)) {
+            this.friendRequests.add(friendInfo);
+        }
+    }
+
+    public void removeFriendRequest(FriendInfo friendInfo) {
+        this.friendRequests.remove(friendInfo);
+    }
+
+    // Methods for managing following
+    public void followUser(Follow follow) {
+        if (!this.following.contains(follow)) {
+            this.following.add(follow);
+        }
+    }
+
+    public void unfollowUser(String userId) {
+        this.following.removeIf(follow -> follow.getFolloweeId().equals(userId));
+    }
+
+    // Methods for managing followers
+    public void addFollower(Follow follow) {
+        if (!this.followers.contains(follow)) {
+            this.followers.add(follow);
+        }
+    }
+
+    public void removeFollower(String userId) {
+        this.followers.removeIf(follow -> follow.getFollowerId().equals(userId));
+    }
+
+    // Method for managing profile visits
+    public void addProfileVisit(String visitorId) {
+        this.profileVisits.add(visitorId);
     }
 }

@@ -14,49 +14,62 @@ import java.io.IOException;
 
 @Component
 public class MessageCreateHandler {
-    private static final Logger logger = LoggerFactory.getLogger(MessageCreateHandler.class);
-    private static final String CONVERSATION_ID = "conversationId";
-    private static final String USER_ID = "userId";
-    private static final String USER_FIRST_NAME = "userFirstName";
-    private static final String USER_LAST_NAME = "userLastName";
-    private static final String CONTENT = "content";
+        private static final Logger logger = LoggerFactory.getLogger(MessageCreateHandler.class);
+        private static final String CONVERSATION_ID = "conversationId";
+        private static final String USER_ID = "userId";
+        private static final String USER_FIRST_NAME = "userFirstName";
+        private static final String USER_LAST_NAME = "userLastName";
+        private static final String CONTENT = "content";
 
-    private final MessageService messageService;
+        private final MessageService messageService;
 
-    public MessageCreateHandler(MessageService messageService) {
-        this.messageService = messageService;
-    }
-
-    public void handleCreateMessage(WebSocketSession session, JsonNode payload) {
-        String conversationId =
-                payload.hasNonNull(CONVERSATION_ID) ? payload.get(CONVERSATION_ID).asText() : null;
-        String senderId = payload.hasNonNull(USER_ID) ? payload.get(USER_ID).asText() : null;
-        String senderFirstName =
-                payload.hasNonNull(USER_FIRST_NAME) ? payload.get(USER_FIRST_NAME).asText() : null;
-        String senderLastName =
-                payload.hasNonNull(USER_LAST_NAME) ? payload.get(USER_LAST_NAME).asText() : null;
-        String content = payload.hasNonNull(CONTENT) ? payload.get(CONTENT).asText() : null;
-
-        if (conversationId == null || senderId == null || senderFirstName == null
-                || senderLastName == null || content == null) {
-            WebSocketErrorHandler.sendErrorMessage(session,
-                    "Missing fields in message.create payload");
-            return;
+        public MessageCreateHandler(MessageService messageService) {
+                this.messageService = messageService;
         }
 
-        Message message =
-                new Message(conversationId, senderId, senderFirstName, senderLastName, content);
+        public void handleCreateMessage(WebSocketSession session, JsonNode payload) {
+                logger.info("Received message.create payload: {}", payload);
 
-        messageService.createMessage(message).subscribe(createdMessage -> {
-            try {
-                session.sendMessage(new TextMessage(String.format(
-                        "{\"type\":\"message.create.success\",\"payload\":{\"messageId\":\"%s\"}}",
-                        createdMessage.getId())));
-                logger.info("Message created: {}", createdMessage);
-            } catch (IOException e) {
-                logger.error("Error sending message creation confirmation", e);
-            }
-        }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error creating message",
-                error));
-    }
+                String conversationId = payload.hasNonNull(CONVERSATION_ID)
+                                ? payload.get(CONVERSATION_ID).asText()
+                                : null;
+                String senderId =
+                                payload.hasNonNull(USER_ID) ? payload.get(USER_ID).asText() : null;
+                String senderFirstName = payload.hasNonNull(USER_FIRST_NAME)
+                                ? payload.get(USER_FIRST_NAME).asText()
+                                : null;
+                String senderLastName = payload.hasNonNull(USER_LAST_NAME)
+                                ? payload.get(USER_LAST_NAME).asText()
+                                : null;
+                String content = payload.hasNonNull(CONTENT) ? payload.get(CONTENT).asText() : null;
+
+                if (conversationId == null || senderId == null || senderFirstName == null
+                                || senderLastName == null || content == null) {
+                        logger.warn("Missing fields in message.create payload");
+                        WebSocketErrorHandler.sendErrorMessage(session,
+                                        "Missing fields in message.create payload");
+                        return;
+                }
+
+                Message message = new Message(conversationId, senderId, senderFirstName,
+                                senderLastName, content);
+
+                logger.info("Creating message: {}", message);
+
+                messageService.createMessage(message).subscribe(createdMessage -> {
+                        try {
+                                String response = String.format(
+                                                "{\"type\":\"message.create.success\",\"payload\":{\"messageId\":\"%s\"}}",
+                                                createdMessage.getId());
+                                session.sendMessage(new TextMessage(response));
+                                logger.info("Message created: {}", createdMessage);
+                        } catch (IOException e) {
+                                logger.error("Error sending message creation confirmation", e);
+                        }
+                }, error -> {
+                        logger.error("Error creating message", error);
+                        WebSocketErrorHandler.sendErrorMessage(session, "Error creating message",
+                                        error);
+                });
+        }
 }

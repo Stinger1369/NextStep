@@ -39,23 +39,29 @@ public class MessageLikeHandler {
                 payload.hasNonNull(USER_LAST_NAME) ? payload.get(USER_LAST_NAME).asText() : null;
 
         if (messageId == null || userId == null || userFirstName == null || userLastName == null) {
+            logger.warn("Missing fields in {} payload", MESSAGE_ID);
             WebSocketErrorHandler.sendErrorMessage(session,
-                    "Missing fields in message.like payload");
+                    "Missing fields in " + MESSAGE_ID + " payload");
             return;
         }
+
+        logger.info("Liking message with ID: {} by user: {} {} ({})", messageId, userFirstName,
+                userLastName, userId);
 
         messageService.likeMessage(messageId, userId, userFirstName, userLastName)
                 .subscribe(likedMessage -> {
                     try {
                         String result = objectMapper
                                 .writeValueAsString(Map.of("type", "message.like.success", PAYLOAD,
-                                        Map.of("messageId", likedMessage.getId())));
+                                        Map.of(MESSAGE_ID, likedMessage.getId())));
                         session.sendMessage(new TextMessage(result));
-                        logger.info("Message liked: {}", likedMessage);
+                        logger.info("Message liked successfully: {}", likedMessage);
                     } catch (IOException e) {
                         logger.error("Error sending message like confirmation", e);
                     }
-                }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error liking message",
-                        error));
+                }, error -> {
+                    logger.error("Error liking message with ID: {}", messageId, error);
+                    WebSocketErrorHandler.sendErrorMessage(session, "Error liking message", error);
+                });
     }
 }

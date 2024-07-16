@@ -2,6 +2,9 @@ package com.example.websocket.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,6 +12,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Document(collection = "messages")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Message {
     @Id
     private String id;
@@ -20,85 +26,16 @@ public class Message {
     private Date timestamp;
     private List<Like> likes = new ArrayList<>();
 
-    public Message() {
-        this.id = UUID.randomUUID().toString();
-        this.timestamp = new Date();
-    }
-
     public Message(String conversationId, String senderId, String senderFirstName,
             String senderLastName, String content) {
-        this();
+        this.id = UUID.randomUUID().toString();
+        this.timestamp = new Date();
         this.conversationId = conversationId;
         this.senderId = senderId;
         this.senderFirstName = senderFirstName;
         this.senderLastName = senderLastName;
         this.content = content;
-    }
-
-    // Getters and setters
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getConversationId() {
-        return conversationId;
-    }
-
-    public void setConversationId(String conversationId) {
-        this.conversationId = conversationId;
-    }
-
-    public String getSenderId() {
-        return senderId;
-    }
-
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
-    }
-
-    public String getSenderFirstName() {
-        return senderFirstName;
-    }
-
-    public void setSenderFirstName(String senderFirstName) {
-        this.senderFirstName = senderFirstName;
-    }
-
-    public String getSenderLastName() {
-        return senderLastName;
-    }
-
-    public void setSenderLastName(String senderLastName) {
-        this.senderLastName = senderLastName;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public List<Like> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(List<Like> likes) {
-        this.likes = likes;
+        this.likes = new ArrayList<>();
     }
 
     public void addLike(Like like) {

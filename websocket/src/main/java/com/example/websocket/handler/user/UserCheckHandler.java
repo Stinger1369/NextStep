@@ -22,6 +22,8 @@ public class UserCheckHandler {
     }
 
     public void handleUserCheck(WebSocketSession session, JsonNode payload) {
+        logger.info("Received user.check request with payload: {}", payload);
+
         if (payload.hasNonNull(EMAIL)) {
             String email = payload.get(EMAIL).asText();
             logger.info("Checking if user with email {} exists", email);
@@ -30,13 +32,15 @@ public class UserCheckHandler {
                 logger.info("User existence check for {}: {}", email, userExists);
                 WebSocketErrorHandler.sendMessage(session, "user.check.result",
                         Map.of("exists", userExists));
+                logger.info("Sent user.check.result for email {}: {}", email, userExists);
             }, error -> {
-                logger.error("Error checking user existence", error);
+                logger.error("Error checking user existence for email: {}", email, error);
                 WebSocketErrorHandler.sendMessage(session, "user.check.result",
                         Map.of("exists", false));
+                logger.info("Sent user.check.result for email {}: false", email);
             });
         } else {
-            logger.warn("Missing fields in user.check payload");
+            logger.warn("Missing email field in user.check payload: {}", payload);
             WebSocketErrorHandler.sendErrorMessage(session, "Missing fields in user.check payload");
         }
     }

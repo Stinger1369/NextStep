@@ -40,33 +40,43 @@ public class PostWebSocketHandler {
         logger.info("Handling message of type: {}", messageType);
         switch (messageType) {
             case "post.create":
+                logger.info("Invoking create post handler");
                 postCreateHandler.handlePostCreate(session, payload);
                 break;
             case "post.getById":
+                logger.info("Invoking get post by ID handler");
                 postFetchHandler.handleGetPost(session, payload);
                 break;
             case "post.getAll":
+                logger.info("Invoking get all posts handler");
                 postFetchHandler.handleGetAllPosts(session);
                 break;
             case "post.delete":
+                logger.info("Invoking delete post handler");
                 postDeleteHandler.handleDeletePost(session, payload);
                 break;
             case "post.update":
+                logger.info("Invoking update post handler");
                 postUpdateHandler.handleUpdatePost(session, payload);
                 break;
             case "post.like":
+                logger.info("Invoking like post handler");
                 postLikeHandler.handleLikePost(session, payload);
                 break;
             case "post.unlike":
+                logger.info("Invoking unlike post handler");
                 postUnlikeHandler.handleUnlikePost(session, payload);
                 break;
             case "post.share":
+                logger.info("Invoking share post handler");
                 postShareHandler.handleSharePost(session, payload);
                 break;
             case "post.repost":
+                logger.info("Invoking repost post handler");
                 postRepostHandler.handleRepostPost(session, payload);
                 break;
             default:
+                logger.warn("Unknown post message type: {}", messageType);
                 WebSocketErrorHandler.sendErrorMessage(session,
                         "Unknown post message type: " + messageType);
         }

@@ -30,15 +30,20 @@ public class ConversationLikeHandler {
     }
 
     public void handleLikeConversation(WebSocketSession session, JsonNode payload) {
+        logger.info("Handling like conversation with payload: {}", payload);
+
         String conversationId =
                 payload.hasNonNull(CONVERSATION_ID) ? payload.get(CONVERSATION_ID).asText() : null;
         String userId = payload.hasNonNull(USER_ID) ? payload.get(USER_ID).asText() : null;
 
         if (conversationId == null || userId == null) {
+            logger.error("Missing fields in conversation.like payload");
             WebSocketErrorHandler.sendErrorMessage(session,
                     "Missing fields in conversation.like payload");
             return;
         }
+
+        logger.info("Liking conversation with ID: {} by user ID: {}", conversationId, userId);
 
         conversationService.likeConversation(conversationId, userId)
                 .subscribe(likedConversation -> {
@@ -51,7 +56,11 @@ public class ConversationLikeHandler {
                     } catch (IOException e) {
                         logger.error("Error sending conversation like confirmation", e);
                     }
-                }, error -> WebSocketErrorHandler.sendErrorMessage(session,
-                        "Error liking conversation", error));
+                }, error -> {
+                    logger.error("Error liking conversation with ID: {} by user ID: {}",
+                            conversationId, userId, error);
+                    WebSocketErrorHandler.sendErrorMessage(session, "Error liking conversation",
+                            error);
+                });
     }
 }
