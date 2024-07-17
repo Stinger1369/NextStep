@@ -27,6 +27,7 @@ public class User {
     private List<Notification> notifications = new ArrayList<>();
     private List<Conversation> conversations = new ArrayList<>();
     private List<Like> likes = new ArrayList<>();
+    private List<Unlike> unlikes = new ArrayList<>(); // Nouvelle liste pour les unlikes
     private List<FriendInfo> friends = new ArrayList<>();
     private List<FriendInfo> friendRequests = new ArrayList<>();
     private List<Follow> following = new ArrayList<>();
@@ -51,6 +52,18 @@ public class User {
         this.likes.removeIf(existingLike -> existingLike.getUserId().equals(like.getUserId())
                 && existingLike.getEntityId().equals(like.getEntityId())
                 && existingLike.getEntityType().equals(like.getEntityType()));
+    }
+
+    // Methods for managing unlikes
+    public void addUnlike(Unlike unlike) {
+        this.unlikes.add(unlike);
+    }
+
+    public void removeUnlike(Unlike unlike) {
+        this.unlikes
+                .removeIf(existingUnlike -> existingUnlike.getUserId().equals(unlike.getUserId())
+                        && existingUnlike.getEntityId().equals(unlike.getEntityId())
+                        && existingUnlike.getEntityType().equals(unlike.getEntityType()));
     }
 
     // Methods for managing posts

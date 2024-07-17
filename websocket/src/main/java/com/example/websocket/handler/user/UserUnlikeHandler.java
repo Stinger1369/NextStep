@@ -31,11 +31,17 @@ public class UserUnlikeHandler {
             String entityId = payload.get(ENTITY_ID).asText();
             String entityType = payload.get(ENTITY_TYPE).asText();
 
-            userService.unlikeEntity(userId, entityId, entityType).subscribe(unused -> {
-                WebSocketErrorHandler.sendMessage(session, "user.unlike.success", null);
+            userService.unlikeEntity(userId, entityId, entityType).subscribe(savedUnlike -> {
+                WebSocketErrorHandler.sendMessage(session, "user.unlike.success", savedUnlike);
                 logger.info("Entity unliked by user: {}", userId);
-            }, error -> WebSocketErrorHandler.sendErrorMessage(session, "Error unliking entity",
-                    error));
+            }, error -> {
+                if ("User has already unliked this entity.".equals(error.getMessage())) {
+                    WebSocketErrorHandler.sendErrorMessage(session,
+                            "You have already unliked this entity.");
+                } else {
+                    WebSocketErrorHandler.sendErrorMessage(session, "Error unliking entity", error);
+                }
+            });
         } else {
             logger.warn("Missing fields in user.unlike payload: {}", payload);
             WebSocketErrorHandler.sendErrorMessage(session,

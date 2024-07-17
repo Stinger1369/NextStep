@@ -1,6 +1,7 @@
 package com.example.websocket.service;
 
 import com.example.websocket.model.Like;
+import com.example.websocket.model.Unlike;
 import com.example.websocket.model.User;
 import com.example.websocket.service.user.*;
 import org.slf4j.Logger;
@@ -81,7 +82,7 @@ public class UserService {
         return userLikeService.likeEntity(userId, entityId, entityType);
     }
 
-    public Mono<Void> unlikeEntity(String userId, String entityId, String entityType) {
+    public Mono<Unlike> unlikeEntity(String userId, String entityId, String entityType) {
         return userUnlikeService.unlikeEntity(userId, entityId, entityType);
     }
 
