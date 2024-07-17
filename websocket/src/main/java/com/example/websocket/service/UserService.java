@@ -21,11 +21,12 @@ public class UserService {
     private final UserUnlikeService userUnlikeService;
     private final UserFollowService userFollowService;
     private final UserProfileVisitService userProfileVisitService;
+    private final UserBlockService userBlockService;
 
     public UserService(UserCreationService userCreationService, UserFetchService userFetchService,
             UserFriendService userFriendService, UserLikeService userLikeService,
             UserUnlikeService userUnlikeService, UserFollowService userFollowService,
-            UserProfileVisitService userProfileVisitService) {
+            UserProfileVisitService userProfileVisitService, UserBlockService userBlockService) {
         this.userCreationService = userCreationService;
         this.userFetchService = userFetchService;
         this.userFriendService = userFriendService;
@@ -33,6 +34,7 @@ public class UserService {
         this.userUnlikeService = userUnlikeService;
         this.userFollowService = userFollowService;
         this.userProfileVisitService = userProfileVisitService;
+        this.userBlockService = userBlockService;
     }
 
     public Mono<User> createUser(User user) {
@@ -92,8 +94,19 @@ public class UserService {
         return userFollowService.unfollowUser(userId, followId);
     }
 
-    public Mono<Void> visitProfile(String visitorId, String visitedId) {
-        return userProfileVisitService.visitProfile(visitorId, visitedId);
+    public Mono<Void> visitProfile(String visitorId, String visitedId, String visitorFirstName,
+            String visitorLastName) {
+        return userProfileVisitService.visitProfile(visitorId, visitedId, visitorFirstName,
+                visitorLastName);
+    }
+
+    public Mono<Void> blockUser(String blockerId, String blockedId, String blockerFirstName,
+            String blockerLastName) {
+        return userBlockService.blockUser(blockerId, blockedId, blockerFirstName, blockerLastName);
+    }
+
+    public Mono<Void> unblockUser(String blockerId, String blockedId) {
+        return userBlockService.unblockUser(blockerId, blockedId);
     }
 
     public Mono<Void> deleteUser(String id) {

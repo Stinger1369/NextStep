@@ -1,6 +1,6 @@
 package com.example.websocket.service.user;
 
-import com.example.websocket.model.Follow;
+import com.example.websocket.model.user.Follow;
 import com.example.websocket.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

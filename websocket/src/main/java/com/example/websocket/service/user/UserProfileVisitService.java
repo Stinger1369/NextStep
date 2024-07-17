@@ -1,5 +1,6 @@
 package com.example.websocket.service.user;
 
+import com.example.websocket.model.user.ProfileVisit;
 import com.example.websocket.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +20,16 @@ public class UserProfileVisitService {
         this.notificationService = notificationService;
     }
 
-    public Mono<Void> visitProfile(String visitorId, String visitedId) {
+    public Mono<Void> visitProfile(String visitorId, String visitedId, String visitorFirstName,
+            String visitorLastName) {
         logger.info("User {} visiting profile of {}", visitorId, visitedId);
         return userRepository.findById(visitedId).flatMap(visitedUser -> {
-            visitedUser.addProfileVisit(visitorId);
+            ProfileVisit profileVisit =
+                    new ProfileVisit(visitorId, visitorFirstName, visitorLastName);
+            visitedUser.addProfileVisit(profileVisit);
             return userRepository.save(visitedUser).flatMap(savedVisitedUser -> {
-                String message = String.format("User %s visited your profile.", visitorId);
+                String message = String.format("User %s %s visited your profile.", visitorFirstName,
+                        visitorLastName);
                 return notificationService.sendNotification(visitedId, message, visitorId).then();
             });
         }).doOnError(error -> logger.error("Error visiting profile: {}", error.getMessage()));

@@ -1,4 +1,4 @@
-package com.example.websocket.model;
+package com.example.websocket.model.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.example.websocket.model;
+package com.example.websocket.model.user;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,16 +14,13 @@ import java.util.UUID;
 public class ProfileVisit {
     @Id
     private String id;
-    private String userId;
     private String visitorId;
     private String visitorFirstName;
     private String visitorLastName;
     private Date visitedAt;
 
-    public ProfileVisit(String userId, String visitorId, String visitorFirstName,
-            String visitorLastName) {
+    public ProfileVisit(String visitorId, String visitorFirstName, String visitorLastName) {
         this.id = UUID.randomUUID().toString();
-        this.userId = userId;
         this.visitorId = visitorId;
         this.visitorFirstName = visitorFirstName;
         this.visitorLastName = visitorLastName;

@@ -68,6 +68,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 case "profile.visit":
                 case "user.follow":
                 case "user.unfollow":
+                case "user.block":
+                case "user.unblock":
                     userHandler.handleMessage(session, messageType, payload);
                     break;
                 case "post.create":

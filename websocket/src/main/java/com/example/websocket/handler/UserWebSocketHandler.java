@@ -1,7 +1,7 @@
 package com.example.websocket.handler;
 
-import com.example.websocket.handler.user.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.example.websocket.handler.user.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,12 +20,13 @@ public class UserWebSocketHandler {
     private final FriendRequestHandler friendRequestHandler;
     private final ProfileVisitHandler profileVisitHandler;
     private final FollowHandler followHandler;
+    private final BlockHandler blockHandler;
 
     public UserWebSocketHandler(UserCreationHandler userCreationHandler,
             UserCheckHandler userCheckHandler, UserLikeHandler userLikeHandler,
             UserUnlikeHandler userUnlikeHandler, UserFetchHandler userFetchHandler,
             FriendRequestHandler friendRequestHandler, ProfileVisitHandler profileVisitHandler,
-            FollowHandler followHandler) {
+            FollowHandler followHandler, BlockHandler blockHandler) {
         this.userCreationHandler = userCreationHandler;
         this.userCheckHandler = userCheckHandler;
         this.userLikeHandler = userLikeHandler;
@@ -34,6 +35,7 @@ public class UserWebSocketHandler {
         this.friendRequestHandler = friendRequestHandler;
         this.profileVisitHandler = profileVisitHandler;
         this.followHandler = followHandler;
+        this.blockHandler = blockHandler;
     }
 
     public void handleMessage(WebSocketSession session, String messageType, JsonNode payload) {
@@ -77,6 +79,12 @@ public class UserWebSocketHandler {
                 break;
             case "user.unfollow":
                 followHandler.handleUnfollowUser(session, payload);
+                break;
+            case "user.block":
+                blockHandler.handleBlockUser(session, payload);
+                break;
+            case "user.unblock":
+                blockHandler.handleUnblockUser(session, payload);
                 break;
             default:
                 WebSocketErrorHandler.sendErrorMessage(session,

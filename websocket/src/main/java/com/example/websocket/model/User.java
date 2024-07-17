@@ -4,6 +4,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import com.example.websocket.model.user.Block;
+import com.example.websocket.model.user.Follow;
+import com.example.websocket.model.user.FriendInfo;
+import com.example.websocket.model.user.ProfileVisit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +31,8 @@ public class User {
     private List<FriendInfo> friendRequests = new ArrayList<>();
     private List<Follow> following = new ArrayList<>();
     private List<Follow> followers = new ArrayList<>();
-    private List<String> profileVisits = new ArrayList<>();
+    private List<ProfileVisit> profileVisits = new ArrayList<>();
+    private List<Block> blocks = new ArrayList<>();
 
     public User(String id, String email, String firstName, String lastName) {
         this.id = (id != null && !id.isEmpty()) ? id : UUID.randomUUID().toString();
@@ -113,7 +118,22 @@ public class User {
     }
 
     // Method for managing profile visits
-    public void addProfileVisit(String visitorId) {
-        this.profileVisits.add(visitorId);
+    public void addProfileVisit(ProfileVisit profileVisit) {
+        this.profileVisits.add(profileVisit);
+    }
+
+    // Methods for managing blocks
+    public void blockUser(Block block) {
+        if (!this.blocks.contains(block)) {
+            this.blocks.add(block);
+        }
+    }
+
+    public void unblockUser(String blockedId) {
+        this.blocks.removeIf(block -> block.getBlockedId().equals(blockedId));
+    }
+
+    public boolean isBlocked(String blockedId) {
+        return this.blocks.stream().anyMatch(block -> block.getBlockedId().equals(blockedId));
     }
 }
