@@ -44,3 +44,5 @@ websocket
 
 mvn clean install -U
 mvn spring-boot:run -U
+les 2 commande en une seule = mvn clean install -Pstart
+

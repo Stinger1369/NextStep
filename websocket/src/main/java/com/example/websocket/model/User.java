@@ -96,6 +96,11 @@ public class User {
         this.following.removeIf(follow -> follow.getFolloweeId().equals(userId));
     }
 
+    public boolean isFollowing(String followeeId) {
+        return this.following.stream()
+                .anyMatch(follow -> follow.getFolloweeId().equals(followeeId));
+    }
+
     // Methods for managing followers
     public void addFollower(Follow follow) {
         if (!this.followers.contains(follow)) {

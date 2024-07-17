@@ -24,6 +24,12 @@ public class UserFollowService {
             String lastName) {
         logger.info("User {} following {}", userId, followId);
         return userRepository.findById(userId).flatMap(user -> {
+            if (user.isFollowing(followId)) {
+                String message = "You are already following this user.";
+                return notificationService.sendNotification(userId, message, followId)
+                        .then(Mono.error(new IllegalStateException("User already following")));
+            }
+
             Follow follow = new Follow(userId, followId, user.getFirstName(), user.getLastName());
             user.followUser(follow);
             return userRepository.save(user).flatMap(savedUser -> {
