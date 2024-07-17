@@ -36,6 +36,7 @@ public class FriendRequestHandler {
                 if (payload.hasNonNull(USER_ID) && payload.hasNonNull(FRIEND_ID)
                                 && payload.hasNonNull(FIRST_NAME) && payload.hasNonNull(LAST_NAME)
                                 && payload.hasNonNull(CONTENT)) {
+
                         String userId = payload.get(USER_ID).asText();
                         String friendId = payload.get(FRIEND_ID).asText();
                         String firstName = payload.get(FIRST_NAME).asText();
@@ -52,8 +53,9 @@ public class FriendRequestHandler {
                                                 userId, friendId);
 
                                 // Create a notification
-                                String message = String.format("User %s sent you a friend request.",
-                                                userId);
+                                String message = String.format(
+                                                "User %s %s sent you a friend request.", firstName,
+                                                lastName);
                                 Notification notification = new Notification(userId, firstName,
                                                 lastName, message, content, "friend_request");
 
@@ -65,8 +67,10 @@ public class FriendRequestHandler {
                                                 error);
                         });
                 } else {
-                        logger.error("Missing fields in friend.request payload: userId={}, friendId={}",
-                                        payload.hasNonNull(USER_ID), payload.hasNonNull(FRIEND_ID));
+                        logger.error("Missing fields in friend.request payload: userId={}, friendId={}, firstName={}, lastName={}, content={}",
+                                        payload.hasNonNull(USER_ID), payload.hasNonNull(FRIEND_ID),
+                                        payload.hasNonNull(FIRST_NAME),
+                                        payload.hasNonNull(LAST_NAME), payload.hasNonNull(CONTENT));
                         WebSocketErrorHandler.sendErrorMessage(session,
                                         "Missing fields in friend.request payload");
                 }

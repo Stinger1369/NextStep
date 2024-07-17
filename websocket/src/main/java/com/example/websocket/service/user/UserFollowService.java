@@ -51,8 +51,9 @@ public class UserFollowService {
                     return userRepository.save(followedUser).flatMap(savedFollowedUser -> {
                         String message = String.format("User %s %s stopped following you.",
                                 user.getFirstName(), user.getLastName());
-                        return notificationService.sendNotification(followId, message, userId)
-                                .then();
+                        return notificationService.sendNotification(followId, message, userId).then(
+                                notificationService.deleteNotificationByContentAndType(followId,
+                                        userId, "follow"));
                     });
                 });
             });

@@ -1,7 +1,6 @@
 package com.example.websocket.service.user;
 
 import com.example.websocket.model.Notification;
-import com.example.websocket.model.User;
 import com.example.websocket.repository.UserRepository;
 import com.example.websocket.service.NotificationService;
 import org.slf4j.Logger;
@@ -25,17 +24,10 @@ public class UserNotificationService {
     public Mono<Void> sendNotification(String userId, String message, String entityId) {
         logger.info("Sending notification to user {}: {}", userId, message);
         return userRepository.findById(userId).flatMap(user -> {
-            // Check if notification already exists
-            boolean notificationExists = user.getNotifications().stream().anyMatch(
-                    n -> n.getMessage().equals(message) && n.getContent().equals(entityId));
-
-            if (notificationExists) {
-                return Mono.error(new Exception("Notification already sent."));
-            }
-
-            Notification notification = new Notification(user.getId(), user.getFirstName(),
-                    user.getLastName(), message, entityId);
-            return notificationService.createNotification(notification)
+            // Check if notification already exists and delete it
+            return deleteNotificationByContentAndType(userId, entityId, "follow")
+                    .then(notificationService.createNotification(new Notification(user.getId(),
+                            user.getFirstName(), user.getLastName(), message, entityId)))
                     .flatMap(savedNotification -> {
                         user.addNotification(savedNotification);
                         return userRepository.save(user)
@@ -43,5 +35,10 @@ public class UserNotificationService {
                     });
         }).then().doOnError(
                 error -> logger.error("Error sending notification: {}", error.getMessage()));
+    }
+
+    public Mono<Void> deleteNotificationByContentAndType(String userId, String content,
+            String type) {
+        return notificationService.deleteNotificationByContentAndType(userId, content, type);
     }
 }

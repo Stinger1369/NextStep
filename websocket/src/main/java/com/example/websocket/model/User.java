@@ -27,7 +27,7 @@ public class User {
     private List<FriendInfo> friendRequests = new ArrayList<>();
     private List<Follow> following = new ArrayList<>();
     private List<Follow> followers = new ArrayList<>();
-    private List<String> profileVisits = new ArrayList<>(); // Ajouter cette ligne
+    private List<String> profileVisits = new ArrayList<>();
 
     public User(String id, String email, String firstName, String lastName) {
         this.id = (id != null && !id.isEmpty()) ? id : UUID.randomUUID().toString();
