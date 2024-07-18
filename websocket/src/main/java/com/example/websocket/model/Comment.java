@@ -24,6 +24,7 @@ public class Comment {
     private Date createdAt;
     private Date updatedAt;
     private List<Like> likes = new ArrayList<>();
+    private List<Unlike> unlikes = new ArrayList<>(); // Nouvelle liste pour les unlikes
 
     public Comment(String userId, String postId, String firstName, String lastName,
             String content) {
@@ -42,12 +43,31 @@ public class Comment {
         this.updatedAt = new Date();
     }
 
-    public void removeLike(Like like2) {
-        this.likes.removeIf(like -> like.getUserId().equals(like2.getUserId()));
+    public void removeLike(Like like) {
+        this.likes.removeIf(existingLike -> existingLike.getUserId().equals(like.getUserId())
+                && existingLike.getEntityId().equals(like.getEntityId())
+                && existingLike.getEntityType().equals(like.getEntityType()));
+        this.updatedAt = new Date();
+    }
+
+    public void addUnlike(Unlike unlike) {
+        this.unlikes.add(unlike);
+        this.updatedAt = new Date();
+    }
+
+    public void removeUnlike(Unlike unlike) {
+        this.unlikes
+                .removeIf(existingUnlike -> existingUnlike.getUserId().equals(unlike.getUserId())
+                        && existingUnlike.getEntityId().equals(unlike.getEntityId())
+                        && existingUnlike.getEntityType().equals(unlike.getEntityType()));
         this.updatedAt = new Date();
     }
 
     public boolean hasLiked(String userId) {
         return this.likes.stream().anyMatch(like -> like.getUserId().equals(userId));
+    }
+
+    public boolean hasUnliked(String userId) {
+        return this.unlikes.stream().anyMatch(unlike -> unlike.getUserId().equals(userId));
     }
 }

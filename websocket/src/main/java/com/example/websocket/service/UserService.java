@@ -3,7 +3,10 @@ package com.example.websocket.service;
 import com.example.websocket.model.Like;
 import com.example.websocket.model.Unlike;
 import com.example.websocket.model.User;
+import com.example.websocket.model.Post; // Importer le modèle Post
 import com.example.websocket.service.user.*;
+import com.example.websocket.service.post.PostLikeService;
+import com.example.websocket.service.post.PostUnlikeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,11 +26,14 @@ public class UserService {
     private final UserFollowService userFollowService;
     private final UserProfileVisitService userProfileVisitService;
     private final UserBlockService userBlockService;
+    private final PostLikeService postLikeService;
+    private final PostUnlikeService postUnlikeService;
 
     public UserService(UserCreationService userCreationService, UserFetchService userFetchService,
             UserFriendService userFriendService, UserLikeService userLikeService,
             UserUnlikeService userUnlikeService, UserFollowService userFollowService,
-            UserProfileVisitService userProfileVisitService, UserBlockService userBlockService) {
+            UserProfileVisitService userProfileVisitService, UserBlockService userBlockService,
+            PostLikeService postLikeService, PostUnlikeService postUnlikeService) {
         this.userCreationService = userCreationService;
         this.userFetchService = userFetchService;
         this.userFriendService = userFriendService;
@@ -36,6 +42,8 @@ public class UserService {
         this.userFollowService = userFollowService;
         this.userProfileVisitService = userProfileVisitService;
         this.userBlockService = userBlockService;
+        this.postLikeService = postLikeService;
+        this.postUnlikeService = postUnlikeService;
     }
 
     public Mono<User> createUser(User user) {
@@ -115,5 +123,14 @@ public class UserService {
         return userFetchService.deleteUser(id)
                 .doOnSuccess(unused -> logger.info("User deleted with ID: {}", id))
                 .doOnError(error -> logger.error("Error deleting user: {}", error.getMessage()));
+    }
+
+    // Mise à jour des méthodes pour les posts
+    public Mono<Post> likePost(String userId, String postId) {
+        return postLikeService.likePost(userId, postId);
+    }
+
+    public Mono<Post> unlikePost(String userId, String postId) {
+        return postUnlikeService.unlikePost(userId, postId);
     }
 }

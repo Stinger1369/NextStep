@@ -24,6 +24,7 @@ public class Post {
     private Date updatedAt;
     private List<Comment> comments = new ArrayList<>();
     private List<Like> likes = new ArrayList<>();
+    private List<Unlike> unlikes = new ArrayList<>(); // Nouvelle liste pour les unlikes
     private List<Share> shares = new ArrayList<>();
     private int repostCount = 0;
     private List<String> reposters = new ArrayList<>();
@@ -54,6 +55,18 @@ public class Post {
         this.likes.removeIf(existingLike -> existingLike.getUserId().equals(like.getUserId())
                 && existingLike.getEntityId().equals(like.getEntityId())
                 && existingLike.getEntityType().equals(like.getEntityType()));
+    }
+
+    public void addUnlike(Unlike unlike) {
+        this.unlikes.add(unlike);
+        this.updatedAt = new Date();
+    }
+
+    public void removeUnlike(Unlike unlike) {
+        this.unlikes
+                .removeIf(existingUnlike -> existingUnlike.getUserId().equals(unlike.getUserId())
+                        && existingUnlike.getEntityId().equals(unlike.getEntityId())
+                        && existingUnlike.getEntityType().equals(unlike.getEntityType()));
     }
 
     public void addShare(Share share) {
