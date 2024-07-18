@@ -20,12 +20,14 @@ public class PostWebSocketHandler {
     private final PostUnlikeHandler postUnlikeHandler;
     private final PostShareHandler postShareHandler;
     private final PostRepostHandler postRepostHandler;
+    private final PostImageHandler postImageHandler; // Nouveau handler
 
     public PostWebSocketHandler(PostCreateHandler postCreateHandler,
             PostFetchHandler postFetchHandler, PostUpdateHandler postUpdateHandler,
             PostDeleteHandler postDeleteHandler, PostLikeHandler postLikeHandler,
             PostUnlikeHandler postUnlikeHandler, PostShareHandler postShareHandler,
-            PostRepostHandler postRepostHandler) {
+            PostRepostHandler postRepostHandler, PostImageHandler postImageHandler) { // Ajout du
+                                                                                      // postImageHandler
         this.postCreateHandler = postCreateHandler;
         this.postFetchHandler = postFetchHandler;
         this.postUpdateHandler = postUpdateHandler;
@@ -34,6 +36,7 @@ public class PostWebSocketHandler {
         this.postUnlikeHandler = postUnlikeHandler;
         this.postShareHandler = postShareHandler;
         this.postRepostHandler = postRepostHandler;
+        this.postImageHandler = postImageHandler; // Initialisation du postImageHandler
     }
 
     public void handleMessage(WebSocketSession session, String messageType, JsonNode payload) {
@@ -74,6 +77,10 @@ public class PostWebSocketHandler {
             case "post.repost":
                 logger.info("Invoking repost post handler");
                 postRepostHandler.handleRepostPost(session, payload);
+                break;
+            case "post.addImage": // Nouveau case pour l'ajout d'images
+                logger.info("Invoking add image to post handler");
+                postImageHandler.handleAddImageToPost(session, payload);
                 break;
             default:
                 logger.warn("Unknown post message type: {}", messageType);

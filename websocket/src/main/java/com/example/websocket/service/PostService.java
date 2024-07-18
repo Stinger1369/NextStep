@@ -21,6 +21,7 @@ public class PostService {
     private final PostUnlikeService postUnlikeService;
     private final PostShareService postShareService;
     private final PostRepostService postRepostService;
+    private final PostImageService postImageService;
 
     private static final Logger logger = LoggerFactory.getLogger(PostService.class);
 
@@ -28,7 +29,8 @@ public class PostService {
             PostCommentService postCommentService, PostFetchService postFetchService,
             PostUpdateService postUpdateService, PostDeleteService postDeleteService,
             PostLikeService postLikeService, PostUnlikeService postUnlikeService,
-            PostShareService postShareService, PostRepostService postRepostService) {
+            PostShareService postShareService, PostRepostService postRepostService,
+            PostImageService postImageService) {
         this.postCreationService = postCreationService;
         this.postCommentService = postCommentService;
         this.postFetchService = postFetchService;
@@ -38,6 +40,7 @@ public class PostService {
         this.postUnlikeService = postUnlikeService;
         this.postShareService = postShareService;
         this.postRepostService = postRepostService;
+        this.postImageService = postImageService;
     }
 
     public Mono<Post> createPost(Post post) {
@@ -88,5 +91,11 @@ public class PostService {
     public Mono<Post> repostPost(String postId, String userId) {
         logger.info("Service: Reposting post {}", postId);
         return postRepostService.repostPost(postId, userId);
+    }
+
+    public Mono<Post> addImageToPost(String postId, String userId, String imageName,
+            String base64Data) {
+        logger.info("Service: Adding image to post {}", postId);
+        return postImageService.addImageToPost(postId, userId, imageName, base64Data);
     }
 }

@@ -26,6 +26,7 @@ public class Post {
     private List<Like> likes = new ArrayList<>();
     private List<Unlike> unlikes = new ArrayList<>(); // Nouvelle liste pour les unlikes
     private List<Share> shares = new ArrayList<>();
+    private List<String> images = new ArrayList<>(); // Nouvelle liste pour les URLs d'images
     private int repostCount = 0;
     private List<String> reposters = new ArrayList<>();
 
@@ -71,6 +72,11 @@ public class Post {
 
     public void addShare(Share share) {
         this.shares.add(share);
+        this.updatedAt = new Date();
+    }
+
+    public void addImage(String imageUrl) {
+        this.images.add(imageUrl);
         this.updatedAt = new Date();
     }
 
