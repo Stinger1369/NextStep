@@ -43,8 +43,6 @@ public class ConversationUnlikeHandler {
             return;
         }
 
-        logger.info("Unliking conversation with ID: {} by user ID: {}", conversationId, userId);
-
         conversationService.unlikeConversation(conversationId, userId)
                 .subscribe(unlikedConversation -> {
                     try {
@@ -57,10 +55,13 @@ public class ConversationUnlikeHandler {
                         logger.error("Error sending conversation unlike confirmation", e);
                     }
                 }, error -> {
-                    logger.error("Error unliking conversation with ID: {} by user ID: {}",
-                            conversationId, userId, error);
-                    WebSocketErrorHandler.sendErrorMessage(session, "Error unliking conversation",
-                            error);
+                    if ("User has already unliked this conversation.".equals(error.getMessage())) {
+                        WebSocketErrorHandler.sendErrorMessage(session,
+                                "You have already unliked this conversation.");
+                    } else {
+                        WebSocketErrorHandler.sendErrorMessage(session,
+                                "Error unliking conversation", error);
+                    }
                 });
     }
 }

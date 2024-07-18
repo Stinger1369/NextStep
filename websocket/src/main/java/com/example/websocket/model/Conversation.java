@@ -1,9 +1,9 @@
 package com.example.websocket.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,6 +25,7 @@ public class Conversation {
     private String name;
     private List<Message> messages = new ArrayList<>();
     private List<Like> likes = new ArrayList<>();
+    private List<Unlike> unlikes = new ArrayList<>();
     private Date createdAt;
     private Date updatedAt;
 
@@ -50,10 +51,27 @@ public class Conversation {
 
     public void addLike(Like like) {
         this.likes.add(like);
+        this.updatedAt = new Date();
     }
 
-    public void removeLike(String userId) {
-        this.likes.removeIf(like -> like.getUserId().equals(userId));
+    public void removeLike(Like like) {
+        this.likes.removeIf(existingLike -> existingLike.getUserId().equals(like.getUserId())
+                && existingLike.getEntityId().equals(like.getEntityId())
+                && existingLike.getEntityType().equals(like.getEntityType()));
+        this.updatedAt = new Date();
+    }
+
+    public void addUnlike(Unlike unlike) {
+        this.unlikes.add(unlike);
+        this.updatedAt = new Date();
+    }
+
+    public void removeUnlike(Unlike unlike) {
+        this.unlikes
+                .removeIf(existingUnlike -> existingUnlike.getUserId().equals(unlike.getUserId())
+                        && existingUnlike.getEntityId().equals(unlike.getEntityId())
+                        && existingUnlike.getEntityType().equals(unlike.getEntityType()));
+        this.updatedAt = new Date();
     }
 
     @Data

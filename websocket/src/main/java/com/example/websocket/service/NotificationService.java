@@ -3,6 +3,7 @@ package com.example.websocket.service;
 import com.example.websocket.model.Notification;
 import com.example.websocket.repository.NotificationRepository;
 import com.example.websocket.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,11 +15,14 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
+    @Autowired
     public NotificationService(NotificationRepository notificationRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository, EmailService emailService) {
         this.notificationRepository = notificationRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
     public Mono<Notification> createNotification(Notification notification) {
@@ -30,8 +34,17 @@ public class NotificationService {
             return notificationRepository.save(notification).flatMap(savedNotification -> {
                 user.addNotification(savedNotification);
                 return userRepository.save(user).thenReturn(savedNotification);
-            });
+            }).doOnSuccess(
+                    savedNotification -> sendEmailNotification(user.getEmail(), savedNotification));
         });
+    }
+
+    private void sendEmailNotification(String to, Notification notification) {
+        String subject = "New Notification: " + notification.getType();
+        String body = "Dear " + notification.getFirstName() + " " + notification.getLastName()
+                + ",\n\n" + "You have a new notification:\n\n" + notification.getMessage() + "\n\n"
+                + "Best regards,\nYour WebSocket App Team";
+        emailService.sendEmail(to, subject, body);
     }
 
     public Mono<Void> deleteNotificationByContentAndType(String userId, String content,

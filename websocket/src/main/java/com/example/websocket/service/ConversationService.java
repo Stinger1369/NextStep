@@ -1,174 +1,72 @@
 package com.example.websocket.service;
 
 import com.example.websocket.model.Conversation;
-import com.example.websocket.model.Like;
-import com.example.websocket.model.Notification;
-import com.example.websocket.model.User;
-import com.example.websocket.repository.ConversationRepository;
-import com.example.websocket.repository.LikeRepository;
-import com.example.websocket.repository.UserRepository;
+import com.example.websocket.service.conversation.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
-import java.util.List;
-
 @Service
 public class ConversationService {
-    private static final String SYSTEM = "System";
-    private final ConversationRepository conversationRepository;
-    private final UserRepository userRepository;
-    private final NotificationService notificationService;
-    private final LikeRepository likeRepository;
 
-    public ConversationService(ConversationRepository conversationRepository,
-            UserRepository userRepository, NotificationService notificationService,
-            LikeRepository likeRepository) {
-        this.conversationRepository = conversationRepository;
-        this.userRepository = userRepository;
-        this.notificationService = notificationService;
-        this.likeRepository = likeRepository;
+    private final ConversationCreationService conversationCreationService;
+    private final ConversationFetchService conversationFetchService;
+    private final ConversationUpdateService conversationUpdateService;
+    private final ConversationDeleteService conversationDeleteService;
+    private final ConversationLikeService conversationLikeService;
+    private final ConversationUnlikeService conversationUnlikeService;
+
+    private static final Logger logger = LoggerFactory.getLogger(ConversationService.class);
+
+    public ConversationService(ConversationCreationService conversationCreationService,
+            ConversationFetchService conversationFetchService,
+            ConversationUpdateService conversationUpdateService,
+            ConversationDeleteService conversationDeleteService,
+            ConversationLikeService conversationLikeService,
+            ConversationUnlikeService conversationUnlikeService) {
+        this.conversationCreationService = conversationCreationService;
+        this.conversationFetchService = conversationFetchService;
+        this.conversationUpdateService = conversationUpdateService;
+        this.conversationDeleteService = conversationDeleteService;
+        this.conversationLikeService = conversationLikeService;
+        this.conversationUnlikeService = conversationUnlikeService;
     }
 
     public Mono<Conversation> createConversation(Conversation conversation, String initialMessage) {
-        conversation.addMessage(conversation.getSenderId(), conversation.getSenderFirstName(),
-                conversation.getSenderLastName(), initialMessage);
-        return conversationRepository.save(conversation).flatMap(savedConversation -> {
-            Mono<User> senderUpdate =
-                    userRepository.findById(savedConversation.getSenderId()).flatMap(sender -> {
-                        sender.addConversation(savedConversation);
-                        return userRepository.save(sender);
-                    });
-
-            Mono<User> receiverUpdate =
-                    userRepository.findById(savedConversation.getReceiverId()).flatMap(receiver -> {
-                        receiver.addConversation(savedConversation);
-                        Notification notification = new Notification(receiver.getId(),
-                                receiver.getFirstName(), receiver.getLastName(),
-                                "New conversation started by: " + savedConversation.getSenderId(),
-                                initialMessage);
-                        return notificationService.createNotification(notification)
-                                .flatMap(savedNotification -> {
-                                    receiver.addNotification(savedNotification);
-                                    return userRepository.save(receiver);
-                                });
-                    });
-
-            return Mono.when(senderUpdate, receiverUpdate).thenReturn(savedConversation);
-        });
+        logger.info("Service: Creating conversation");
+        return conversationCreationService.createConversation(conversation, initialMessage);
     }
 
     public Mono<Conversation> getConversationById(String id) {
-        return conversationRepository.findById(id);
+        logger.info("Service: Fetching conversation by id {}", id);
+        return conversationFetchService.getConversationById(id);
     }
 
     public Flux<Conversation> getAllConversations() {
-        return conversationRepository.findAll();
+        logger.info("Service: Fetching all conversations");
+        return conversationFetchService.getAllConversations();
     }
 
     public Mono<Conversation> updateConversation(String id, JsonNode payload) {
-        return conversationRepository.findById(id).flatMap(existingConversation -> {
-            if (payload.hasNonNull("senderId"))
-                existingConversation.setSenderId(payload.get("senderId").asText());
-            if (payload.hasNonNull("receiverId"))
-                existingConversation.setReceiverId(payload.get("receiverId").asText());
-            existingConversation.setUpdatedAt(new Date());
-            return conversationRepository.save(existingConversation);
-        });
+        logger.info("Service: Updating conversation {}", id);
+        return conversationUpdateService.updateConversation(id, payload);
     }
 
     public Mono<Void> deleteConversation(String id) {
-        return conversationRepository.deleteById(id);
+        logger.info("Service: Deleting conversation {}", id);
+        return conversationDeleteService.deleteConversation(id);
     }
 
     public Mono<Conversation> likeConversation(String conversationId, String userId) {
-        return userRepository.findById(userId).flatMap(user -> {
-            return conversationRepository.findById(conversationId).flatMap(conversation -> {
-                Like like = new Like(userId, conversationId, "conversation", user.getFirstName(),
-                        user.getLastName());
-                conversation.addLike(like);
-                return likeRepository.save(like).then(conversationRepository.save(conversation))
-                        .flatMap(savedConversation -> {
-                            Notification notification =
-                                    new Notification(conversationId, SYSTEM, SYSTEM,
-                                            "Your conversation was liked by " + user.getFirstName()
-                                                    + " " + user.getLastName(),
-                                            conversation.getName());
-                            return notificationService.createNotification(notification)
-                                    .thenReturn(savedConversation);
-                        });
-            });
-        });
+        logger.info("Service: Liking conversation {}", conversationId);
+        return conversationLikeService.likeConversation(conversationId, userId);
     }
 
     public Mono<Conversation> unlikeConversation(String conversationId, String userId) {
-        return userRepository.findById(userId).flatMap(user -> {
-            return conversationRepository.findById(conversationId).flatMap(conversation -> {
-                conversation.removeLike(userId);
-                return conversationRepository.save(conversation).flatMap(savedConversation -> {
-                    Notification notification = new Notification(
-                            conversationId, SYSTEM, SYSTEM, "Your conversation was unliked by "
-                                    + user.getFirstName() + " " + user.getLastName(),
-                            conversation.getName());
-                    return notificationService.createNotification(notification)
-                            .thenReturn(savedConversation);
-                });
-            });
-        });
-    }
-
-    public Mono<Conversation.Message> likeMessage(String conversationId, String messageId,
-            String userId) {
-        return userRepository.findById(userId).flatMap(user -> {
-            return conversationRepository.findById(conversationId).flatMap(conversation -> {
-                List<Conversation.Message> messages = conversation.getMessages();
-                for (Conversation.Message message : messages) {
-                    if (message.getId().equals(messageId)) {
-                        Like like = new Like(userId, messageId, "message", user.getFirstName(),
-                                user.getLastName());
-                        message.addLike(like);
-                        return likeRepository.save(like)
-                                .then(conversationRepository.save(conversation))
-                                .flatMap(savedConversation -> {
-                                    Notification notification = new Notification(messageId, SYSTEM,
-                                            SYSTEM,
-                                            "Your message was liked by " + user.getFirstName() + " "
-                                                    + user.getLastName(),
-                                            message.getContent());
-                                    return notificationService.createNotification(notification)
-                                            .thenReturn(message);
-                                });
-                    }
-                }
-                return Mono.error(new Exception("Message not found"));
-            });
-        });
-    }
-
-    public Mono<Conversation.Message> unlikeMessage(String conversationId, String messageId,
-            String userId) {
-        return userRepository.findById(userId).flatMap(user -> {
-            return conversationRepository.findById(conversationId).flatMap(conversation -> {
-                List<Conversation.Message> messages = conversation.getMessages();
-                for (Conversation.Message message : messages) {
-                    if (message.getId().equals(messageId)) {
-                        message.removeLike(userId);
-                        return conversationRepository.save(conversation)
-                                .flatMap(savedConversation -> {
-                                    Notification notification = new Notification(messageId, SYSTEM,
-                                            SYSTEM,
-                                            "Your message was unliked by " + user.getFirstName()
-                                                    + " " + user.getLastName(),
-                                            message.getContent());
-                                    return notificationService.createNotification(notification)
-                                            .thenReturn(message);
-                                });
-                    }
-                }
-                return Mono.error(new Exception("Message not found"));
-            });
-        });
+        logger.info("Service: Unliking conversation {}", conversationId);
+        return conversationUnlikeService.unlikeConversation(conversationId, userId);
     }
 }

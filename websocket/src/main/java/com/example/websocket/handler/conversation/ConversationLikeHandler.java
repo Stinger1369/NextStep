@@ -4,6 +4,7 @@ import com.example.websocket.handler.WebSocketErrorHandler;
 import com.example.websocket.service.ConversationService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import reactor.core.publisher.Mono;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -43,24 +44,32 @@ public class ConversationLikeHandler {
             return;
         }
 
-        logger.info("Liking conversation with ID: {} by user ID: {}", conversationId, userId);
-
-        conversationService.likeConversation(conversationId, userId)
-                .subscribe(likedConversation -> {
-                    try {
-                        String result = objectMapper.writeValueAsString(
-                                Map.of("type", "conversation.like.success", PAYLOAD,
-                                        Map.of(CONVERSATION_ID, likedConversation.getId())));
-                        session.sendMessage(new TextMessage(result));
-                        logger.info("Conversation liked: {}", likedConversation);
-                    } catch (IOException e) {
-                        logger.error("Error sending conversation like confirmation", e);
-                    }
-                }, error -> {
-                    logger.error("Error liking conversation with ID: {} by user ID: {}",
-                            conversationId, userId, error);
-                    WebSocketErrorHandler.sendErrorMessage(session, "Error liking conversation",
-                            error);
-                });
+        conversationService.getConversationById(conversationId).flatMap(conversation -> {
+            if (conversation.getSenderId().equals(userId)) {
+                WebSocketErrorHandler.sendErrorMessage(session,
+                        "Users cannot like their own conversation");
+                return Mono.empty();
+            }
+            return conversationService.likeConversation(conversationId, userId)
+                    .flatMap(likedConversation -> {
+                        try {
+                            String result = objectMapper.writeValueAsString(
+                                    Map.of("type", "conversation.like.success", PAYLOAD,
+                                            Map.of(CONVERSATION_ID, likedConversation.getId())));
+                            session.sendMessage(new TextMessage(result));
+                            logger.info("Conversation liked: {}", likedConversation);
+                        } catch (IOException e) {
+                            logger.error("Error sending conversation like confirmation", e);
+                        }
+                        return Mono.empty();
+                    });
+        }).doOnError(error -> {
+            if ("User has already liked this conversation.".equals(error.getMessage())) {
+                WebSocketErrorHandler.sendErrorMessage(session,
+                        "You have already liked this conversation.");
+            } else {
+                WebSocketErrorHandler.sendErrorMessage(session, "Error liking conversation", error);
+            }
+        }).subscribe();
     }
 }
