@@ -17,7 +17,7 @@ fake_fr = Faker('fr_FR')
 fake_ar = Faker('ar_AA')
 fake_en = Faker('en_US')
 
-IMAGE_SERVER_URL = 'http://localhost:7000/server-image/ajouter-image'
+IMAGE_SERVER_URL = 'http://57.129.35.0:7000/server-image'
 
 # Fonction pour obtenir une image
 def get_image(user_id):
@@ -45,7 +45,7 @@ def save_image(url, user_id):
             "base64": image_base64
         }
         try:
-            image_response = requests.post(IMAGE_SERVER_URL, json=data)
+            image_response = requests.post(f"{IMAGE_SERVER_URL}/ajouter-image", json=data)
             if image_response.status_code == 200 and 'link' in image_response.json():
                 return image_response.json()['link']
             else:
@@ -119,7 +119,7 @@ def generate_profiles(n):
     return profiles
 
 # Générer et insérer des profils dans MongoDB
-profiles = generate_profiles(50)
+profiles = generate_profiles(5)
 if profiles:
     collection.insert_many(profiles)
     print("Profiles insérés avec succès !")

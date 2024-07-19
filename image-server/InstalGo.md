@@ -90,3 +90,5 @@ tree H:\recruteProject\image-server /F
 ```bash
 python .\utils\nsfw_detector.py .\public\images\1.jpg
 ```
+ssh -i C:\Users\bilel\.ssh\id_rsa ubuntu@57.129.35.0
+transfert local to server "scp -r H:/gitServeurImage/ImageServer/* ubuntu@57.129.35.0:/home/ubuntu/project/"
