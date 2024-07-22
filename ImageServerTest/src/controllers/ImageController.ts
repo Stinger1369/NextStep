@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import axios, { AxiosError } from "axios";
 import User, { IUser } from "../models/User";
 
-const IMAGE_SERVER_URL = "http://localhost:7000/server-image";
+const IMAGE_SERVER_URL = "http://57.129.50.107:7000/server-image";
 const MAX_IMAGES_PER_USER = 5;
 
 export const addImage = async (req: Request, res: Response) => {

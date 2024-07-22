@@ -43,11 +43,14 @@ export const addImage = async (req: Request, res: Response) => {
     }
 
     console.log(`Sending image to image server for processing`);
-    const response = await axios.post(`${config.imageServerURL}/ajouter-image`, {
-      user_id: id,
-      nom: imageName,
-      base64: imageBase64,
-    });
+    const response = await axios.post(
+      `${config.imageServerURL}/ajouter-image`,
+      {
+        user_id: id,
+        nom: imageName,
+        base64: imageBase64,
+      }
+    );
 
     if (response.data.error) {
       console.log(`Image rejected by image server: ${response.data.error}`);
@@ -57,7 +60,7 @@ export const addImage = async (req: Request, res: Response) => {
       });
     }
 
-    const imageUrl = response.data.link;
+    const imageUrl = response.data.link.replace("localhost", "57.129.50.107");
     console.log(`Image URL received from image server: ${imageUrl}`);
 
     if (!user.images.includes(imageUrl)) {

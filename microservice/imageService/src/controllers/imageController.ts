@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const IMAGE_SERVER_URL =
-  process.env.IMAGE_SERVER_URL || "http://localhost:7000/server-image";
+  process.env.IMAGE_SERVER_URL || "http://57.129.50.107:7000/server-image";
 
 export const addImage = async (req: Request, res: Response) => {
   const { userId, imageName, imageBase64 } = req.body;

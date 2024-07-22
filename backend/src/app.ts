@@ -26,7 +26,7 @@ app.use(
   })
 );
 
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: ["http://localhost:3000", "http://57.129.50.107"] }));
 app.use(express.static("uploads"));
 
 // Log the request method and URL

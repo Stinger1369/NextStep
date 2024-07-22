@@ -5,6 +5,11 @@ import requests
 from PIL import Image
 from io import BytesIO
 import base64
+from dotenv import load_dotenv
+import os
+
+# Charger les variables d'environnement depuis le fichier .env
+load_dotenv()
 
 # Connexion à MongoDB
 mongo_uri = 'mongodb://admin:DALt5z7kaxBKqX1V4O6I@node1-ca7500ced7cd4521.database.cloud.ovh.net,node2-ca7500ced7cd4521.database.cloud.ovh.net,node3-ca7500ced7cd4521.database.cloud.ovh.net/admin?replicaSet=replicaset&tls=true'
@@ -17,7 +22,8 @@ fake_fr = Faker('fr_FR')
 fake_ar = Faker('ar_AA')
 fake_en = Faker('en_US')
 
-IMAGE_SERVER_URL = 'http://57.129.35.0:7000/server-image'
+# Obtenir l'URL du serveur d'images depuis les variables d'environnement
+IMAGE_SERVER_URL = os.getenv('IMAGE_SERVER_URL')
 
 # Fonction pour obtenir une image
 def get_image(user_id):
@@ -44,12 +50,17 @@ def save_image(url, user_id):
             "nom": image_name,
             "base64": image_base64
         }
+
+        #print("Sending image data:", data)  # Log the data being sent
+
         try:
             image_response = requests.post(f"{IMAGE_SERVER_URL}/ajouter-image", json=data)
             if image_response.status_code == 200 and 'link' in image_response.json():
-                return image_response.json()['link']
+                image_link = image_response.json()['link'].replace("localhost", "57.129.50.107")
+                print(f"Image uploaded successfully: {image_link}")
+                return image_link
             else:
-                print(f"Error uploading image: {image_response.json()}")
+                print(f"Error uploading image: {image_response.text}")
         except requests.exceptions.RequestException as e:
             print(f"Request failed: {e}")
     return ""
@@ -119,7 +130,7 @@ def generate_profiles(n):
     return profiles
 
 # Générer et insérer des profils dans MongoDB
-profiles = generate_profiles(5)
+profiles = generate_profiles(100)
 if profiles:
     collection.insert_many(profiles)
     print("Profiles insérés avec succès !")

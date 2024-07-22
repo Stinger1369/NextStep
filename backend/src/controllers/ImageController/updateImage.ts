@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import axios, { AxiosError } from "axios";
 import User, { IUser } from "../../models/User";
 
-const IMAGE_SERVER_URL = "http://localhost:7000/server-image";
+const IMAGE_SERVER_URL = "http://57.129.50.107:7000/server-image";
 
 export const updateImage = async (
   req: Request,

@@ -14,7 +14,7 @@ public class PostImageService {
 
     public PostImageService(PostRepository postRepository) {
         this.postRepository = postRepository;
-        this.webClient = WebClient.builder().baseUrl("http://localhost:7000").build();
+        this.webClient = WebClient.builder().baseUrl("http://57.129.50.107:7000").build();
     }
 
     public Mono<Post> addImageToPost(String postId, String userId, String imageName,
