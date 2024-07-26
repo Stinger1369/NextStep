@@ -59,6 +59,9 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
             case "notification.get":
                 handleGetNotifications(session, payload);
                 break;
+            case "notification.getAllByUser":
+                handleGetAllNotificationsByUser(session, payload);
+                break;
             default:
                 sendErrorMessage(session, "Unknown message type: " + messageType);
                 break;
@@ -89,6 +92,27 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
                         return Mono.empty();
                     } catch (IOException e) {
                         logger.error("Error sending notifications to user {}", userId, e);
+                        return Mono.error(e);
+                    }
+                }).subscribe();
+    }
+
+    private void handleGetAllNotificationsByUser(WebSocketSession session, JsonNode payload) {
+                                                                                               //
+        String userId = payload.get("userId").asText();
+        logger.info("Fetching all notifications for user: {}", userId);
+
+        notificationService.getNotificationsByUserId(userId).collectList()
+                .flatMap(notifications -> {
+                    try {
+                        logger.info("Sending all notifications to user {}: {}", userId,
+                                notifications);
+                        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(
+                                Map.of("type", "notification.getAllByUser.success", "payload",
+                                        notifications))));
+                        return Mono.empty();
+                    } catch (IOException e) {
+                        logger.error("Error sending all notifications to user {}", userId, e);
                         return Mono.error(e);
                     }
                 }).subscribe();

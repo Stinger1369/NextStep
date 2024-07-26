@@ -34,7 +34,7 @@ public class CommentFetchHandler {
                 handleGetCommentById(session, payload);
                 break;
             case "comment.getAll":
-                handleGetAllComments(session);
+                handleGetAllComments(session, payload);
                 break;
             default:
                 logger.warn("Unknown comment fetch message type: {}", messageType);
@@ -74,20 +74,27 @@ public class CommentFetchHandler {
         }
     }
 
-    private void handleGetAllComments(WebSocketSession session) {
-        logger.info("handleGetAllComments called");
-        commentService.getAllComments().collectList().subscribe(comments -> {
-            try {
-                String result = objectMapper.writeValueAsString(Map.of("type",
-                        "comment.getAll.success", PAYLOAD, Map.of("comments", comments)));
-                session.sendMessage(new TextMessage(result));
-                logger.info("Sent all comments: {}", result);
-            } catch (IOException e) {
-                logger.error("Error sending all comments", e);
-            }
-        }, error -> {
-            logger.error("Error fetching all comments", error);
-            WebSocketErrorHandler.sendErrorMessage(session, "Error fetching comments", error);
-        });
+    private void handleGetAllComments(WebSocketSession session, JsonNode payload) {
+        logger.info("handleGetAllComments called with payload: {}", payload);
+        if (payload.hasNonNull("postId")) {
+            String postId = payload.get("postId").asText();
+            commentService.getCommentsByPostId(postId).collectList().subscribe(comments -> {
+                try {
+                    String result = objectMapper.writeValueAsString(Map.of("type",
+                            "comment.getAll.success", PAYLOAD, Map.of("comments", comments)));
+                    session.sendMessage(new TextMessage(result));
+                    logger.info("Sent all comments for post {}: {}", postId, result);
+                } catch (IOException e) {
+                    logger.error("Error sending all comments", e);
+                }
+            }, error -> {
+                logger.error("Error fetching all comments", error);
+                WebSocketErrorHandler.sendErrorMessage(session, "Error fetching comments", error);
+            });
+        } else {
+            logger.warn("Missing postId in comment.getAll payload: {}", payload);
+            WebSocketErrorHandler.sendErrorMessage(session,
+                    "Missing postId in comment.getAll payload");
+        }
     }
 }

@@ -1,4 +1,3 @@
-// src/redux/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './features/auth/authSlice';
 import companyReducer from './features/company/companySlice';
@@ -9,6 +8,7 @@ import themeReducer from './features/theme/themeSlice';
 import postReducer, { selectPostsWithDates } from './features/websocket/posts/postSlice';
 import userWebSocketReducer from './features/websocket/users/userWebSocketSlice';
 import commentReducer from './features/websocket/comments/commentSlice';
+import notificationReducer from './features/websocket/notification/notificationSlice';
 
 const store = configureStore({
   reducer: {
@@ -20,7 +20,8 @@ const store = configureStore({
     theme: themeReducer,
     posts: postReducer,
     userWebSocket: userWebSocketReducer,
-    comments: commentReducer
+    comments: commentReducer,
+    notifications: notificationReducer // Add the notification reducer
   }
 });
 

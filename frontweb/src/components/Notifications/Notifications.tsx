@@ -1,26 +1,49 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../redux/store'; // Import the types
 import { Notification } from '../../types';
-import { subscribeToNotifications, getNotifications, unsubscribeFromNotifications } from '../../websocket/notificationWebSocket';
+import { subscribeToNotifications, initializeWebSocket, addErrorListener, unsubscribeFromNotifications } from '../../websocket/notificationWebSocket';
+import { fetchNotifications, addNewNotification } from '../../redux/features/websocket/notification/notificationActions';
+import { selectNotifications, selectNotificationsLoading, selectNotificationsError } from '../../redux/features/websocket/notification/notificationSlice';
 import './Notifications.css';
 
 const Notifications: React.FC = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const userId = 'user-id'; // Remplacez ceci par la manière dont vous obtenez l'ID utilisateur dans votre application
+  const dispatch: AppDispatch = useDispatch(); // Cast dispatch to AppDispatch
+  const notifications = useSelector(selectNotifications);
+  const loading = useSelector(selectNotificationsLoading);
+  const error = useSelector(selectNotificationsError);
+  const userId = localStorage.getItem('currentUserId'); // Récupère l'ID utilisateur depuis le localStorage
 
   useEffect(() => {
-    console.log('Fetching notifications for user:', userId);
+    console.log('Initializing WebSocket...');
+    const websocketUrl = process.env.REACT_APP_WEBSOCKET_URL || 'ws://localhost:8081/ws/chat';
+    initializeWebSocket(websocketUrl);
+
+    const storedUserId = localStorage.getItem('currentUserId');
+
+    if (storedUserId) {
+      dispatch(fetchNotifications(storedUserId));
+    }
+
+    addErrorListener((error) => {
+      console.error('WebSocket error:', error);
+    });
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!userId) {
+      console.error('No user ID found in localStorage');
+      return;
+    }
+
+    console.log('Fetching all notifications for user:', userId);
     // Initial fetch of notifications
-    getNotifications(userId)
-      .then((notifications) => {
-        console.log('Notifications fetched:', notifications); // Add this log
-        setNotifications(notifications);
-      })
-      .catch((error) => console.error('Error fetching notifications:', error));
+    dispatch(fetchNotifications(userId));
 
     // Subscribe to new notifications
     const unsubscribe = subscribeToNotifications(userId, (notification) => {
-      console.log('New notification received:', notification); // Add this log
-      setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+      console.log('New notification received:', notification);
+      dispatch(addNewNotification(notification));
     });
 
     // Cleanup on unmount
@@ -28,14 +51,31 @@ const Notifications: React.FC = () => {
       unsubscribe();
       unsubscribeFromNotifications(userId);
     };
-  }, [userId]);
+  }, [userId, dispatch]);
+
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
 
   return (
     <div className="notifications-container">
       <h2>Notifications</h2>
+      {loading && <p>Loading...</p>}
+      {error && <p>{error}</p>}
       <ul>
         {notifications.map((notification, index) => (
-          <li key={index}>{notification.message}</li>
+          <li key={index}>
+            {notification.message}
+            <span> - {formatDate(notification.createdAt)} </span>
+          </li>
         ))}
       </ul>
     </div>

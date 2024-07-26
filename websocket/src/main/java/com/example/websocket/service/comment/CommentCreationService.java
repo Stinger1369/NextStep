@@ -101,4 +101,11 @@ public class CommentCreationService {
                 .doOnError(
                         error -> logger.error("Error fetching comments: {}", error.getMessage()));
     }
+
+    public Flux<Comment> getCommentsByPostId(String postId) {
+        return commentRepository.findByPostId(postId)
+                .doOnComplete(() -> logger.info("Comments for post ID {} fetched", postId))
+                .doOnError(error -> logger.error("Error fetching comments by post ID {}: {}",
+                        postId, error.getMessage()));
+    }
 }

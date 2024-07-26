@@ -66,5 +66,9 @@ public class CommentService {
         logger.info("Service: Fetching all comments");
         return commentCreationService.getAllComments();
     }
-    
+
+ public Flux<Comment> getCommentsByPostId(String postId) {
+        logger.info("Service: Fetching comments by postId {}", postId);
+        return commentCreationService.getCommentsByPostId(postId);
+    }
 }

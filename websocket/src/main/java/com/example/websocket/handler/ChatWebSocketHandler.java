@@ -121,6 +121,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 case "notification.subscribe":
                 case "notification.unsubscribe":
                 case "notification.get":
+                case "notification.getAllByUser":
                     notificationHandler.handleTextMessage(session, message);
                     break;
                 default:
