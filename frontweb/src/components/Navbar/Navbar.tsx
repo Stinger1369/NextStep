@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { FaHome, FaInfoCircle, FaUser, FaUserPlus, FaSignOutAlt, FaBriefcase, FaUserCircle, FaUsers } from 'react-icons/fa';
+import { FaHome, FaInfoCircle, FaUser, FaUserPlus, FaSignOutAlt, FaBriefcase, FaUserCircle, FaUsers, FaBell } from 'react-icons/fa';
 import logo from '../../assests/Images/nextstep.webp';
 import { RootState, AppDispatch } from '../../redux/store';
 import { performLogout } from '../../redux/features/auth/authLogout';
@@ -52,6 +52,11 @@ const Navbar: React.FC = () => {
         <li>
           <Link to="/members">
             <FaUsers /> Members
+          </Link>
+        </li>
+        <li>
+          <Link to="/notifications">
+            <FaBell /> Notifications
           </Link>
         </li>
       </ul>

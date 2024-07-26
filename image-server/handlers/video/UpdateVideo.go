@@ -1,12 +1,13 @@
 package video
 
 import (
-    "encoding/base64"
-    "io/ioutil"
-    "net/http"
-    "path/filepath"
-    "github.com/gin-gonic/gin"
-    "log"
+	"encoding/base64"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"path/filepath"
+
+	"github.com/gin-gonic/gin"
 )
 
 func UpdateVideo(c *gin.Context) {
@@ -41,5 +42,5 @@ func UpdateVideo(c *gin.Context) {
         return
     }
 
-    c.JSON(http.StatusOK, gin.H{"link": "http://57.129.50.107:7000/server-video/video/" + compressedPath})
+    c.JSON(http.StatusOK, gin.H{"link": "http://135.125.244.65:7000/server-video/video/" + compressedPath})
 }

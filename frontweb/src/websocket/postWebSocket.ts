@@ -1,14 +1,14 @@
-import { WebSocketMessage, Post, PostCreatedSuccessData, PostGetAllSuccessData } from '../types';
+import { WebSocketMessage, Post, PostCreatedSuccessData, PostGetAllSuccessData, Like, Share, Unlike } from '../types';
 import { sendMessage, addEventListener, removeEventListener } from './websocket';
 
-export function createPost(content: string): Promise<string> {
+export function createPost(content: string): Promise<PostCreatedSuccessData> {
   return new Promise((resolve, reject) => {
     const userId = localStorage.getItem('currentUserId');
     const userFirstName = localStorage.getItem('currentUserFirstName');
     const userLastName = localStorage.getItem('currentUserLastName');
 
     if (!userId || !userFirstName || !userLastName) {
-      reject(new Error('User ID, first name, or last name is missing'));
+      reject(new Error('User information is missing in localStorage'));
       return;
     }
 
@@ -18,24 +18,33 @@ export function createPost(content: string): Promise<string> {
         userId,
         userFirstName,
         userLastName,
-        title: 'Default Title', // Default title
+        title: 'Default Title',
         content
       }
     };
 
-    console.log('Sending post.create message:', message);
+    console.log('Sending post.create message:', JSON.stringify(message));
 
-    const handlePostCreateResult = (data: PostCreatedSuccessData) => {
-      console.log('Received post.create.success message:', data);
-      if (data.postId) {
-        resolve(data.postId);
-      } else {
-        reject(new Error('Post creation failed'));
-      }
-      removeEventListener('post.create.success', handlePostCreateResult);
+    const handlePostCreateSuccess = (data: PostCreatedSuccessData) => {
+      console.log('Post created successfully with ID:', data.postId);
+      resolve({
+        postId: data.postId,
+        userFirstName: data.userFirstName,
+        userLastName: data.userLastName,
+        content: (message.payload as { content: string }).content
+      });
+      removeEventListener('post.create.success', handlePostCreateSuccess);
     };
 
-    addEventListener('post.create.success', handlePostCreateResult);
+    const handleError = (error: unknown) => {
+      console.error('Error in createPost:', error);
+      reject(new Error('Error creating post'));
+      removeEventListener('error', handleError);
+    };
+
+    addEventListener('post.create.success', handlePostCreateSuccess);
+    addEventListener('error', handleError);
+
     sendMessage(message);
   });
 }

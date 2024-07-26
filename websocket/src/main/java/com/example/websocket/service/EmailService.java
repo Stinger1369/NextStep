@@ -25,7 +25,7 @@ public class EmailService {
                 + "<div style='background-color: #0077b5; color: white; padding: 20px; text-align: center;'>"
                 + "<h1 style='margin: 0;'>WebSocket App</h1>" + "</div>"
                 + "<div style='padding: 20px;'>"
-                + "<p style='font-size: 16px;'>Dear <strong>bilel raara</strong>,</p>"
+                + "<p style='font-size: 16px;'>Dear <strong>bilel zaaraoui</strong>,</p>"
                 + "<p style='font-size: 16px;'>" + body + "</p>"
                 + "<p style='font-size: 16px;'>Best regards,<br>Your WebSocket App Team</p>"
                 + "</div>"
@@ -38,7 +38,7 @@ public class EmailService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlMsg, true);
-            helper.setFrom("saccharose13@gmail.com");
+            helper.setFrom("contact@neststep.fr");
             mailSender.send(message);
         } catch (MessagingException e) {
             e.printStackTrace();

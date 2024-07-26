@@ -7,29 +7,35 @@ import EventsActivities from './EventsActivities/EventsActivities';
 import Testimonials from './Testimonials/Testimonials';
 import './Home.css';
 
-const Home: React.FC = () => {
+const Home = () => {
   return (
-    <div className="home-container">
-      <h2>Home Page</h2>
-      <p>Welcome to the home page!</p>
-      <div className="cards-container">
-        <div className="card home-login-container">
-          <LoginComponent />
+    <div className="container-fluid home-container">
+      <div className="row">
+        <div className="col-md-3">
+          <div className="card">
+            <LoginComponent />
+          </div>
+          <div className="card">
+            <SkillDevelopment />
+          </div>
+          <div className="card">
+            <EventsActivities />
+          </div>
         </div>
-        <div className="card home-job-container">
-          <HomeJob />
+        <div className="col-md-6">
+          <div className="card main-content">
+            <h2>Home Page</h2>
+            <p>Welcome to the home page!</p>
+            <HomeJob />
+          </div>
         </div>
-        <div className="card post-job-container">
-          <PostJob />
-        </div>
-        <div className="card skill-development-container">
-          <SkillDevelopment />
-        </div>
-        <div className="card events-activities-container">
-          <EventsActivities />
-        </div>
-        <div className="card testimonials-container">
-          <Testimonials />
+        <div className="col-md-3">
+          <div className="card">
+            <PostJob />
+          </div>
+          <div className="card">
+            <Testimonials />
+          </div>
         </div>
       </div>
     </div>

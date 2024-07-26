@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { refreshToken } from './redux/features/auth/authSlice';
 import { AppDispatch } from './redux/store';
 //import { initializeWebSocket } from './websocket/websocket';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

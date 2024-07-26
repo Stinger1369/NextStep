@@ -38,17 +38,23 @@ export function createUser(email: string, firstName: string, lastName: string): 
 
     const handleUserCreateResult = async (data: { userId: string }) => {
       try {
-        const user = await getUserById(data.userId); // Fetch the full user details
+        console.log('User creation successful, fetching user details');
+        const user = await getUserById(data.userId);
+        console.log('Fetched user details:', user);
         resolve(user);
       } catch (error) {
+        console.error('Error fetching user after creation:', error);
         reject(new Error('User creation failed'));
       } finally {
         removeEventListener('user.create.success', handleUserCreateResult);
+        removeEventListener('error', handleError);
       }
     };
 
     const handleError = (error: unknown) => {
+      console.error('Error in createUser:', error);
       reject(error);
+      removeEventListener('user.create.success', handleUserCreateResult);
       removeEventListener('error', handleError);
     };
 
@@ -79,16 +85,30 @@ export function getUserByEmail(email: string): Promise<User> {
 export function getUserById(userId: string): Promise<User> {
   return new Promise((resolve, reject) => {
     const message: WebSocketMessage = {
-      type: 'user.getById', // Ensure the type matches what the server expects
+      type: 'user.getById',
       payload: { userId }
     };
 
-    const handleGetUserResult = (data: User) => {
-      resolve(data);
+    const handleGetUserResult = (data: string | User) => {
+      console.log('Received user data:', data);
+      let parsedData: User;
+      if (typeof data === 'string') {
+        try {
+          parsedData = JSON.parse(data);
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          reject(new Error('Invalid user data received'));
+          return;
+        }
+      } else {
+        parsedData = data;
+      }
+      resolve(parsedData);
       removeEventListener('user.getById.success', handleGetUserResult);
     };
 
     const handleError = (error: unknown) => {
+      console.error('Error in getUserById:', error);
       reject(error);
       removeEventListener('error', handleError);
     };

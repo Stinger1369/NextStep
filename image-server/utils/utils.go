@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"image-server/config"
 	"log"
 	"os"
 	"os/exec"
@@ -9,7 +10,7 @@ import (
 
 const (
 	MaxImagesPerUser = 6
-	ServerBaseURL    = "http://57.129.50.107:7000/"
+	ServerBaseURL    = "http://135.125.244.65:7000/"
 
 	ErrInvalidRequestFormat  = "ERR001"
 	ErrEmptyUserID           = "ERR002"
@@ -30,7 +31,6 @@ const (
 func CheckImageForNSFW(filePath string) (bool, error) {
 	log.Printf("Checking image for NSFW: %s", filePath)
 
-	// Create log file
 	logFile, err := os.Create("nsfw_detector.log")
 	if err != nil {
 		log.Printf("Error creating log file: %v", err)
@@ -38,7 +38,8 @@ func CheckImageForNSFW(filePath string) (bool, error) {
 	}
 	defer logFile.Close()
 
-	cmd := exec.Command("/bin/bash", "utils/run_nsfw_detector.sh", filePath)
+	scriptPath := config.GetEnv("NSFW_DETECTOR_SCRIPT_PATH", "utils/run_nsfw_detector.sh")
+	cmd := exec.Command("/bin/bash", scriptPath, filePath)
 	cmd.Stdout = logFile
 	cmd.Stderr = logFile
 	err = cmd.Run()

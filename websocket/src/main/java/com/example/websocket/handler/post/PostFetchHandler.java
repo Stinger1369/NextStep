@@ -36,6 +36,7 @@ public class PostFetchHandler {
                 logger.info("Sent all posts: {}", result);
             } catch (IOException e) {
                 logger.error("Error sending all posts", e);
+                WebSocketErrorHandler.sendErrorMessage(session, "Error sending all posts", e);
             }
         }, error -> {
             logger.error("Error fetching all posts", error);
@@ -57,6 +58,8 @@ public class PostFetchHandler {
                     logger.info("Post retrieved: {}", post);
                 } catch (IOException e) {
                     logger.error("Error sending post retrieval confirmation", e);
+                    WebSocketErrorHandler.sendErrorMessage(session,
+                            "Error sending post retrieval confirmation", e);
                 }
             }, error -> {
                 logger.error("Error retrieving post with postId: {}", postId, error);

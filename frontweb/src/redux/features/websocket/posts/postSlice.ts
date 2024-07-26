@@ -1,15 +1,9 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
-import { Post } from '../../../../types';
-
-interface SerializedPost extends Omit<Post, 'createdAt' | 'updatedAt'> {
-  createdAt: string;
-  updatedAt: string;
-  reposters: string[]; // Ajout de cette ligne
-}
+import { Post, Like, Share, Unlike } from '../../../../types';
 
 interface PostState {
-  posts: SerializedPost[];
+  posts: Post[];
   loading: boolean;
   error: string | null;
 }
@@ -35,7 +29,6 @@ const postSlice = createSlice({
         createdAt: new Date(post.createdAt).toISOString(),
         updatedAt: new Date(post.updatedAt).toISOString()
       }));
-      console.log('Posts in fetchPostsSuccess:', state.posts);
     },
     fetchPostsFailure(state, action: PayloadAction<string>) {
       state.loading = false;
@@ -47,37 +40,49 @@ const postSlice = createSlice({
         createdAt: new Date(action.payload.createdAt).toISOString(),
         updatedAt: new Date(action.payload.updatedAt).toISOString()
       });
-      console.log('Post added:', action.payload);
     },
-    likePostSuccess(state, action: PayloadAction<{ postId: string; userId: string }>) {
-      const post = state.posts.find((p) => p.id === action.payload.postId);
-      if (post) {
-        post.likes.push(action.payload.userId);
+    updatePost(state, action: PayloadAction<Post>) {
+      const index = state.posts.findIndex((post) => post.id === action.payload.id);
+      if (index !== -1) {
+        state.posts[index] = {
+          ...action.payload,
+          createdAt: new Date(action.payload.createdAt).toISOString(),
+          updatedAt: new Date(action.payload.updatedAt).toISOString()
+        };
       }
     },
-    unlikePostSuccess(state, action: PayloadAction<{ postId: string; userId: string }>) {
+    deletePost(state, action: PayloadAction<string>) {
+      state.posts = state.posts.filter((post) => post.id !== action.payload);
+    },
+    likePostSuccess(state, action: PayloadAction<{ postId: string; like: Like }>) {
       const post = state.posts.find((p) => p.id === action.payload.postId);
       if (post) {
-        post.likes = post.likes.filter((id) => id !== action.payload.userId);
+        post.likes.push(action.payload.like);
       }
     },
-    sharePostSuccess(state, action: PayloadAction<{ postId: string; email: string }>) {
+    unlikePostSuccess(state, action: PayloadAction<{ postId: string; unlike: Unlike }>) {
       const post = state.posts.find((p) => p.id === action.payload.postId);
       if (post) {
-        post.shares.push(action.payload.email);
+        post.unlikes.push(action.payload.unlike);
+      }
+    },
+    sharePostSuccess(state, action: PayloadAction<{ postId: string; share: Share }>) {
+      const post = state.posts.find((p) => p.id === action.payload.postId);
+      if (post) {
+        post.shares.push(action.payload.share);
       }
     },
     repostPostSuccess(state, action: PayloadAction<{ postId: string; userId: string }>) {
       const post = state.posts.find((p) => p.id === action.payload.postId);
       if (post) {
-        post.repostCount += 1;
         post.reposters.push(action.payload.userId);
+        post.repostCount++;
       }
     }
   }
 });
 
-export const { fetchPostsRequest, fetchPostsSuccess, fetchPostsFailure, addPost, likePostSuccess, unlikePostSuccess, sharePostSuccess, repostPostSuccess } = postSlice.actions;
+export const { fetchPostsRequest, fetchPostsSuccess, fetchPostsFailure, addPost, updatePost, deletePost, likePostSuccess, unlikePostSuccess, sharePostSuccess, repostPostSuccess } = postSlice.actions;
 
 export default postSlice.reducer;
 

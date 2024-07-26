@@ -1,9 +1,7 @@
-// src/controllers/ImageController/deleteImage.ts
 import { Request, Response } from "express";
 import axios, { AxiosError } from "axios";
 import User, { IUser } from "../../models/User";
-
-const IMAGE_SERVER_URL = "http://57.129.50.107:7000/server-image";
+import { config } from "../../config/config";
 
 export const deleteImage = async (
   req: Request,
@@ -21,7 +19,7 @@ export const deleteImage = async (
       throw new Error("Invalid image name");
     }
 
-    await axios.delete(`${IMAGE_SERVER_URL}/delete-image/${id}/${filename}`);
+    await axios.delete(`${config.imageServerURL}/server-image/delete-image/${id}/${filename}`);
     console.log(`Image ${filename} deleted from image server for user ${id}`);
 
     const user: IUser | null = await User.findById(id);

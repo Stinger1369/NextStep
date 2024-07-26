@@ -46,3 +46,16 @@ mvn clean install -U
 mvn spring-boot:run -U
 les 2 commande en une seule = mvn clean install -Pstart
 
+
+
+
+scp /mnt/h/NextStep/websocket.rar ubuntu@135.125.244.65:~
+
+
+ssh ubuntu@135.125.244.65
+sudo apt-get update
+sudo apt-get install unrar
+unrar x websocket.rar
+cd websocket
+mvn clean package
+nohup java -jar target/websocket-0.0.1-SNAPSHOT.jar > websocket.log 2>&1 &

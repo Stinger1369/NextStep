@@ -60,20 +60,27 @@ export const addImage = async (req: Request, res: Response) => {
       });
     }
 
-    const imageUrl = response.data.link.replace("localhost", "57.129.50.107");
-    console.log(`Image URL received from image server: ${imageUrl}`);
+    const relativeImagePath = response.data.link.replace(
+      `http://${config.serverDomain}:7000`,
+      ""
+    );
+    console.log(
+      `Relative image path received from image server: ${relativeImagePath}`
+    );
 
-    if (!user.images.includes(imageUrl)) {
-      user.images.push(imageUrl);
+    if (!user.images.includes(relativeImagePath)) {
+      user.images.push(relativeImagePath);
       user.images = Array.from(new Set(user.images));
 
       await user.save();
       console.log(`Images array after saving: ${JSON.stringify(user.images)}`);
 
-      console.log(`Image added successfully for user ${id}: ${imageUrl}`);
+      console.log(
+        `Image added successfully for user ${id}: ${relativeImagePath}`
+      );
       res.status(200).json(user);
     } else {
-      console.log(`Image already exists for user ${id}: ${imageUrl}`);
+      console.log(`Image already exists for user ${id}: ${relativeImagePath}`);
       return res.status(400).json({
         message: ERROR_CODES.ErrImageAlreadyExists,
         code: ERROR_CODES.ErrImageAlreadyExists,

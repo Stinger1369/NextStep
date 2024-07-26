@@ -2,6 +2,7 @@ package com.example.websocket.service.post;
 
 import com.example.websocket.model.Post;
 import com.example.websocket.repository.PostRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -12,15 +13,15 @@ public class PostImageService {
     private final PostRepository postRepository;
     private final WebClient webClient;
 
-    public PostImageService(PostRepository postRepository) {
+    public PostImageService(PostRepository postRepository,
+            @Value("${image.server.base-url}") String imageServerBaseUrl) {
         this.postRepository = postRepository;
-        this.webClient = WebClient.builder().baseUrl("http://57.129.50.107:7000").build();
+        this.webClient = WebClient.builder().baseUrl(imageServerBaseUrl).build();
     }
 
     public Mono<Post> addImageToPost(String postId, String userId, String imageName,
             String base64Data) {
         return postRepository.findById(postId).flatMap(post -> {
-            // Appeler le serveur d'images pour ajouter l'image
             return webClient.post().uri("/server-image/ajouter-image")
                     .bodyValue(new ImageRequest(userId, imageName, base64Data)).retrieve()
                     .bodyToMono(ImageResponse.class).flatMap(response -> {
@@ -33,7 +34,6 @@ public class PostImageService {
                     });
         });
     }
-
     private static class ImageRequest {
         private final String userId;
         private final String nom;

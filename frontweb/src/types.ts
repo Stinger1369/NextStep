@@ -10,37 +10,113 @@ export interface Post {
   createdAt: string;
   updatedAt: string;
   comments: Comment[];
-  likes: string[];
-  shares: string[];
+  likes: Like[];
+  unlikes: Unlike[];
+  shares: Share[];
+  images: string[];
   repostCount: number;
   reposters: string[];
 }
 
 export interface Comment {
   id: string;
+  postId: string;
   userId: string;
   firstName: string;
   lastName: string;
-  postId: string;
   content: string;
-  createdAt: Date | string;
-  updatedAt: Date | string;
+  createdAt: string;
+  updatedAt: string;
+  likes: Like[];
+  unlikes: Unlike[];
 }
 
-export interface PostCreatedSuccessData {
+export interface Like {
+  id: string;
+  userId: string;
+  entityId: string; // ID of the entity being liked (User, Post, Comment, etc.)
+  entityType: string; // Type of the entity (User, Post, Comment, etc.)
+  createdAt: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface Unlike {
+  id: string;
+  userId: string;
+  entityId: string; // ID of the entity being unliked (Post, Comment, etc.)
+  entityType: string; // Type of the entity (Post, Comment, etc.)
+  createdAt: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface Share {
+  id: string;
+  userId: string;
   postId: string;
-  userFirstName: string;
-  userLastName: string;
+  userEmail: string;
+  sharedAt: string;
 }
 
-export interface PostGetAllSuccessData {
-  posts: Post[];
-}
-
-export interface ApiError {
+export interface Notification {
+  id: string;
+  userId: string;
+  firstName: string;
+  lastName: string;
   message: string;
-  status?: number;
-  [key: string]: unknown;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  type: string;
+}
+
+export interface Conversation {
+  id: string;
+  senderId: string;
+  senderFirstName: string;
+  senderLastName: string;
+  receiverId: string;
+  receiverFirstName: string;
+  receiverLastName: string;
+  name: string;
+  messages: Message[];
+  likes: Like[];
+  unlikes: Unlike[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Message {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  senderFirstName: string;
+  senderLastName: string;
+  content: string;
+  timestamp: string;
+  likes: Like[];
+}
+
+export interface FriendInfo {
+  userId: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface Follow {
+  followerId: string;
+  followeeId: string;
+}
+
+export interface ProfileVisit {
+  userId: string;
+  visitDate: string;
+}
+
+export interface Block {
+  blockerId: string;
+  blockedId: string;
 }
 
 export interface User {
@@ -52,36 +128,42 @@ export interface User {
   posts: Post[];
   notifications: Notification[];
   conversations: Conversation[];
+  likes: Like[];
+  unlikes: Unlike[];
+  friends: FriendInfo[];
+  friendRequests: FriendInfo[];
+  following: Follow[];
+  followers: Follow[];
+  profileVisits: ProfileVisit[];
+  blocks: Block[];
 }
 
-export interface Notification {
-  _id: string;
-  userId: string;
-  firstName: string;
-  lastName: string;
-  message: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Conversation {
-  _id: string;
-  senderId: string;
-  senderFirstName: string;
-  senderLastName: string;
-  receiverId: string;
-  receiverFirstName: string;
-  receiverLastName: string;
-  name: string;
-  messages: Message[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Message {
-  senderId: string;
+export interface PostCreatedSuccessData {
+  postId: string;
+  userFirstName: string;
+  userLastName: string;
   content: string;
-  timestamp: Date;
+}
+
+export interface CommentCreatedSuccessData {
+  commentId: string;
+  userId: string;
+  postId: string;
+  content: string;
+  userFirstName: string;
+  userLastName: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PostGetAllSuccessData {
+  posts: Post[];
+}
+
+export interface ApiError {
+  message: string;
+  status?: number;
+  [key: string]: unknown;
 }
 
 // Helper type to represent objects with $date property
@@ -128,7 +210,7 @@ export type WebSocketMessage =
   | { type: 'user.update'; payload: Partial<User> & { userId: string } }
   | { type: 'user.delete'; payload: { userId: string } }
   | { type: 'user.check'; payload: { email: string } }
-  | { type: 'post.create'; payload: Omit<Post, 'id'> }
+  | { type: 'post.create'; payload: Omit<Post, 'id' | 'createdAt' | 'updatedAt'> }
   | { type: 'post.getAll'; payload: Record<string, never> }
   | { type: 'post.getById'; payload: { postId: string } }
   | { type: 'post.update'; payload: { postId: string; content: string } }
@@ -139,5 +221,6 @@ export type WebSocketMessage =
   | { type: 'conversation.getAll'; payload: Record<string, never> }
   | { type: 'conversation.update'; payload: { conversationId: string; name: string } }
   | { type: 'conversation.delete'; payload: { conversationId: string } }
+  | { type: 'notification'; payload: Notification }
   | { type: 'error'; payload: ErrorPayload }
   | { type: string; payload: unknown };

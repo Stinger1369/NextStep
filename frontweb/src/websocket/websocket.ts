@@ -19,16 +19,20 @@ export const initializeWebSocket = (url: string): void => {
 
   socket.onmessage = (event: MessageEvent) => {
     console.log('Raw message received:', event.data);
-    const message: WebSocketMessage = JSON.parse(event.data);
-    console.log('Parsed message:', message);
-    triggerEventListeners(message.type, message.payload);
+    try {
+      const message: WebSocketMessage = JSON.parse(event.data);
+      console.log('Parsed message:', message);
+      triggerEventListeners(message.type, message.payload);
+    } catch (error) {
+      console.error('Error parsing message:', error);
+      triggerEventListeners('error', { message: 'Error parsing message', error });
+    }
   };
 
   socket.onerror = (event: Event) => {
     console.error('WebSocket error:', event);
-    triggerEventListeners('error', event);
+    triggerEventListeners('error', { message: 'WebSocket error', event });
   };
-
   socket.onclose = () => {
     console.log('WebSocket connection closed');
     socket = null;

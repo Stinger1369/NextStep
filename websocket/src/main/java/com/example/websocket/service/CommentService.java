@@ -66,4 +66,5 @@ public class CommentService {
         logger.info("Service: Fetching all comments");
         return commentCreationService.getAllComments();
     }
+    
 }

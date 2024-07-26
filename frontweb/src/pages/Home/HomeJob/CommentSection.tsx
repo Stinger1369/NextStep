@@ -1,3 +1,5 @@
+// CommentSection.tsx
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
@@ -7,8 +9,8 @@ import { selectCommentsWithDatesByPostId } from '../../../redux/selectors';
 import { TextField, Button, Typography, CircularProgress } from '@mui/material';
 import CommentList from '../../../components/CommentCard/CommentList';
 import './CommentSection.css';
-import { Comment } from '../../../types';
-import { addEventListener, removeEventListener } from '../../../websocket/websocket'; // Importez les fonctions
+import { Comment, Like, Unlike } from '../../../types';
+import { addEventListener, removeEventListener } from '../../../websocket/websocket';
 
 interface CommentSectionProps {
   postId: string;
@@ -43,14 +45,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
         content: data.content,
         firstName: data.userFirstName,
         lastName: data.userLastName,
-        createdAt: data.createdAt ? new Date(data.createdAt).toISOString() : new Date().toISOString(),
-        updatedAt: data.updatedAt ? new Date(data.updatedAt).toISOString() : new Date().toISOString()
+        createdAt: data.createdAt || new Date().toISOString(),
+        updatedAt: data.updatedAt || new Date().toISOString(),
+        likes: [],
+        unlikes: []
       };
-      if (isValidDate(newComment.createdAt) && isValidDate(newComment.updatedAt)) {
-        dispatch(addComment(newComment));
-      } else {
-        console.error('Invalid date received for comment:', newComment);
-      }
+      dispatch(addComment(newComment));
     };
 
     addEventListener('comment.create.success', handleCommentCreateSuccess);
@@ -79,13 +79,19 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
       .catch((error) => console.error('Error creating comment:', error));
   }, [content, postId]);
 
+  const formattedComments = comments.map((comment) => ({
+    ...comment,
+    createdAt: new Date(comment.createdAt).toISOString(),
+    updatedAt: new Date(comment.updatedAt).toISOString()
+  }));
+
   let contentToDisplay;
   if (loading) {
     contentToDisplay = <CircularProgress />;
   } else if (error) {
     contentToDisplay = <Typography color="error">{error}</Typography>;
-  } else if (comments.length > 0) {
-    contentToDisplay = <CommentList comments={comments} />;
+  } else if (formattedComments.length > 0) {
+    contentToDisplay = <CommentList comments={formattedComments} />;
   } else {
     contentToDisplay = <Typography>Aucun commentaire à afficher pour le moment.</Typography>;
   }

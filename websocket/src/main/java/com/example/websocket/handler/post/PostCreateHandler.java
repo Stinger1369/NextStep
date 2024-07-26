@@ -40,8 +40,8 @@ public class PostCreateHandler {
                     .subscribe(createdPost -> {
                         try {
                             session.sendMessage(new TextMessage(String.format(
-                                    "{\"type\":\"post.create.success\",\"payload\":{\"postId\":\"%s\"}}",
-                                    createdPost.getId())));
+                                    "{\"type\":\"post.create.success\",\"payload\":{\"postId\":\"%s\", \"content\":\"%s\"}}",
+                                    createdPost.getId(), createdPost.getContent())));
                             logger.info("Post created: {}", createdPost);
                         } catch (IOException e) {
                             logger.error("Error sending post creation confirmation", e);
@@ -57,3 +57,4 @@ public class PostCreateHandler {
         }
     }
 }
+

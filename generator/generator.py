@@ -56,7 +56,7 @@ def save_image(url, user_id):
         try:
             image_response = requests.post(f"{IMAGE_SERVER_URL}/ajouter-image", json=data)
             if image_response.status_code == 200 and 'link' in image_response.json():
-                image_link = image_response.json()['link'].replace("localhost", "57.129.50.107")
+                image_link = image_response.json()['link'].replace("localhost", "135.125.244.65")
                 print(f"Image uploaded successfully: {image_link}")
                 return image_link
             else:

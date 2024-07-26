@@ -1,5 +1,3 @@
-// src/components/LoginComponent.tsx
-
 import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -30,7 +28,8 @@ const LoginComponent: React.FC = () => {
       ).unwrap();
 
       if (resultAction.user) {
-        await handleCreateUser(resultAction.user);
+        const createdUser = await handleCreateUser(resultAction.user);
+        storeUserInfo(createdUser);
         navigate('/');
       }
     } catch (error) {
@@ -40,21 +39,29 @@ const LoginComponent: React.FC = () => {
   };
 
   const handleCreateUser = async (user: { email: string; firstName?: string; lastName?: string }) => {
-    const createdUser = await dispatch(
-      createUserAndSetCurrent({
-        email: user.email,
-        firstName: user.firstName ?? 'DefaultFirstName',
-        lastName: user.lastName ?? 'DefaultLastName'
-      })
-    ).unwrap();
+    try {
+      const createdUser = await dispatch(
+        createUserAndSetCurrent({
+          email: user.email,
+          firstName: user.firstName ?? 'DefaultFirstName',
+          lastName: user.lastName ?? 'DefaultLastName'
+        })
+      ).unwrap();
 
-    // Stocker les informations utilisateur dans localStorage
-    console.log('createdUser:', createdUser); // Ajouter un log pour vérifier la structure de createdUser
-    localStorage.setItem('currentUserId', createdUser.id); // Utilisez createdUser.id
-    localStorage.setItem('currentUserFirstName', createdUser.firstName);
-    localStorage.setItem('currentUserLastName', createdUser.lastName);
+      return createdUser;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
+  };
 
-    console.log('User created on the server: Java Websocket', createdUser, 'User ID for already exists:', createdUser.id);
+  const storeUserInfo = (user: { id: string; email: string; firstName: string; lastName: string; apiKey: string }) => {
+    localStorage.setItem('currentUserId', user.id);
+    localStorage.setItem('currentUserEmail', user.email);
+    localStorage.setItem('currentUserFirstName', user.firstName);
+    localStorage.setItem('currentUserLastName', user.lastName);
+    localStorage.setItem('currentUserApiKey', user.apiKey);
+    console.log('User info stored in localStorage:', user);
   };
 
   const handleLoginError = (error: unknown, setErrors: (errors: Partial<{ email?: string; password?: string }>) => void) => {

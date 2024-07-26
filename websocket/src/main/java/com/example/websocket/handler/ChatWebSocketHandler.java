@@ -24,11 +24,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final ConversationWebSocketHandler conversationHandler;
     private final LikeWebSocketHandler likeHandler;
     private final MessageWebSocketHandler messageHandler;
+    private final NotificationWebSocketHandler notificationHandler;
 
     public ChatWebSocketHandler(ObjectMapper objectMapper, UserWebSocketHandler userHandler,
             PostWebSocketHandler postHandler, CommentWebSocketHandler commentHandler,
             ConversationWebSocketHandler conversationHandler, LikeWebSocketHandler likeHandler,
-            MessageWebSocketHandler messageHandler) {
+            MessageWebSocketHandler messageHandler,
+            NotificationWebSocketHandler notificationHandler) {
         this.objectMapper = objectMapper;
         this.userHandler = userHandler;
         this.postHandler = postHandler;
@@ -36,6 +38,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         this.conversationHandler = conversationHandler;
         this.likeHandler = likeHandler;
         this.messageHandler = messageHandler;
+        this.notificationHandler = notificationHandler;
     }
 
     @Override
@@ -114,6 +117,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 case "like.create":
                 case "like.delete":
                     likeHandler.handleMessage(session, messageType, payload);
+                    break;
+                case "notification.subscribe":
+                case "notification.unsubscribe":
+                case "notification.get":
+                    notificationHandler.handleTextMessage(session, message);
                     break;
                 default:
                     WebSocketErrorHandler.sendErrorMessage(session,

@@ -22,11 +22,10 @@ const PostNews: React.FC = () => {
 
   useEffect(() => {
     console.log('Initializing WebSocket...');
-    initializeWebSocket('ws://localhost:8080/ws/chat');
+    const websocketUrl = process.env.REACT_APP_WEBSOCKET_URL || 'ws://localhost:8081/ws/chat';
+    initializeWebSocket(websocketUrl);
 
     const storedUserId = localStorage.getItem('currentUserId');
-    const storedFirstName = localStorage.getItem('currentUserFirstName');
-    const storedLastName = localStorage.getItem('currentUserLastName');
 
     if (storedUserId) {
       dispatch(fetchUser(storedUserId)).then((result) => {
@@ -70,12 +69,14 @@ const PostNews: React.FC = () => {
           userFirstName: user.firstName,
           userLastName: user.lastName,
           title: 'Default Title',
-          content,
+          content: data.content,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           comments: [],
           likes: [],
+          unlikes: [],
           shares: [],
+          images: [],
           repostCount: 0,
           reposters: []
         };
@@ -89,35 +90,40 @@ const PostNews: React.FC = () => {
         removeEventListener<PostCreatedSuccessData>('post.create.success', handlePostCreateSuccess);
       };
     }
-  }, [user, dispatch, content]);
+  }, [user, dispatch]);
 
   const handleCreatePost = useCallback(() => {
     if (user) {
       console.log('Creating post...');
       createPost(content)
-        .then((postId) => {
-          console.log('Post created with ID:', postId);
+        .then((data) => {
+          console.log('Post created with ID:', data.postId);
           setContent(''); // Clear the content after creating the post
         })
-        .catch((error) => console.error('Error creating post:', error));
+        .catch((error) => {
+          console.error('Error creating post:', error);
+        });
     } else {
       console.error('No user logged in');
     }
   }, [content, user]);
 
-  const formattedPosts = posts.map((post) => ({
-    ...post,
-    createdAt: new Date(post.createdAt).toISOString(),
-    updatedAt: new Date(post.updatedAt).toISOString()
-  }));
+  // Sort posts by createdAt date descending and convert dates to strings
+  const sortedPosts = posts
+    .map((post) => ({
+      ...post,
+      createdAt: new Date(post.createdAt).toISOString(),
+      updatedAt: new Date(post.updatedAt).toISOString()
+    }))
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   let contentToDisplay;
   if (loading) {
     contentToDisplay = <CircularProgress />;
   } else if (error) {
     contentToDisplay = <Typography color="error">{error}</Typography>;
-  } else if (formattedPosts.length > 0) {
-    contentToDisplay = <PostList posts={formattedPosts} />;
+  } else if (sortedPosts.length > 0) {
+    contentToDisplay = <PostList posts={sortedPosts} />;
   } else {
     contentToDisplay = <Typography>Aucun post à afficher pour le moment.</Typography>;
   }

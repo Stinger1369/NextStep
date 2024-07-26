@@ -10,6 +10,7 @@ import authRoutes from "./routes/authRoutes";
 import imageRoutes from "./routes/imageRoutes";
 import companyRoutes from "./routes/companyRoutes";
 import authMiddleware from "./middlewares/authMiddleware";
+import activityRoutes from "./routes/activityRoutes";
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ app.use(
   })
 );
 
-app.use(cors({ origin: ["http://localhost:3000", "http://57.129.50.107"] }));
+app.use(cors({ origin: ["http://localhost:3000", "http://135.125.244.65"] }));
 app.use(express.static("uploads"));
 
 // Log the request method and URL
@@ -41,6 +42,7 @@ app.use("/api/users", authMiddleware, userRoutes);
 app.use("/api/jobs", authMiddleware, jobRoutes);
 app.use("/api/applications", authMiddleware, applicationRoutes);
 app.use("/api/images", authMiddleware, imageRoutes);
+app.use("/api/activities", authMiddleware, activityRoutes);
 
 // Add a route for the root URL
 app.get("/", (req, res) => {

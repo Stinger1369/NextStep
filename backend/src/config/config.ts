@@ -13,6 +13,9 @@ export const config = {
   emailPass: process.env.EMAIL_PASS || "defaultEmailPass",
   redisURL: process.env.REDIS_URL || "redis://redis:6379",
   imageServerURL:
-    process.env.IMAGE_SERVER_URL || `http://${process.env.SERVER_IP}:7000`,
+    process.env.IMAGE_SERVER_URL || `http://${process.env.SERVER_DOMAIN}:7000`,
   maxImagesPerUser: parseInt(process.env.MAX_IMAGES_PER_USER || "5", 10),
+  serverDomain: process.env.SERVER_DOMAIN || "localhost",
 };
+
+// Utiliser config.serverDomain pour reconstruire l'URL complète

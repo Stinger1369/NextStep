@@ -24,6 +24,7 @@ import RecruitOtherInfo from '../pages/ProfileSection/ProfileEditRecruits/OtherI
 import RecruitSocialMediaInfo from '../pages/ProfileSection/ProfileEditRecruits/SocialMediaInfo/SocialMediaInfo';
 import UserProfile from '../pages/ProfileSection/UserProfile/UserProfile';
 import PublicUserProfile from '../pages/ProfileSection/PublicUserProfile/PublicUserProfile';
+import Notifications from '../components/Notifications/Notifications'; // Import the Notifications component
 import Members from '../pages/Members/Members';
 import { RootState, AppDispatch } from '../redux/store';
 import { getCompanies } from '../redux/features/company/companySlice';
@@ -67,6 +68,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/user-profile/:userId" element={user ? <UserProfile /> : <Navigate to="/login" />} />
         <Route path="/public-profile/:userId" element={<PublicUserProfile />} />
         <Route path="/members" element={<Members />} />
+        <Route path="/notifications" element={<Notifications />} />
       </Routes>
     </Router>
   );

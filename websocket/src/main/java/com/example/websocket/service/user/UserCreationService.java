@@ -39,7 +39,7 @@ public class UserCreationService {
     public Mono<User> createUserIfNotExists(String email, String firstName, String lastName) {
         return userRepository.findByEmail(email).flux().next().switchIfEmpty(Mono.defer(() -> {
             User newUser = new User(null, email, firstName, lastName);
-            logger.info("Creating user: {}", newUser);
+            logger.info("Creating new user: {}", newUser);
             return createUser(newUser);
         })).doOnSuccess(user -> {
             if (user != null) {

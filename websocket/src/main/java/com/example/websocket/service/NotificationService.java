@@ -9,9 +9,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Date;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class NotificationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
@@ -34,18 +38,28 @@ public class NotificationService {
             return notificationRepository.save(notification).flatMap(savedNotification -> {
                 user.addNotification(savedNotification);
                 return userRepository.save(user).thenReturn(savedNotification);
-            }).doOnSuccess(
-                    savedNotification -> sendEmailNotification(user.getEmail(), savedNotification));
+            }).doOnSuccess(savedNotification -> {
+                logger.info("Notification created: {}", savedNotification);
+                // sendEmailNotification(user.getEmail(), savedNotification);
+            });
+        }).doOnError(error -> {
+            logger.error("Error creating notification: {}", error.getMessage());
         });
     }
 
-    private void sendEmailNotification(String to, Notification notification) {
-        String subject = "New Notification: " + notification.getType();
-        String body = "Dear " + notification.getFirstName() + " " + notification.getLastName()
-                + ",\n\n" + "You have a new notification:\n\n" + notification.getMessage() + "\n\n"
-                + "Best regards,\nYour WebSocket App Team";
-        emailService.sendEmail(to, subject, body);
-    }
+    // private void sendEmailNotification(String to, Notification notification) {
+    // String subject = "New Notification: " + notification.getType();
+    // String body = "Dear " + notification.getFirstName() + " " + notification.getLastName()
+    // + ",\n\n" + "You have a new notification:\n\n" + notification.getMessage() + "\n\n"
+    // + "Best regards,\nYour WebSocket App Team";
+
+    // try {
+    // emailService.sendEmail(to, subject, body);
+    // logger.info("Email sent to: {}", to);
+    // } catch (Exception e) {
+    // logger.error("Error sending email: {}", e.getMessage());
+    // }
+    // }
 
     public Mono<Void> deleteNotificationByContentAndType(String userId, String content,
             String type) {
@@ -59,6 +73,10 @@ public class NotificationService {
 
     public Flux<Notification> getAllNotifications() {
         return notificationRepository.findAll();
+    }
+
+    public Flux<Notification> getNotificationsByUserId(String userId) {
+        return notificationRepository.findByUserId(userId);
     }
 
     public Mono<Notification> updateNotification(String id, Notification notification) {

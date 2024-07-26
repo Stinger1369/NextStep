@@ -1,0 +1,17 @@
+.notifications-container {
+  padding: 20px;
+}
+
+.notifications-container h2 {
+  margin-bottom: 20px;
+}
+
+.notifications-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.notifications-container li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
