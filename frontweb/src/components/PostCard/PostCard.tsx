@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Card, CardContent, Typography, IconButton } from '@mui/material';
 import { ThumbUp, Share, Repeat } from '@mui/icons-material';
 import { Post } from '../../types';
-import CommentSection from '../../pages/Home/HomeJob/CommentSection';
+import CommentSection from '../../pages/Home/PostScreen/CommentSection';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUser } from '../../redux/features/websocket/users/userWebsocketThunks/userWebsocketThunks';
 import { RootState, AppDispatch } from '../../redux/store';

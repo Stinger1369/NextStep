@@ -1,9 +1,17 @@
 .notifications-container {
   padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .notifications-container h2 {
   margin-bottom: 20px;
+  text-align: center;
+  font-size: 24px;
+  color: #333;
 }
 
 .notifications-container ul {
@@ -12,6 +20,28 @@
 }
 
 .notifications-container li {
-  padding: 10px;
+  padding: 15px;
   border-bottom: 1px solid #ddd;
+  background-color: #fff;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
+}
+
+.notifications-container li:hover {
+  transform: scale(1.02);
+  background-color: #f1f1f1;
+}
+
+.notification-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-content span.notification-date {
+  color: #888;
+  font-size: 12px;
 }

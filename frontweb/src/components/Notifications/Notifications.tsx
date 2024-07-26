@@ -55,12 +55,13 @@ const Notifications: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long', // Ajouter le jour de la semaine
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+      minute: '2-digit'
+      //second: '2-digit'
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
@@ -73,8 +74,10 @@ const Notifications: React.FC = () => {
       <ul>
         {notifications.map((notification, index) => (
           <li key={index}>
-            {notification.message}
-            <span> - {formatDate(notification.createdAt)} </span>
+            <div className="notification-content">
+              {notification.message}
+              <span className="notification-date">{formatDate(notification.createdAt)}</span>
+            </div>
           </li>
         ))}
       </ul>
