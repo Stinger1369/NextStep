@@ -1,5 +1,3 @@
-// CommentSection.tsx
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
@@ -9,7 +7,7 @@ import { selectCommentsWithDatesByPostId } from '../../../redux/selectors';
 import { TextField, Button, Typography, CircularProgress } from '@mui/material';
 import CommentList from '../../../components/CommentCard/CommentList';
 import './CommentSection.css';
-import { Comment, Like, Unlike } from '../../../types';
+import { Comment } from '../../../types';
 import { addEventListener, removeEventListener } from '../../../websocket/websocket';
 
 interface CommentSectionProps {
@@ -30,14 +28,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
         dispatch(fetchCommentsSuccess(comments));
       })
       .catch((error) => {
-        console.error('Error fetching comments:', error);
         dispatch(fetchCommentsFailure(error.message));
       });
   }, [postId, dispatch]);
 
   useEffect(() => {
     const handleCommentCreateSuccess = (data: CommentCreatedSuccessData) => {
-      console.log('Handling comment.create.success event:', data);
       const newComment: Comment = {
         id: data.commentId,
         userId: data.userId,
@@ -70,11 +66,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
       return;
     }
 
-    console.log('Creating comment...');
     createComment(content, postId, userId, userFirstName, userLastName)
-      .then((commentData) => {
-        console.log('Comment created with ID:', commentData.commentId);
-        setContent(''); // Clear the content after creating the comment
+      .then(() => {
+        setContent('');
       })
       .catch((error) => console.error('Error creating comment:', error));
   }, [content, postId]);
@@ -110,7 +104,3 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
 };
 
 export default CommentSection;
-
-const isValidDate = (date: Date | string): boolean => {
-  return !isNaN(new Date(date).getTime());
-};

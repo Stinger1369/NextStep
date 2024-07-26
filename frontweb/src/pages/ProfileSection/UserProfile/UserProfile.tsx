@@ -1,3 +1,4 @@
+// src/components/UserProfile/UserProfile.tsx
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
@@ -24,7 +25,8 @@ const UserProfile: React.FC = () => {
   const [themeLink, setThemeLink] = useState<HTMLLinkElement | null>(null);
   const [key, setKey] = useState(0);
 
-  const profession = location.state?.profession;
+  // Lire la profession depuis le localStorage
+  const profession = localStorage.getItem('userProfession') || location.state?.profession;
 
   useEffect(() => {
     if (userId) {
@@ -49,8 +51,10 @@ const UserProfile: React.FC = () => {
 
   const applyTheme = (themeStatus: ThemeStatus) => {
     if (themeStatus.theme_enabled) {
+      console.log(`Loading theme: ${themeStatus.theme}`);
       loadTheme(themeStatus.theme);
     } else {
+      console.log('Removing theme');
       removeTheme();
     }
   };

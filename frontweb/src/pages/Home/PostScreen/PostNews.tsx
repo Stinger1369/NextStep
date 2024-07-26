@@ -7,10 +7,10 @@ import { fetchPostsRequest, fetchPostsSuccess, fetchPostsFailure, addPost } from
 import { fetchUser } from '../../../redux/features/websocket/users/userWebsocketThunks/userWebsocketThunks';
 import { setCurrentUser } from '../../../redux/features/websocket/users/userWebSocketSlice';
 import { selectPostsWithDates } from '../../../redux/selectors';
-import { TextField, Button, Typography, CircularProgress } from '@mui/material';
+import { TextField, Button, Typography, CircularProgress, Box } from '@mui/material';
 import PostList from '../../../components/PostCard/PostList';
-import './PostNews.css';
 import { Post, User, PostCreatedSuccessData } from '../../../types';
+import './PostNews.css';
 
 const PostNews: React.FC = () => {
   const [content, setContent] = useState('');
@@ -21,7 +21,6 @@ const PostNews: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    console.log('Initializing WebSocket...');
     const websocketUrl = process.env.REACT_APP_WEBSOCKET_URL || 'ws://localhost:8081/ws/chat';
     initializeWebSocket(websocketUrl);
 
@@ -45,15 +44,12 @@ const PostNews: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      console.log('User state changed:', user);
       dispatch(fetchPostsRequest());
       getAllPosts()
         .then((posts) => {
-          console.log('Posts fetched:', posts);
           dispatch(fetchPostsSuccess(posts));
         })
         .catch((error) => {
-          console.error('Error fetching posts:', error);
           dispatch(fetchPostsFailure(error.message));
         });
     }
@@ -62,7 +58,6 @@ const PostNews: React.FC = () => {
   useEffect(() => {
     if (user) {
       const handlePostCreateSuccess = (data: PostCreatedSuccessData) => {
-        console.log('Handling post.create.success event:', data);
         const newPost: Post = {
           id: data.postId,
           userId: user.id,
@@ -80,7 +75,6 @@ const PostNews: React.FC = () => {
           repostCount: 0,
           reposters: []
         };
-        console.log('New post created:', newPost);
         dispatch(addPost(newPost));
       };
 
@@ -94,11 +88,9 @@ const PostNews: React.FC = () => {
 
   const handleCreatePost = useCallback(() => {
     if (user) {
-      console.log('Creating post...');
       createPost(content)
-        .then((data) => {
-          console.log('Post created with ID:', data.postId);
-          setContent(''); // Clear the content after creating the post
+        .then(() => {
+          setContent('');
         })
         .catch((error) => {
           console.error('Error creating post:', error);
@@ -108,7 +100,6 @@ const PostNews: React.FC = () => {
     }
   }, [content, user]);
 
-  // Sort posts by createdAt date descending and convert dates to strings
   const sortedPosts = posts
     .map((post) => ({
       ...post,
@@ -129,16 +120,27 @@ const PostNews: React.FC = () => {
   }
 
   return (
-    <div className="home-job">
-      <Typography variant="h1">HomeJob</Typography>
-      <div>
-        <TextField label="Write your post here" multiline rows={4} value={content} onChange={(e) => setContent(e.target.value)} variant="outlined" fullWidth />
+    <Box className="home-job" sx={{ padding: '10px', margin: '10px auto', borderRadius: '8px', boxShadow: 2 }}>
+      <Typography variant="h5" component="div" sx={{ marginBottom: '10px', textAlign: 'center' }}>
+        HomeJob
+      </Typography>
+      <Box className="create-post" sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px', borderRadius: '20px', padding: '10px', border: '1px solid #ddd' }}>
+        <TextField
+          placeholder="Commencer un post"
+          multiline
+          rows={1}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          variant="outlined"
+          fullWidth
+          sx={{ marginRight: '10px', borderRadius: '20px' }}
+        />
         <Button variant="contained" color="primary" onClick={handleCreatePost}>
-          Create Post
+          Post
         </Button>
-      </div>
+      </Box>
       {contentToDisplay}
-    </div>
+    </Box>
   );
 };
 

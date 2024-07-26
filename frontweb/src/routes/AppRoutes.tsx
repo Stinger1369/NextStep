@@ -1,4 +1,3 @@
-// src/AppRoutes.tsx
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -24,6 +23,7 @@ import RecruitOtherInfo from '../pages/ProfileSection/ProfileEditRecruits/OtherI
 import RecruitSocialMediaInfo from '../pages/ProfileSection/ProfileEditRecruits/SocialMediaInfo/SocialMediaInfo';
 import UserProfile from '../pages/ProfileSection/UserProfile/UserProfile';
 import PublicUserProfile from '../pages/ProfileSection/PublicUserProfile/PublicUserProfile';
+import Portfolio from '../pages/Portfolio/Portfolio'; // Import the Portfolio component
 import Notifications from '../components/Notifications/Notifications'; // Import the Notifications component
 import Members from '../pages/Members/Members';
 import { RootState, AppDispatch } from '../redux/store';
@@ -67,8 +67,8 @@ const AppRoutes: React.FC = () => {
         <Route path="/profile-edit-recruiter" element={user ? <ProfileEditRecruits /> : <Navigate to="/login" />} />
         <Route path="/user-profile/:userId" element={user ? <UserProfile /> : <Navigate to="/login" />} />
         <Route path="/public-profile/:userId" element={<PublicUserProfile />} />
+        <Route path="/portfolio/:userId" element={<Portfolio />} /> {/* Add the Portfolio route */}
         <Route path="/members" element={<Members />} />
-        <Route path="/notifications" element={<Notifications />} />
       </Routes>
     </Router>
   );

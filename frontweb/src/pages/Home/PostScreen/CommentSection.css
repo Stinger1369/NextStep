@@ -1,0 +1,29 @@
+.comment-section {
+  background: #f3f2ef;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.comment-list {
+  list-style: none;
+  padding: 0;
+}
+
+.comment-card {
+  background: #fff;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.comment-card p {
+  margin: 0;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.comment-card .comment-meta {
+  font-size: 0.8em;
+  color: #777;
+}

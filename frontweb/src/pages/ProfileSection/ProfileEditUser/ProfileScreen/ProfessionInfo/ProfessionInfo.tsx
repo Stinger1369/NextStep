@@ -1,5 +1,4 @@
 // src/components/ProfessionInfo/ProfessionInfo.tsx
-
 import React, { useEffect, useState } from 'react';
 import { useFormik, FieldArray, FormikProvider } from 'formik';
 import * as Yup from 'yup';
@@ -11,6 +10,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../../redux/store';
 import { updateUser, getUserById } from '../../../../../redux/features/user/userSlice';
 import { changeThemeStatus, getThemeStatus } from '../../../../../redux/features/theme/thunks/themeThunk';
+import { professions } from '../../../../../data/professions';
+import { getProfessionTheme } from '../../../../../utils/professionHelper';
 
 const ProfessionInfo: React.FC = () => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const ProfessionInfo: React.FC = () => {
       }
     },
     validationSchema: Yup.object({
-      profession: Yup.string(),
+      profession: Yup.string().required('Profession is required'),
       company: Yup.string(),
       hobbies: Yup.array().of(Yup.string()),
       socialMediaLinks: Yup.object({
@@ -56,8 +57,13 @@ const ProfessionInfo: React.FC = () => {
         };
         console.log('Updating user with profession info:', updatedValues);
         await dispatch(updateUser({ id: user._id, userData: updatedValues }));
-        await dispatch(changeThemeStatus({ userId: user._id, profession: values.profession }));
-        await dispatch(getThemeStatus({ userId: user._id, profession: values.profession }));
+
+        // Enregistrer la profession dans le localStorage
+        localStorage.setItem('userProfession', values.profession);
+
+        const theme = getProfessionTheme(values.profession);
+        await dispatch(changeThemeStatus({ userId: user._id, profession: theme }));
+        await dispatch(getThemeStatus({ userId: user._id, profession: theme }));
         setIsSubmitting(false);
         navigate('/profile-edit-user/bio-skills-info');
       }
@@ -87,22 +93,6 @@ const ProfessionInfo: React.FC = () => {
     }
   }, [userData]);
 
-  const handleSave = async () => {
-    console.log('Saved Profession Info:', formik.values);
-    if (user?._id) {
-      const updatedValues = {
-        ...userData,
-        profession: formik.values.profession,
-        company: formik.values.company,
-        hobbies: formik.values.hobbies.filter((hobby) => hobby.trim() !== ''),
-        socialMediaLinks: formik.values.socialMediaLinks
-      };
-      await dispatch(updateUser({ id: user._id, userData: updatedValues }));
-      await dispatch(changeThemeStatus({ userId: user._id, profession: formik.values.profession }));
-      await dispatch(getThemeStatus({ userId: user._id, profession: formik.values.profession }));
-    }
-  };
-
   return (
     <div className="profession-info-container">
       <div className="header-icons">
@@ -113,7 +103,14 @@ const ProfessionInfo: React.FC = () => {
         <form onSubmit={formik.handleSubmit} className="profession-info-form">
           <div className="form-group">
             <label htmlFor="profession">Profession</label>
-            <input type="text" id="profession" {...formik.getFieldProps('profession')} className="form-control" />
+            <select id="profession" {...formik.getFieldProps('profession')} className="form-control">
+              <option value="">Select Profession</option>
+              {professions.map((profession) => (
+                <option key={profession.profession} value={profession.profession}>
+                  {profession.profession}
+                </option>
+              ))}
+            </select>
             {formik.touched.profession && formik.errors.profession ? <div className="text-danger">{formik.errors.profession}</div> : null}
           </div>
 
@@ -122,6 +119,8 @@ const ProfessionInfo: React.FC = () => {
             <input type="text" id="company" {...formik.getFieldProps('company')} className="form-control" />
             {formik.touched.company && formik.errors.company ? <div className="text-danger">{formik.errors.company}</div> : null}
           </div>
+
+          {/* Social Media Links */}
 
           <div className="form-group">
             <label htmlFor="socialMediaLinks.github">Github</label>
@@ -176,11 +175,8 @@ const ProfessionInfo: React.FC = () => {
           </div>
 
           <div className="button-container">
-            <button type="button" className="btn btn-secondary" onClick={handleSave} disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save'}
-            </button>
             <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Continue'}
+              {isSubmitting ? 'Saving...' : 'Save'}
             </button>
           </div>
         </form>

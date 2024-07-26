@@ -1,0 +1,9 @@
+.portfolio-container {
+  padding: 20px;
+}
+
+.portfolio-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}

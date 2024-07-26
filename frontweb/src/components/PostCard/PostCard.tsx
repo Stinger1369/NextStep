@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Typography, IconButton } from '@mui/material';
-import { ThumbUp, Share, Repeat } from '@mui/icons-material';
+import { ThumbUp, Share, Repeat, Comment } from '@mui/icons-material';
 import { Post } from '../../types';
 import CommentSection from '../../pages/Home/PostScreen/CommentSection';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +17,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const user = useSelector((state: RootState) => state.userWebSocket.users[post.userId]);
   const createdAt = new Date(post.createdAt).toLocaleString();
   const currentUser = useSelector((state: RootState) => state.userWebSocket.currentUser);
+  const [showComments, setShowComments] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -59,6 +60,10 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
     }
   };
 
+  const toggleComments = () => {
+    setShowComments(!showComments);
+  };
+
   return (
     <Card style={{ marginBottom: '20px' }}>
       <CardContent>
@@ -79,8 +84,11 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           <IconButton onClick={handleRepost} aria-label="repost">
             <Repeat />
           </IconButton>
+          <IconButton onClick={toggleComments} aria-label="comment">
+            <Comment />
+          </IconButton>
         </div>
-        <CommentSection postId={post.id} />
+        {showComments && <CommentSection postId={post.id} />}
       </CardContent>
     </Card>
   );

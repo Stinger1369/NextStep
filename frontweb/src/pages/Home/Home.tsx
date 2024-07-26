@@ -23,11 +23,7 @@ const Home = () => {
           </div>
         </div>
         <div className="col-md-6">
-          <div className="card main-content">
-            <h2>Home Page</h2>
-            <p>Welcome to the home page!</p>
-            <HomeJob />
-          </div>
+          <HomeJob />
         </div>
         <div className="col-md-3">
           <div className="card">

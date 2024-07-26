@@ -1,16 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { FaHome, FaInfoCircle, FaUser, FaUserPlus, FaSignOutAlt, FaBriefcase, FaUserCircle, FaUsers, FaBell } from 'react-icons/fa';
+import { FaHome, FaInfoCircle, FaUser, FaUserPlus, FaSignOutAlt, FaBriefcase, FaUserCircle, FaUsers, FaBell, FaCaretDown } from 'react-icons/fa';
 import logo from '../../assests/Images/nextstep.webp';
 import { RootState, AppDispatch } from '../../redux/store';
 import { performLogout } from '../../redux/features/auth/authLogout';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './NavBar.css';
 
 const Navbar: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLLIElement>(null);
 
   const handleLogout = async () => {
     await dispatch(performLogout());
@@ -26,76 +29,111 @@ const Navbar: React.FC = () => {
     }
   };
 
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
-    <nav className="navbar">
-      <div className="navbar-brand">
-        <Link to="/">
+    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+      <div className="container-fluid">
+        <Link to="/" className="navbar-brand">
           <img src={logo} alt="Next Step Logo" className="navbar-logo" />
         </Link>
-      </div>
-      <ul className="navbar-links">
-        <li>
-          <Link to="/">
-            <FaHome /> Home
-          </Link>
-        </li>
-        <li>
-          <Link to="/about">
-            <FaInfoCircle /> About
-          </Link>
-        </li>
-        <li>
-          <Link to="/job-offers">
-            <FaBriefcase /> Job Offers
-          </Link>
-        </li>
-        <li>
-          <Link to="/members">
-            <FaUsers /> Members
-          </Link>
-        </li>
-        <li>
-          <Link to="/notifications">
-            <FaBell /> Notifications
-          </Link>
-        </li>
-      </ul>
-      <div className="navbar-separator"></div>
-      <ul className="navbar-links navbar-auth">
-        {!user ? (
-          <>
-            <li>
-              <Link to="/login">
-                <FaUser /> Login
+        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <li className="nav-item">
+              <Link to="/" className="nav-link">
+                <FaHome /> Home
               </Link>
             </li>
-            <li>
-              <Link to="/register">
-                <FaUserPlus /> Register
+            <li className="nav-item">
+              <Link to="/about" className="nav-link">
+                <FaInfoCircle /> About
               </Link>
             </li>
-          </>
-        ) : (
-          <>
-            <li className="navbar-user">
-              <span>Welcome, {user.firstName ? user.firstName : user.email}!</span>
-              <div className="navbar-dropdown">
-                <button onClick={handleLogout}>
-                  <FaSignOutAlt /> Logout
-                </button>
-              </div>
+            <li className="nav-item">
+              <Link to="/job-offers" className="nav-link">
+                <FaBriefcase /> Job Offers
+              </Link>
             </li>
-            <li>
-              <button onClick={handleProfileClick} className="navbar-profile-btn">
-                <FaUserCircle /> Profile
-              </button>
+            <li className="nav-item">
+              <Link to="/members" className="nav-link">
+                <FaUsers /> Members
+              </Link>
             </li>
-          </>
-        )}
-      </ul>
-      <div className="navbar-search">
-        <input type="text" placeholder="Search..." />
-        <button type="submit">Go</button>
+            <li className="nav-item">
+              <Link to="/notifications" className="nav-link">
+                <FaBell /> Notifications
+              </Link>
+            </li>
+          </ul>
+          <ul className="navbar-nav">
+            {!user ? (
+              <>
+                <li className="nav-item">
+                  <Link to="/login" className="nav-link">
+                    <FaUser /> Login
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link to="/register" className="nav-link">
+                    <FaUserPlus /> Register
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item dropdown" ref={dropdownRef}>
+                  <button className="btn nav-link dropdown-toggle" id="navbarDropdown" aria-expanded={dropdownOpen} onClick={toggleDropdown}>
+                    <FaUserCircle /> My Account <FaCaretDown />
+                  </button>
+                  <ul className={`dropdown-menu${dropdownOpen ? ' show' : ''}`} aria-labelledby="navbarDropdown">
+                    <li>
+                      <button className="dropdown-item" onClick={handleProfileClick}>
+                        Profile
+                      </button>
+                    </li>
+                    <li>
+                      <Link to={`/portfolio/${user._id}`} className="dropdown-item">
+                        Portfolio
+                      </Link>
+                    </li>
+                    <li>
+                      <hr className="dropdown-divider" />
+                    </li>
+                    <li>
+                      <button className="dropdown-item" onClick={handleLogout}>
+                        <FaSignOutAlt /> Logout
+                      </button>
+                    </li>
+                  </ul>
+                </li>
+              </>
+            )}
+          </ul>
+          <form className="d-flex">
+            <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+            <button className="btn btn-outline-success" type="submit">
+              Go
+            </button>
+          </form>
+        </div>
       </div>
     </nav>
   );
