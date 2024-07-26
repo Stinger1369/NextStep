@@ -1,5 +1,6 @@
 import { WebSocketMessage, Post, PostCreatedSuccessData, PostGetAllSuccessData, Like, Share, Unlike } from '../types';
 import { sendMessage, addEventListener, removeEventListener } from './websocket';
+import { likeEntity, unlikeEntity } from './likeWebSocket';
 
 export function createPost(content: string): Promise<PostCreatedSuccessData> {
   return new Promise((resolve, reject) => {
@@ -135,4 +136,12 @@ export function deletePost(postId: string): Promise<void> {
     addEventListener('post.delete.success', handleDeletePostResult);
     sendMessage(message);
   });
+}
+
+export function likePost(postId: string, userId: string): Promise<void> {
+  return likeEntity(postId, userId, 'post');
+}
+
+export function unlikePost(postId: string, userId: string): Promise<void> {
+  return unlikeEntity(postId, userId, 'post');
 }

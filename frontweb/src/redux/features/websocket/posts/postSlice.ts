@@ -1,6 +1,7 @@
+// src/redux/features/websocket/posts/postSlice.ts
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
-import { Post, Like, Share, Unlike } from '../../../../types';
+import { Post, Like, Unlike, Share } from '../../../../types';
 
 interface PostState {
   posts: Post[];

@@ -24,15 +24,23 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
     }
   }, [dispatch, post.userId, user]);
 
-  const handleLike = () => {
+  const handleLike = async () => {
     if (currentUser && currentUser.id) {
-      dispatch(likePost(post.id, currentUser.id));
+      try {
+        await dispatch(likePost(post.id, currentUser.id));
+      } catch (error) {
+        console.error('Error liking post:', error);
+      }
     }
   };
 
-  const handleUnlike = () => {
+  const handleUnlike = async () => {
     if (currentUser && currentUser.id) {
-      dispatch(unlikePost(post.id, currentUser.id));
+      try {
+        await dispatch(unlikePost(post.id, currentUser.id));
+      } catch (error) {
+        console.error('Error unliking post:', error);
+      }
     }
   };
 

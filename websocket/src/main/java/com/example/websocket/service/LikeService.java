@@ -19,7 +19,9 @@ public class LikeService {
     }
 
     public Mono<Like> likeEntity(Like like) {
-        return unlikeRepository.findByUserIdAndEntityIdAndEntityType(like.getUserId(), like.getEntityId(), like.getEntityType())
+        return unlikeRepository
+                .findByUserIdAndEntityIdAndEntityType(like.getUserId(), like.getEntityId(),
+                        like.getEntityType())
                 .flatMap(existingUnlike -> unlikeRepository.delete(existingUnlike))
                 .then(likeRepository.save(like));
     }
