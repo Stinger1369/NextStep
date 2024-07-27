@@ -24,8 +24,16 @@ const Navbar: React.FC = () => {
     if (user && (!user.firstName || !user.lastName)) {
       navigate('/profile-edit-user/personal-info');
     } else if (user && user._id) {
-      console.log(`Navigating to profile with profession: ${user.profession}`);
-      navigate(`/user-profile/${user._id}`, { state: { profession: user.profession } });
+      navigate(`/user-profile/${user._id}`);
+    }
+  };
+
+  const handlePortfolioClick = () => {
+    if (user && user.firstName && user.lastName) {
+      const slug = `${user.firstName.toLowerCase()}-${user.lastName.toLowerCase()}`;
+      navigate(`/portfolio/${slug}`);
+    } else if (user && user._id) {
+      navigate(`/portfolio/${user._id}`);
     }
   };
 
@@ -110,9 +118,9 @@ const Navbar: React.FC = () => {
                       </button>
                     </li>
                     <li>
-                      <Link to={`/portfolio/${user._id}`} className="dropdown-item">
+                      <button className="dropdown-item" onClick={handlePortfolioClick}>
                         Portfolio
-                      </Link>
+                      </button>
                     </li>
                     <li>
                       <hr className="dropdown-divider" />

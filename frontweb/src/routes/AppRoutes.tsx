@@ -23,8 +23,13 @@ import RecruitOtherInfo from '../pages/ProfileSection/ProfileEditRecruits/OtherI
 import RecruitSocialMediaInfo from '../pages/ProfileSection/ProfileEditRecruits/SocialMediaInfo/SocialMediaInfo';
 import UserProfile from '../pages/ProfileSection/UserProfile/UserProfile';
 import PublicUserProfile from '../pages/ProfileSection/PublicUserProfile/PublicUserProfile';
-import Portfolio from '../pages/Portfolio/Portfolio'; // Import the Portfolio component
-import Notifications from '../components/Notifications/Notifications'; // Import the Notifications component
+import Portfolio from '../pages/Portfolio/Portfolio';
+import AboutSection from '../pages/Portfolio/About/About';
+import ProfileSection from '../pages/Portfolio/Profile/Profile';
+import SkillsSection from '../pages/Portfolio/Skills/Skills';
+import BioSection from '../pages/Portfolio/Bio/Bio';
+import ContactSection from '../pages/Portfolio/Contact/Contact';
+import Notifications from '../components/Notifications/Notifications';
 import Members from '../pages/Members/Members';
 import { RootState, AppDispatch } from '../redux/store';
 import { getCompanies } from '../redux/features/company/companySlice';
@@ -36,10 +41,9 @@ const AppRoutes: React.FC = () => {
 
   useEffect(() => {
     if (status === 'idle' && user) {
-      // Ajoutez une vérification si l'utilisateur est connecté
       dispatch(getCompanies());
     }
-  }, [dispatch, status, user]); // Ajoutez user comme dépendance
+  }, [dispatch, status, user]);
 
   return (
     <Router>
@@ -66,8 +70,16 @@ const AppRoutes: React.FC = () => {
         <Route path="/edit-recruit/:companyId/social-media-info" element={<RecruitSocialMediaInfo />} />
         <Route path="/profile-edit-recruiter" element={user ? <ProfileEditRecruits /> : <Navigate to="/login" />} />
         <Route path="/user-profile/:userId" element={user ? <UserProfile /> : <Navigate to="/login" />} />
+        <Route path="/Notifications" element={user ? <Notifications /> : <Navigate to="/login" />} />
         <Route path="/public-profile/:userId" element={<PublicUserProfile />} />
-        <Route path="/portfolio/:userId" element={<Portfolio />} /> {/* Add the Portfolio route */}
+        <Route path="/portfolio/:slug/*" element={<Portfolio />}>
+          <Route index element={<Navigate to="about" replace />} />
+          <Route path="about" element={<AboutSection />} />
+          <Route path="profile" element={<ProfileSection />} />
+          <Route path="skills" element={<SkillsSection />} />
+          <Route path="bio" element={<BioSection />} />
+          <Route path="contact" element={<ContactSection />} />
+        </Route>
         <Route path="/members" element={<Members />} />
       </Routes>
     </Router>

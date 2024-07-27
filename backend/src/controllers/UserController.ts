@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import User from "../models/User";
 
 export const getUsers = async (req: Request, res: Response) => {
@@ -6,37 +7,35 @@ export const getUsers = async (req: Request, res: Response) => {
     const users = await User.find();
     res.status(200).json(users);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la récupération des utilisateurs",
-        error,
-      });
+    res.status(500).json({
+      message: "Erreur lors de la récupération des utilisateurs",
+      error,
+    });
   }
 };
 
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserByIdOrSlug = async (req: Request, res: Response) => {
   const { id } = req.params;
-  console.log("Récupération de l'utilisateur par ID :", id); // Log pour vérifier l'ID
 
   try {
-    const user = await User.findById(id);
+    let user;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      user = await User.findById(id);
+    } else {
+      user = await User.findOne({ slug: id });
+    }
+
     if (!user) {
-      console.log("Utilisateur non trouvé :", id); // Log pour vérifier si l'utilisateur n'est pas trouvé
       return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
     res.status(200).json(user);
   } catch (error) {
-    console.log("Erreur lors de la récupération de l'utilisateur :", error); // Log pour vérifier les erreurs
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la récupération de l'utilisateur",
-        error,
-      });
+    res.status(500).json({
+      message: "Erreur lors de la récupération de l'utilisateur",
+      error,
+    });
   }
 };
-
 
 export const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -110,6 +109,16 @@ export const updateUser = async (req: Request, res: Response) => {
       ...(socialMediaLinks && { socialMediaLinks }),
     };
 
+    // Mettre à jour le champ slug si le prénom ou le nom de famille a changé
+    if (firstName || lastName) {
+      const user = await User.findById(id);
+      if (user) {
+        const newFirstName = firstName || user.firstName;
+        const newLastName = lastName || user.lastName;
+        updateData.slug = `${newFirstName.toLowerCase()}-${newLastName.toLowerCase()}`;
+      }
+    }
+
     console.log("Update data:", updateData);
 
     const user = await User.findByIdAndUpdate(id, updateData, {
@@ -131,7 +140,6 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-
 export const deleteUser = async (req: Request, res: Response) => {
   const { id } = req.params;
 
@@ -142,11 +150,9 @@ export const deleteUser = async (req: Request, res: Response) => {
     }
     res.status(200).json({ message: "Utilisateur supprimé avec succès" });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la suppression de l'utilisateur",
-        error,
-      });
+    res.status(500).json({
+      message: "Erreur lors de la suppression de l'utilisateur",
+      error,
+    });
   }
 };

@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/companies", authMiddleware, companyRoutes);
-app.use("/api/users", authMiddleware, userRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/jobs", authMiddleware, jobRoutes);
 app.use("/api/applications", authMiddleware, applicationRoutes);
 app.use("/api/images", authMiddleware, imageRoutes);

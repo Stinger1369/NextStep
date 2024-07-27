@@ -2,8 +2,17 @@
   padding: 20px;
 }
 
-.portfolio-content {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+.internal-nav {
+  background: #f8f9fa;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.section {
+  margin: 20px 0;
+}
+
+.section h2 {
+  margin-top: 0;
 }

@@ -1,0 +1,50 @@
+.about-section {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+}
+
+.about-images {
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.about-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.about-image-button {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.prev-button,
+.next-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.prev-button {
+  left: 1px;
+}
+
+.next-button {
+  right: 1px;
+}
+
+.about-text {
+  flex: 2;
+  padding-left: 20px;
+}

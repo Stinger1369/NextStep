@@ -1,3 +1,4 @@
+// models/User.ts
 import mongoose, { Document, Schema } from "mongoose";
 
 interface Address {
@@ -40,11 +41,12 @@ export interface IUser extends Document {
   isVerified: boolean;
   resetPasswordCode?: string;
   resetPasswordExpiresAt?: Date;
-  sex?: string; // 'male', 'female', or 'other'
-  company?: string; // Pour les utilisateurs travaillant dans une seule entreprise
-  companyId?: string; // Pour les utilisateurs travaillant dans une seule entreprise
-  companies?: mongoose.Types.ObjectId[]; // Pour les utilisateurs gérant plusieurs entreprises
+  sex?: string;
+  company?: string;
+  companyId?: string;
+  companies?: mongoose.Types.ObjectId[];
   socialMediaLinks?: SocialMediaLinks;
+  slug: string;
 }
 
 const UserSchema: Schema = new Schema({
@@ -81,9 +83,9 @@ const UserSchema: Schema = new Schema({
   resetPasswordCode: { type: String },
   resetPasswordExpiresAt: { type: Date },
   sex: { type: String },
-  company: { type: String }, // Pour les utilisateurs travaillant dans une seule entreprise
-  companyId: { type: String }, // Pour les utilisateurs travaillant dans une seule entreprise
-  companies: [{ type: Schema.Types.ObjectId, ref: "Company" }], // Pour les utilisateurs gérant plusieurs entreprises
+  company: { type: String },
+  companyId: { type: String },
+  companies: [{ type: Schema.Types.ObjectId, ref: "Company" }],
   socialMediaLinks: {
     github: { type: String },
     twitter: { type: String },
@@ -91,6 +93,7 @@ const UserSchema: Schema = new Schema({
     facebook: { type: String },
     discord: { type: String },
   },
+  slug: { type: String, unique: true},
 });
 
 UserSchema.pre<IUser>("save", function (next) {
@@ -107,6 +110,11 @@ UserSchema.pre<IUser>("save", function (next) {
     }
     this.age = age;
   }
+
+  if (this.firstName && this.lastName) {
+    this.slug = `${this.firstName.toLowerCase()}-${this.lastName.toLowerCase()}`;
+  }
+
   next();
 });
 
