@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import './PortfolioNavBar.css';
 const PortfolioNavBar: React.FC = () => (
   <nav className="navbar navbar-expand-lg navbar-light bg-light internal-nav">
     <div className="container-fluid">

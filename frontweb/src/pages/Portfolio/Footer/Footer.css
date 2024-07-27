@@ -1,0 +1,38 @@
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #343a40;
+  color: white;
+  left: 0;
+  padding: 5px 0;
+}
+
+.footer .text-muted {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.footer a {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.footer a:hover {
+  color: white;
+}
+
+.social-media-links a {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+}
+
+.social-media-links a:hover {
+  color: white;
+}
+
+.useful-links a {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.useful-links a:hover {
+  color: white;
+}

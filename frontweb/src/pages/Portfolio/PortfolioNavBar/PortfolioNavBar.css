@@ -1,0 +1,21 @@
+.internal-nav {
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+  font-size: 0.8rem;
+}
+
+.navbar-nav .nav-item .nav-link {
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.navbar-toggler {
+  padding: 0.25rem 0.5rem;
+}
+
+.container-fluid {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}

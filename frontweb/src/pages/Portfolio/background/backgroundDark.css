@@ -1,0 +1,61 @@
+/* backgroundDark.css */
+.about-background {
+  background-color: #1a1a1a;
+  color: #f1f1f1;
+}
+
+#background-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.bubble {
+  background: #444;
+  border-radius: 50%;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2), inset 0px 10px 30px 5px rgba(255, 255, 255, 0.1);
+  position: absolute;
+  opacity: 0.7;
+}
+
+/* Add animations and positioning for the bubbles */
+.bubble:after {
+  content: "";
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 70%);
+  border-radius: 50%;
+  box-shadow: inset 0 20px 30px rgba(255, 255, 255, 0.3);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
+/* Additional styles for bubbles */
+.x1 { width: 200px; height: 200px; top: 20%; left: 15%; }
+.x2 { width: 100px; height: 100px; top: 50%; left: 35%; }
+.x3 { width: 150px; height: 150px; top: 80%; left: 55%; }
+.x4 { width: 200px; height: 200px; top: 40%; left: 75%; }
+.x5 { width: 100px; height: 100px; top: 60%; left: 90%; }
+
+/* Keyframes for animations */
+@keyframes animateBubble {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-1000px); }
+}
+
+@keyframes sideWays {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(20px); }
+}
+
+/* Apply animations */
+.x1 { animation: animateBubble 25s linear infinite, sideWays 2s ease-in-out infinite alternate; }
+.x2 { animation: animateBubble 20s linear infinite, sideWays 4s ease-in-out infinite alternate; }
+.x3 { animation: animateBubble 28s linear infinite, sideWays 2s ease-in-out infinite alternate; }
+.x4 { animation: animateBubble 22s linear infinite, sideWays 3s ease-in-out infinite alternate; }
+.x5 { animation: animateBubble 29s linear infinite, sideWays 4s ease-in-out infinite alternate; }
