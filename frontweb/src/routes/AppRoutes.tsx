@@ -70,7 +70,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/edit-recruit/:companyId/social-media-info" element={<RecruitSocialMediaInfo />} />
         <Route path="/profile-edit-recruiter" element={user ? <ProfileEditRecruits /> : <Navigate to="/login" />} />
         <Route path="/user-profile/:userId" element={user ? <UserProfile /> : <Navigate to="/login" />} />
-        <Route path="/Notifications" element={user ? <Notifications /> : <Navigate to="/login" />} />
+        <Route path="/notifications" element={user ? <Notifications /> : <Navigate to="/login" />} />
         <Route path="/public-profile/:userId" element={<PublicUserProfile />} />
         <Route path="/portfolio/:slug/*" element={<Portfolio />}>
           <Route index element={<Navigate to="about" replace />} />
@@ -80,7 +80,7 @@ const AppRoutes: React.FC = () => {
           <Route path="bio" element={<BioSection />} />
           <Route path="contact" element={<ContactSection />} />
         </Route>
-        <Route path="/members" element={<Members />} />
+        <Route path="/members" element={user ? <Members /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );

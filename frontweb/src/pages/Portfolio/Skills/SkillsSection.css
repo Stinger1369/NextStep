@@ -1,0 +1,31 @@
+.skills-section {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+}
+
+.skills-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+.skills-section ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.skills-section .skill-item {
+  background-color: #343a40;
+  color: white;
+  padding: 10px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.skills-section .skill-item:hover {
+  background-color: #495057;
+}
