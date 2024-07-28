@@ -1,16 +1,16 @@
-.about-section {
+.about-section-container {
   display: flex;
   align-items: center;
   padding: 20px;
 }
 
-.about-FlexBlock {
+.about-section-container .about-FlexBlock {
   display: flex;
   justify-content: center;
   align-items: flex-start;
 }
 
-.about-images {
+.about-section-container .about-images {
   position: relative;
   flex: 1;
   display: flex;
@@ -18,29 +18,29 @@
   align-items: center;
 }
 
-.image-container {
+.about-section-container .image-container {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.about-image {
+.about-section-container .about-image {
   max-width: 80%;
   max-height: 80%;
   object-fit: cover;
   cursor: pointer;
 }
 
-.about-image-button {
+.about-section-container .about-image-button {
   background: none;
   border: none;
   padding: 0;
   position: relative;
 }
 
-.prev-button,
-.next-button {
+.about-section-container .prev-button,
+.about-section-container .next-button {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -51,31 +51,33 @@
   z-index: 1;
 }
 
-.prev-button {
+.about-section-container .prev-button {
   left: 5px; /* Ensure the button stays close to the image */
 }
 
-.next-button {
+.about-section-container .next-button {
   right: 5px; /* Ensure the button stays close to the image */
 }
 
-.vertical-line {
+.about-section-container .vertical-line {
   width: 2px;
   background-color: #000;
   margin: 0 20px;
   height: 100%; /* Ensure the line takes full height of the about-text */
 }
 
-.about-text {
+.about-section-container .about-text {
   flex: 2;
   padding-left: 20px;
   text-align: left;
 }
-.card {
+
+.about-section-container .card {
   background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent for a better look */
   border: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add some shadow for depth */
 }
+
 body.no-scroll {
   overflow: hidden;
 }

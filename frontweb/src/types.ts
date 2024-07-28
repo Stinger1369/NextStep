@@ -1,5 +1,94 @@
 // types.ts
 
+
+export interface Time {
+  hour: number;
+  minute: number;
+}
+
+export interface Location {
+  address: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface IActivity {
+  _id?: string;
+  title: string;
+  description: string;
+  author?: string;
+  coOrganizers?: string[];
+  unApprovedUsers?: string[];
+  unApprovedCoOrganizers?: string[];
+  date: string;
+  createAtivityType?: string;
+  addressOnlyForAttendees?: boolean;
+  inviteCommunity?: boolean;
+  buyTicketsLink?: string;
+  friendsNumber?: number;
+  notifyPreviousAttendees?: boolean;
+  inviteMore?: boolean;
+  requestCoOrga?: boolean;
+  startTime: Time;
+  endTime: Time;
+  location: Location;
+  metroStation?: string;
+  ages?: string[];
+  ageRestriction?: boolean;
+  attendeesValidation?: boolean;
+  attendeeLimit?: number;
+  hasPrice?: boolean;
+  price?: number;
+  ticketLink?: string;
+  activityImage?: string;
+  infoLine?: string;
+  howToFind?: string;
+  topic?: number;
+  isOnline: boolean;
+  attendees?: string[];
+  waitingList?: string[];
+  allowGuests?: boolean;
+  allowPhoneNumberDisplay?: boolean;
+  friendsOnly?: boolean;
+  selectPeople?: boolean;
+  repeatEvent?: boolean;
+  repeatEventFrequency?: string;
+  repeatEventDays?: string[];
+  repeatEventEndDate?: string;
+  requestCoOrganizers?: boolean;
+  coOrganizerGifts?: string[];
+  coOrganizerConditions?: string[];
+  helpForOrganizers?: boolean;
+  coOrganizerRequests?: string[];
+  coOrganizerOffers?: string[];
+  whatsappLink?: string;
+  fbPageLink?: string;
+  fbGroupLink?: string;
+  meetupLink?: string;
+  telegramLink?: string;
+  otherLink?: string;
+  likes?: string[];
+  comments?: string[];
+  interested?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  communityOptionIsSelected?: boolean;
+  communityMeDistance?: number;
+  communityMeetingPointDistance?: number;
+  peopleMetNotif?: boolean;
+  peopleMetAsOrgaNotif?: boolean;
+  peopleWhoLoveMyTopicNotif?: boolean;
+  peopleLanguageIsSelected?: boolean;
+  peopleLanguageOptions?: string[];
+  optionalFeaturesIsSelected?: boolean;
+  optionalFeaturesOptions?: string[];
+  manageParityIsSelected?: boolean;
+  manageParityMalePercentage?: number;
+  manageParityInfoLine?: string;
+  manageParityFriendsAllowed?: number;
+  notificationSettings?: Map<string, Map<string, boolean>>;
+  interactions?: string[];
+}
 export interface Post {
   id: string;
   userId: string;

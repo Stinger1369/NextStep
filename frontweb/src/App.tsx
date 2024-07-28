@@ -5,7 +5,6 @@ import AppRoutes from './routes/AppRoutes';
 import { useDispatch } from 'react-redux';
 import { refreshToken } from './redux/features/auth/authSlice';
 import { AppDispatch } from './redux/store';
-//import { initializeWebSocket } from './websocket/websocket';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App: React.FC = () => {
@@ -22,13 +21,11 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   initializeWebSocket(); // Initialize WebSocket connection
-  // }, []);
-
   return (
     <div className="App">
-      <AppRoutes />
+      <div className="content">
+        <AppRoutes />
+      </div>
     </div>
   );
 };

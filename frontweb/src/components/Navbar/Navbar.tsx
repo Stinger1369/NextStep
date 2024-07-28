@@ -1,7 +1,9 @@
+// src/components/Navbar/Navbar.tsx
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { FaHome, FaInfoCircle, FaUser, FaUserPlus, FaSignOutAlt, FaBriefcase, FaUserCircle, FaUsers, FaBell } from 'react-icons/fa';
+import { FaHome, FaInfoCircle, FaUser, FaUserPlus, FaSignOutAlt, FaBriefcase, FaUserCircle, FaUsers, FaBell, FaCalendarAlt } from 'react-icons/fa';
 import logo from '../../assests/Images/nextstep.webp';
 import { RootState, AppDispatch } from '../../redux/store';
 import { performLogout } from '../../redux/features/auth/authLogout';
@@ -15,12 +17,19 @@ const Navbar: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [navbarOpen, setNavbarOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLLIElement>(null);
+
+  useEffect(() => {
+    if (user?.images && user.images.length > 0) {
+      setProfileImage(user.images[0]);
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     await dispatch(performLogout());
-    navigate('/'); // Redirection vers la page d'accueil après la déconnexion
-    setNavbarOpen(false); // Fermer la barre de navigation après la déconnexion
+    navigate('/');
+    setNavbarOpen(false);
   };
 
   const handleProfileClick = () => {
@@ -29,7 +38,7 @@ const Navbar: React.FC = () => {
     } else if (user && user._id) {
       navigate(`/user-profile/${user._id}`);
     }
-    setNavbarOpen(false); // Fermer la barre de navigation après la redirection
+    setNavbarOpen(false);
   };
 
   const handlePortfolioClick = () => {
@@ -39,7 +48,7 @@ const Navbar: React.FC = () => {
     } else if (user && user._id) {
       navigate(`/portfolio/${user._id}`);
     }
-    setNavbarOpen(false); // Fermer la barre de navigation après la redirection
+    setNavbarOpen(false);
   };
 
   const toggleDropdown = () => {
@@ -101,6 +110,11 @@ const Navbar: React.FC = () => {
                     <FaBell /> Notifications
                   </Link>
                 </li>
+                <li className="nav-item">
+                  <Link to="/activities" className="nav-link" onClick={() => setNavbarOpen(false)}>
+                    <FaCalendarAlt /> Activities
+                  </Link>
+                </li>
               </>
             )}
           </ul>
@@ -122,7 +136,8 @@ const Navbar: React.FC = () => {
               <>
                 <li className="nav-item dropdown" ref={dropdownRef}>
                   <button className="btn nav-link dropdown-toggle d-flex align-items-center" id="navbarDropdown" aria-expanded={dropdownOpen} onClick={toggleDropdown}>
-                    <FaUserCircle className="me-1" /> {user?.firstName ? `${user.firstName}` : user?.email}
+                    {profileImage ? <img src={profileImage} alt="Profile" className="profile-thumbnail me-1" /> : <FaUser className="me-1" />}
+                    {user?.firstName ? `${user.firstName}` : user?.email}
                   </button>
                   <ul className={`dropdown-menu dropdown-menu-end${dropdownOpen ? ' show' : ''}`} aria-labelledby="navbarDropdown">
                     <li>

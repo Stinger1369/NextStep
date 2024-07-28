@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
@@ -13,6 +13,13 @@ const LoginComponent: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user?.images && user.images.length > 0) {
+      setProfileImage(user.images[0]); // Set the first image as profile image
+    }
+  }, [user]);
 
   const handleLogin = async (
     values: { email: string; password: string },
@@ -121,8 +128,24 @@ const LoginComponent: React.FC = () => {
   return (
     <div className="login-container">
       {user ? (
-        <div>
+        <div className="user-info">
+          {profileImage && <img src={profileImage} alt="Profile" className="profile-image" />}
           <p>Welcome, {user.firstName ? user.firstName : user.email}!</p>
+          <p>Profession: {user.profession || 'Not specified'}</p>
+          <div className="counters">
+            <div className="counter">
+              <p>Profile Pro Visits</p>
+              <p>123</p>
+            </div>
+            <div className="counter">
+              <p>Profile Member Visits</p>
+              <p>456</p>
+            </div>
+            <div className="counter">
+              <p>Other Visits</p>
+              <p>789</p>
+            </div>
+          </div>
           <button onClick={() => navigate('/role-selection')}>Complete your profile</button>
         </div>
       ) : (

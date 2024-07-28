@@ -1,5 +1,7 @@
+// src/routes/AppRoutes.tsx
+
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Home from '../pages/Home/Home';
 import About from '../pages/About/About';
@@ -33,11 +35,18 @@ import Notifications from '../components/Notifications/Notifications';
 import Members from '../pages/Members/Members';
 import { RootState, AppDispatch } from '../redux/store';
 import { getCompanies } from '../redux/features/company/companySlice';
+import FooterGlobal from '../components/FooterGlobal/FooterGlobal';
+import SkillDevelopment from '../pages/Home/SkillDevelopment/SkillDevelopment';
+import CreateActivity from '../pages/activities/CreateActivity/CreateActivity'; // Import CreateActivity
+import ActivityList from '../pages/activities/ActivityList/ActivityList'; // Import ActivityList
+import '../App.css';
+import '../index.css';
 
 const AppRoutes: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const status = useSelector((state: RootState) => state.company.status);
   const dispatch = useDispatch<AppDispatch>();
+  const location = useLocation();
 
   useEffect(() => {
     if (status === 'idle' && user) {
@@ -45,8 +54,10 @@ const AppRoutes: React.FC = () => {
     }
   }, [dispatch, status, user]);
 
+  const isPortfolioPage = location.pathname.includes('/portfolio');
+
   return (
-    <Router>
+    <>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -81,8 +92,12 @@ const AppRoutes: React.FC = () => {
           <Route path="contact" element={<ContactSection />} />
         </Route>
         <Route path="/members" element={user ? <Members /> : <Navigate to="/login" />} />
+        <Route path="/skill-development" element={<SkillDevelopment />} />
+        <Route path="/activities" element={<ActivityList />} />
+        <Route path="/create-activity" element={<CreateActivity />} />
       </Routes>
-    </Router>
+      {!isPortfolioPage && <FooterGlobal />}
+    </>
   );
 };
 

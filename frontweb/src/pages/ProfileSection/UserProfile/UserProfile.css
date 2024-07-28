@@ -1,11 +1,15 @@
-.carousel {
+.user-profile-container {
+  margin-top: 20px;
+}
+
+.user-profile-container .carousel {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.carousel-control-prev,
-.carousel-control-next {
+.user-profile-container .carousel-control-prev,
+.user-profile-container .carousel-control-next {
   background: none;
   border: none;
   font-size: 2rem;
@@ -16,22 +20,22 @@
   transform: translateY(-50%);
 }
 
-.carousel-control-prev {
+.user-profile-container .carousel-control-prev {
   left: -90px; /* Adjust distance from left */
 }
 
-.carousel-control-next {
+.user-profile-container .carousel-control-next {
   right: 50%; /* Adjust distance from right */
 }
 
-.carousel-image-container {
+.user-profile-container .carousel-image-container {
   position: relative;
   width: 40%;
   height: 150px; /* Adjust height as needed */
   overflow: hidden;
 }
 
-.carousel-image {
+.user-profile-container .carousel-image {
   position: absolute;
   top: 0;
   left: 100%;
@@ -42,63 +46,63 @@
   opacity: 0;
 }
 
-.carousel-image.active {
+.user-profile-container .carousel-image.active {
   left: 0;
   opacity: 1;
 }
 
-.profile-header {
+.user-profile-container .profile-header {
   position: relative;
 }
 
-.edit-profile-btn {
+.user-profile-container .edit-profile-btn {
   position: absolute;
   right: 10px;
   top: 10px;
 }
 
-.video-gallery {
+.user-profile-container .video-gallery {
   display: flex;
   overflow-x: auto;
 }
 
-.vertical-line {
+.user-profile-container .vertical-line {
   border-left: 1px solid #ccc;
   padding-left: 15px;
 }
 
-.text-left {
+.user-profile-container .text-left {
   text-align: left;
 }
 
-.profile-section h3,
-.profile-section p,
-.profile-section ul {
+.user-profile-container .profile-section h3,
+.user-profile-container .profile-section p,
+.user-profile-container .profile-section ul {
   text-align: left;
 }
 
-.toggle-theme-btn {
+.user-profile-container .toggle-theme-btn {
   position: absolute;
   right: 140px;
   top: 10px;
   z-index: 1000;
 }
 
-.Personal-Information {
+.user-profile-container .Personal-Information {
   display: flex;
   flex-direction: row;
 }
 
-.social-media-links {
+.user-profile-container .social-media-links {
   margin-left: 20px;
 }
 
-.separator {
+.user-profile-container .separator {
   border-left: 1px solid #ccc;
   margin-left: 20px;
   margin-right: 20px;
 }
 
-.hobbies-section {
+.user-profile-container .hobbies-section {
   margin-top: 20px;
 }

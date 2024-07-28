@@ -49,7 +49,7 @@ const AboutSection: React.FC = () => {
   };
 
   return (
-    <div className="about-background">
+    <div className="about-section-container about-background">
       <div id="background-wrap">
         <div className="bubble x1"></div>
         <div className="bubble x2"></div>

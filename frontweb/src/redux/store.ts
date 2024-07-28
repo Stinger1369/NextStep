@@ -9,6 +9,7 @@ import postReducer, { selectPostsWithDates } from './features/websocket/posts/po
 import userWebSocketReducer from './features/websocket/users/userWebSocketSlice';
 import commentReducer from './features/websocket/comments/commentSlice';
 import notificationReducer from './features/websocket/notification/notificationSlice';
+import activityReducer from './features/activity/activitySlice'; // Import the activity reducer
 
 const store = configureStore({
   reducer: {
@@ -21,7 +22,8 @@ const store = configureStore({
     posts: postReducer,
     userWebSocket: userWebSocketReducer,
     comments: commentReducer,
-    notifications: notificationReducer // Add the notification reducer
+    notifications: notificationReducer, // Add the notification reducer
+    activities: activityReducer // Add the activity reducer
   }
 });
 
