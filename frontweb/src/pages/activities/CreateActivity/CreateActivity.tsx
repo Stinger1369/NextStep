@@ -15,6 +15,7 @@ import PriceAndLinks from './PriceAndLinks/PriceAndLinks';
 import SocialLinks from './SocialLinks/SocialLinks';
 import NotificationAndManagement from './NotificationAndManagement/NotificationAndManagement';
 import ReviewAndSubmit from './ReviewAndSubmit/ReviewAndSubmit';
+import StepNav from './StepNav'; // Importer le nouveau composant
 import './CreateActivity.css';
 
 const validationSchema = Yup.object({
@@ -54,8 +55,21 @@ const CreateActivity: React.FC = () => {
     { component: <ReviewAndSubmit />, key: 'review-submit' }
   ];
 
+  const stepTitles = [
+    'Basic Details',
+    'Schedule & Dates',
+    'Location Details',
+    'Additional Options',
+    'Participants Validation',
+    'Price & Links',
+    'Social Links',
+    'Notification & Management',
+    'Review & Submit'
+  ];
+
   const handleNext = () => setCurrentStep((prev) => prev + 1);
   const handlePrev = () => setCurrentStep((prev) => prev - 1);
+  const handleStepClick = (stepIndex: number) => setCurrentStep(stepIndex);
 
   const initialValues: IActivity = {
     title: '',
@@ -89,6 +103,7 @@ const CreateActivity: React.FC = () => {
 
   return (
     <div className="create-activity-container">
+      <StepNav steps={stepTitles} currentStep={currentStep} onStepClick={handleStepClick} />
       <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
         {({ handleSubmit }) => (
           <Form>
