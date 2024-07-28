@@ -1,0 +1,61 @@
+/* src/pages/activities/CreateActivity/PriceAndLinks/PriceAndLinks.css */
+
+.price-and-links-container {
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.price-and-links-card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  background-color: #fff;
+  width: 100%;
+  max-width: 650px; /* Adjust width as needed */
+}
+
+.price-and-links-card .card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 1.25rem;
+  font-weight: 500;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.price-and-links-card .card-body {
+  padding: 1rem 1.25rem;
+}
+
+.price-and-links-card .form-group {
+  margin-bottom: 1rem;
+}
+
+.price-and-links-card label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.price-and-links-card input[type='text'],
+.price-and-links-card input[type='number'],
+.price-and-links-card input[type='checkbox'] {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+}
+
+.price-and-links-card .text-danger {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.price-and-links-card .form-check-label {
+  font-weight: 600;
+  margin-left: 0.5rem;
+}

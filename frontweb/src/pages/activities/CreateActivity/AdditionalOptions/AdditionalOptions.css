@@ -1,0 +1,60 @@
+/* src/pages/activities/CreateActivity/AdditionalOptions/AdditionalOptions.css */
+
+.additional-options-container {
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.additional-options-card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  background-color: #fff;
+  width: 100%;
+  max-width: 40%; /* Adjust width as needed */
+}
+
+.additional-options-card .card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 1.25rem;
+  font-weight: 500;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.additional-options-card .card-body {
+  padding: 1rem 1.25rem;
+}
+
+.additional-options-card .form-group {
+  margin-bottom: 1rem;
+}
+
+.additional-options-card label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.additional-options-card input[type='text'],
+.additional-options-card input[type='number'] {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+}
+
+.additional-options-card .text-danger {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.additional-options-card .form-check-label {
+  font-weight: 600;
+  margin-left: 0.5rem;
+}

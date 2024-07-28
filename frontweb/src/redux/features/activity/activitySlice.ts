@@ -5,12 +5,14 @@ import { IActivity } from '../../../types';
 
 interface ActivityState {
   activities: IActivity[];
+  activity: IActivity | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: ActivityState = {
   activities: [],
+  activity: null,
   loading: false,
   error: null
 };
@@ -19,7 +21,20 @@ export const fetchActivities = createAsyncThunk('activities/fetchActivities', as
   try {
     const response = await axiosInstance.get<IActivity[]>('/activities');
     return response.data;
-  } catch (error: unknown) {
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      return rejectWithValue(error.response.data);
+    } else {
+      return rejectWithValue('An unexpected error occurred');
+    }
+  }
+});
+
+export const fetchActivityById = createAsyncThunk('activities/fetchActivityById', async (id: string, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.get<IActivity>(`/activities/${id}`);
+    return response.data;
+  } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       return rejectWithValue(error.response.data);
     } else {
@@ -32,7 +47,7 @@ export const createActivity = createAsyncThunk('activities/createActivity', asyn
   try {
     const response = await axiosInstance.post<IActivity>('/activities', activity);
     return response.data;
-  } catch (error: unknown) {
+  } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       return rejectWithValue(error.response.data);
     } else {
@@ -45,7 +60,7 @@ export const updateActivity = createAsyncThunk('activities/updateActivity', asyn
   try {
     const response = await axiosInstance.put<IActivity>(`/activities/${id}`, activity);
     return response.data;
-  } catch (error: unknown) {
+  } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       return rejectWithValue(error.response.data);
     } else {
@@ -58,7 +73,7 @@ export const deleteActivity = createAsyncThunk('activities/deleteActivity', asyn
   try {
     await axiosInstance.delete(`/activities/${id}`);
     return id;
-  } catch (error: unknown) {
+  } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       return rejectWithValue(error.response.data);
     } else {
@@ -82,6 +97,18 @@ const activitySlice = createSlice({
         state.activities = action.payload;
       })
       .addCase(fetchActivities.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchActivityById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchActivityById.fulfilled, (state, action: PayloadAction<IActivity>) => {
+        state.loading = false;
+        state.activity = action.payload;
+      })
+      .addCase(fetchActivityById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })

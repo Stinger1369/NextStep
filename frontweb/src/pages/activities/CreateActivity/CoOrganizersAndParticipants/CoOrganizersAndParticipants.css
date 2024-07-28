@@ -1,0 +1,54 @@
+/* src/pages/activities/CreateActivity/CoOrganizersAndParticipants/CoOrganizersAndParticipants.css */
+
+.co-organizers-participants-container {
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.co-organizers-participants-card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  background-color: #fff;
+  width: 100%;
+  max-width: 600px; /* Adjust width as needed */
+}
+
+.co-organizers-participants-card .card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 1.25rem;
+  font-weight: 500;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.co-organizers-participants-card .card-body {
+  padding: 1rem 1.25rem;
+}
+
+.co-organizers-participants-card .form-group {
+  margin-bottom: 1rem;
+}
+
+.co-organizers-participants-card label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.co-organizers-participants-card input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+}
+
+.co-organizers-participants-card .text-danger {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}

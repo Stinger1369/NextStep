@@ -39,6 +39,7 @@ import FooterGlobal from '../components/FooterGlobal/FooterGlobal';
 import SkillDevelopment from '../pages/Home/SkillDevelopment/SkillDevelopment';
 import CreateActivity from '../pages/activities/CreateActivity/CreateActivity'; // Import CreateActivity
 import ActivityList from '../pages/activities/ActivityList/ActivityList'; // Import ActivityList
+import ActivityDetail from '../pages/activities/ActivityDetail/ActivityDetail'; // Import ActivityDetail
 import '../App.css';
 import '../index.css';
 
@@ -95,6 +96,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/skill-development" element={<SkillDevelopment />} />
         <Route path="/activities" element={<ActivityList />} />
         <Route path="/create-activity" element={<CreateActivity />} />
+        <Route path="/activities/:id" element={<ActivityDetail />} />
       </Routes>
       {!isPortfolioPage && <FooterGlobal />}
     </>
