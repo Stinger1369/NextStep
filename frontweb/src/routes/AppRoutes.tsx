@@ -35,9 +35,13 @@ import { RootState, AppDispatch } from '../redux/store';
 import { getCompanies } from '../redux/features/company/companySlice';
 import FooterGlobal from '../components/FooterGlobal/FooterGlobal';
 import SkillDevelopment from '../pages/Home/SkillDevelopment/SkillDevelopment';
-import CreateActivity from '../pages/activities/CreateActivity/CreateActivity'; // Import CreateActivity
-import ActivityList from '../pages/activities/ActivityList/ActivityList'; // Import ActivityList
-import ActivityDetail from '../pages/activities/ActivityDetail/ActivityDetail'; // Import ActivityDetail
+import CreateActivity from '../pages/activities/CreateActivity/CreateActivity';
+import ActivityList from '../pages/activities/ActivityList/ActivityList';
+import ActivityDetail from '../pages/activities/ActivityDetail/ActivityDetail';
+import SearchSite from '../components/SearchDropdown/SearchSite/SearchSite';
+import SearchJobs from '../components/SearchDropdown/SearchJobs/SearchJobs';
+import SearchActivities from '../components/SearchDropdown/SearchActivities/SearchActivities';
+import SearchMembers from '../components/SearchDropdown/SearchMembers/SearchMembers';
 import '../App.css';
 import '../index.css';
 
@@ -96,6 +100,10 @@ const AppRoutes: React.FC = () => {
           <Route path="/activities" element={<ActivityList />} />
           <Route path="/create-activity" element={<CreateActivity />} />
           <Route path="/activities/:id" element={<ActivityDetail />} />
+          <Route path="/search-site" element={<SearchSite />} />
+          <Route path="/search-jobs" element={<SearchJobs />} />
+          <Route path="/search-activities" element={<SearchActivities />} />
+          <Route path="/search-members" element={<SearchMembers />} />
         </Routes>
       </div>
       {!isPortfolioPage && <FooterGlobal />}

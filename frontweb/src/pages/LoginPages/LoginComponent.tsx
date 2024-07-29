@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
-import { login } from '../../redux/features/auth/authSlice';
+import { login, loadUserFromCookies } from '../../redux/features/auth/authSlice';
 import { createUserAndSetCurrent } from '../../redux/features/websocket/users/userWebsocketThunks/userWebsocketThunks';
 import { AxiosError } from 'axios';
 import './LoginComponent.css';
@@ -16,8 +16,12 @@ const LoginComponent: React.FC = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
   useEffect(() => {
+    dispatch(loadUserFromCookies());
+  }, [dispatch]);
+
+  useEffect(() => {
     if (user?.images && user.images.length > 0) {
-      setProfileImage(user.images[0]); // Set the first image as profile image
+      setProfileImage(user.images[0]);
     }
   }, [user]);
 
@@ -126,22 +130,22 @@ const LoginComponent: React.FC = () => {
   }
 
   return (
-    <div className="login-container">
+    <div className="LoginComponent-container">
       {user ? (
-        <div className="user-info">
-          {profileImage && <img src={profileImage} alt="Profile" className="profile-image" />}
+        <div className="LoginComponent-user-info">
+          {profileImage && <img src={profileImage} alt="Profile" className="LoginComponent-profile-image" />}
           <p>Welcome, {user.firstName ? user.firstName : user.email}!</p>
           <p>Profession: {user.profession || 'Not specified'}</p>
-          <div className="counters">
-            <div className="counter">
+          <div className="LoginComponent-counters">
+            <div className="LoginComponent-counter">
               <p>Profile Pro Visits</p>
               <p>123</p>
             </div>
-            <div className="counter">
+            <div className="LoginComponent-counter">
               <p>Profile Member Visits</p>
               <p>456</p>
             </div>
-            <div className="counter">
+            <div className="LoginComponent-counter">
               <p>Other Visits</p>
               <p>789</p>
             </div>
@@ -149,27 +153,27 @@ const LoginComponent: React.FC = () => {
           <button onClick={() => navigate('/role-selection')}>Complete your profile</button>
         </div>
       ) : (
-        <form onSubmit={formik.handleSubmit} className="login-form">
-          <div className="form-field">
+        <form onSubmit={formik.handleSubmit} className="LoginComponent-form">
+          <div className="LoginComponent-form-field">
             <input
               type="text"
               id="email"
               {...formik.getFieldProps('email')}
               placeholder="Email or Phone"
-              className={`login-input ${formik.touched.email && formik.errors.email ? 'error-input' : ''}`}
+              className={`LoginComponent-input ${formik.touched.email && formik.errors.email ? 'LoginComponent-error-input' : ''}`}
             />
             {formik.touched.email && formik.errors.email ? (
-              <div className="error">
+              <div className="LoginComponent-error">
                 {formik.errors.email}
                 {formik.errors.email.includes('Email or phone does not exist.') && (
-                  <button type="button" className="register-button" onClick={() => navigate('/register')}>
+                  <button type="button" className="LoginComponent-register-button" onClick={() => navigate('/register')}>
                     Register
                   </button>
                 )}
                 {formik.errors.email.includes('Your account is not verified.') && (
                   <button
                     type="button"
-                    className="verify-button"
+                    className="LoginComponent-verify-button"
                     onClick={() =>
                       navigate('/verify-email', {
                         state: { email: formik.values.email }
@@ -182,20 +186,20 @@ const LoginComponent: React.FC = () => {
               </div>
             ) : null}
           </div>
-          <div className="form-field">
+          <div className="LoginComponent-form-field">
             <input
               type="password"
               id="password"
               {...formik.getFieldProps('password')}
               placeholder="Password"
-              className={`login-input ${formik.touched.password && formik.errors.password ? 'error-input' : ''}`}
+              className={`LoginComponent-input ${formik.touched.password && formik.errors.password ? 'LoginComponent-error-input' : ''}`}
             />
-            {formik.touched.password && formik.errors.password ? <div className="error">{formik.errors.password}</div> : null}
+            {formik.touched.password && formik.errors.password ? <div className="LoginComponent-error">{formik.errors.password}</div> : null}
           </div>
-          <button type="submit" className="login-button" disabled={formik.isSubmitting}>
+          <button type="submit" className="LoginComponent-button" disabled={formik.isSubmitting}>
             {formik.isSubmitting ? 'Logging in...' : 'Login'}
           </button>
-          <Link to="/password-request-reset" className="forgot-password-link">
+          <Link to="/password-request-reset" className="LoginComponent-forgot-password-link">
             Forgot your password?
           </Link>
         </form>

@@ -1,3 +1,4 @@
+/* SearchDropdown.css */
 .search-dropdown {
   position: relative;
 }
@@ -22,6 +23,7 @@
   z-index: 1000;
   width: 250px;
   padding: 10px;
+  display: block; /* Assurez-vous que le menu est affiché */
 }
 
 .search-dropdown .dropdown-menu a {

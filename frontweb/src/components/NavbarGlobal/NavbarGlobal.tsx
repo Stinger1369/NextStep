@@ -4,12 +4,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FaHome, FaInfoCircle, FaUser, FaUserPlus, FaSignOutAlt, FaBriefcase, FaUsers, FaBell, FaCaretDown, FaBars } from 'react-icons/fa';
 import { Modal, Button } from 'react-bootstrap';
 import logo from '../../assests/Images/nextstep.webp';
-import defaultProfilePicture from '../../assests/Images/Profile.png'; // Ajouter une image de profil par défaut
+import defaultProfilePicture from '../../assests/Images/Profile.png';
 import { RootState, AppDispatch } from '../../redux/store';
+import { saveUserToCookies, removeUserFromCookies, logout } from '../../redux/features/auth/authSlice';
 import { performLogout } from '../../redux/features/auth/authLogout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import SearchDropdown from '../SearchDropdown/SearchDropdown';
+import LogoutConfirmationModal from '../LogoutConfirmationModal';
 import './NavbarGlobal.css';
 
 interface User {
@@ -27,12 +29,26 @@ const NavbarGlobal: React.FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const dropdownRef: RefObject<HTMLDivElement> = useRef(null);
   const menuRef: RefObject<HTMLDivElement> = useRef(null);
   const closeMenuTimeoutRef = useRef<number | null>(null);
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
+    setShowLogoutConfirmation(true);
+  };
+
+  const handleLogoutSave = async () => {
+    dispatch(saveUserToCookies());
     await dispatch(performLogout());
+    setShowLogoutConfirmation(false);
+    navigate('/');
+  };
+
+  const handleLogoutDontSave = async () => {
+    dispatch(removeUserFromCookies());
+    await dispatch(performLogout());
+    setShowLogoutConfirmation(false);
     navigate('/');
   };
 
@@ -196,6 +212,8 @@ const NavbarGlobal: React.FC = () => {
           </div>
         </div>
       </nav>
+
+      <LogoutConfirmationModal show={showLogoutConfirmation} handleClose={() => setShowLogoutConfirmation(false)} handleSave={handleLogoutSave} handleDontSave={handleLogoutDontSave} />
 
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>

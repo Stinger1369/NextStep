@@ -21,19 +21,25 @@ const ModalUserProfile: React.FC<ModalUserProfileProps> = ({ images, currentInde
   };
 
   return (
-    <div className="modal-overlay" role="dialog" aria-modal="true" onClick={onClose} onKeyPress={(event) => handleKeyPress(event, onClose)}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()} role="document">
-        <button className="close-modal" onClick={onClose} aria-label="Close modal" onKeyPress={(event) => handleKeyPress(event, onClose)}>
+    <div className="ModalUserProfile-overlay" role="dialog" aria-modal="true">
+      <div className="ModalUserProfile-content" onClick={(e) => e.stopPropagation()} role="document">
+        <button className="ModalUserProfile-close" onClick={onClose} aria-label="Close modal" onKeyPress={(event) => handleKeyPress(event, onClose)}>
           <FaTimes />
         </button>
-        <button className="modal-control-prev" onClick={onPrev} aria-label="Previous image" onKeyPress={(event) => handleKeyPress(event, onPrev)}>
+        <button className="ModalUserProfile-control-prev" onClick={onPrev} aria-label="Previous image" onKeyPress={(event) => handleKeyPress(event, onPrev)}>
           <FaArrowLeft />
         </button>
-        <img src={images[currentIndex]} alt={`User profile ${currentIndex + 1}`} className="modal-image" />
-        <button className="modal-control-next" onClick={onNext} aria-label="Next image" onKeyPress={(event) => handleKeyPress(event, onNext)}>
+        <img src={images[currentIndex]} alt={`User profile ${currentIndex + 1}`} className="ModalUserProfile-image" />
+        <button className="ModalUserProfile-control-next" onClick={onNext} aria-label="Next image" onKeyPress={(event) => handleKeyPress(event, onNext)}>
           <FaArrowRight />
         </button>
       </div>
+      <button
+        className="ModalUserProfile-overlay-close"
+        onClick={onClose}
+        aria-label="Close modal"
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'none', border: 'none', cursor: 'default' }}
+      ></button>
     </div>
   );
 };

@@ -1,61 +1,64 @@
-.login-container {
+.LoginComponent-container {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  min-height: 85vh; /* Ajustez cette valeur pour laisser de la place pour le footer */
+  background-color: #f5f5f5;
   padding: 20px;
 }
 
-.user-info {
+.LoginComponent-welcome-text {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
   text-align: center;
 }
 
-.profile-image {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 10px;
-}
-
-.counters {
-  display: flex;
-  justify-content: space-around;
-  margin: 20px 0;
-}
-
-.counter {
+.LoginComponent-card {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
   text-align: center;
 }
 
-.counter p {
-  margin: 5px 0;
+.LoginComponent-card-title {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
 }
 
-.login-form {
+.LoginComponent-form {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.form-field {
+.LoginComponent-form-field {
   margin-bottom: 15px;
+  width: 100%;
 }
 
-.login-input {
+.LoginComponent-input {
   width: 100%;
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #ccc;
+  font-size: 1rem;
 }
 
-.error-input {
+.LoginComponent-error-input {
   border-color: red;
 }
 
-.error {
+.LoginComponent-error {
   color: red;
   font-size: 0.9rem;
   margin-top: 5px;
 }
 
-.login-button {
+.LoginComponent-button {
   width: 100%;
   padding: 10px;
   background-color: #007bff;
@@ -66,22 +69,22 @@
   transition: background-color 0.3s ease;
 }
 
-.login-button:disabled {
+.LoginComponent-button:disabled {
   background-color: #cccccc;
 }
 
-.forgot-password-link {
+.LoginComponent-forgot-password-link {
   margin-top: 10px;
   color: #007bff;
   text-decoration: none;
 }
 
-.forgot-password-link:hover {
+.LoginComponent-forgot-password-link:hover {
   text-decoration: underline;
 }
 
-.register-button,
-.verify-button {
+.LoginComponent-register-button,
+.LoginComponent-verify-button {
   background: none;
   border: none;
   color: #007bff;
@@ -89,4 +92,66 @@
   text-decoration: underline;
   font-size: 0.9rem;
   padding: 0;
+}
+
+.LoginComponent-user-info {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.LoginComponent-profile-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.LoginComponent-welcome-message {
+  font-size: 1.25rem;
+  margin-bottom: 10px;
+}
+
+.LoginComponent-profession {
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.LoginComponent-counters {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+}
+
+.LoginComponent-counter {
+  text-align: center;
+}
+
+.LoginComponent-counter p {
+  margin: 5px 0;
+}
+
+.LoginComponent-complete-profile-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.LoginComponent-complete-profile-button:hover {
+  background-color: #0056b3;
+}
+.LoginComponent-welcome-back {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #007bff;
+  margin-bottom: 20px;
 }
