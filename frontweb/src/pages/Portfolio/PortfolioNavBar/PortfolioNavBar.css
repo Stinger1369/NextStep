@@ -9,7 +9,9 @@
   padding-bottom: 0.2rem;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
-  transition: color 0.3s, background-color 0.3s;
+  transition:
+    color 0.3s,
+    background-color 0.3s;
 }
 
 .portfolio-navbar .navbar-nav .nav-item .nav-link:hover {

@@ -25,6 +25,14 @@
   flex-grow: 0;
 }
 
+.NavbarGlobal-profile-picture {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px;
+}
+
 @media (max-width: 991.98px) {
   .NavbarGlobal-collapse {
     position: absolute;
@@ -36,6 +44,7 @@
     z-index: 1000;
     width: 20%;
     text-align: left;
+    padding: 20px;
   }
 }
 

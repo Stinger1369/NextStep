@@ -1,5 +1,5 @@
 .about-section-container {
-   flex: 1;
+  flex: 1;
   align-items: center;
   padding: 20px;
   flex-direction: column; /* Stack elements vertically by default */
