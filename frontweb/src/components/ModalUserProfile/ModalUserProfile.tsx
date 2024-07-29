@@ -14,32 +14,27 @@ interface ModalUserProfileProps {
 const ModalUserProfile: React.FC<ModalUserProfileProps> = ({ images, currentIndex, isOpen, onClose, onNext, onPrev }) => {
   if (!isOpen) return null;
 
-  const handleKeyPress = (event: React.KeyboardEvent, action: () => void) => {
+  const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
     if (event.key === 'Enter' || event.key === ' ') {
       action();
     }
   };
 
   return (
-    <div className="ModalUserProfile-overlay" role="dialog" aria-modal="true">
-      <div className="ModalUserProfile-content" onClick={(e) => e.stopPropagation()} role="document">
-        <button className="ModalUserProfile-close" onClick={onClose} aria-label="Close modal" onKeyPress={(event) => handleKeyPress(event, onClose)}>
+    <div className="modal-user-profile-overlay" role="dialog" aria-modal="true">
+      <div className="modal-user-profile-content" role="document" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-user-profile-close" onClick={onClose} aria-label="Close modal" onKeyDown={(event) => handleKeyDown(event, onClose)}>
           <FaTimes />
         </button>
-        <button className="ModalUserProfile-control-prev" onClick={onPrev} aria-label="Previous image" onKeyPress={(event) => handleKeyPress(event, onPrev)}>
+        <button className="modal-user-profile-control-prev" onClick={onPrev} aria-label="Previous image" onKeyDown={(event) => handleKeyDown(event, onPrev)}>
           <FaArrowLeft />
         </button>
-        <img src={images[currentIndex]} alt={`User profile ${currentIndex + 1}`} className="ModalUserProfile-image" />
-        <button className="ModalUserProfile-control-next" onClick={onNext} aria-label="Next image" onKeyPress={(event) => handleKeyPress(event, onNext)}>
+        <img src={images[currentIndex]} alt={`User profile ${currentIndex + 1}`} className="modal-user-profile-image" />
+        <button className="modal-user-profile-control-next" onClick={onNext} aria-label="Next image" onKeyDown={(event) => handleKeyDown(event, onNext)}>
           <FaArrowRight />
         </button>
       </div>
-      <button
-        className="ModalUserProfile-overlay-close"
-        onClick={onClose}
-        aria-label="Close modal"
-        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'none', border: 'none', cursor: 'default' }}
-      ></button>
+      <div className="modal-user-profile-overlay-close" role="button" tabIndex={0} onClick={onClose} onKeyDown={(event) => handleKeyDown(event, onClose)} aria-label="Close modal"></div>
     </div>
   );
 };

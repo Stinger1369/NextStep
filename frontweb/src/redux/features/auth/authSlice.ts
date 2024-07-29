@@ -1,13 +1,11 @@
 // src/redux/features/auth/authSlice.ts
-
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '../../../axiosConfig';
 import { RootState } from '../../store';
 import { AxiosError } from 'axios';
 import { ApiError } from '../../../../src/types';
-import Cookies from 'js-cookie';
 import { updateUser } from '../user/userSlice';
-
+// Définir les types et interfaces nécessaires
 interface Address {
   street?: string;
   city?: string;
@@ -16,7 +14,7 @@ interface Address {
   country?: string;
 }
 
-interface SocialMediaLinks {
+interface socialMediaLinks {
   github?: string;
   twitter?: string;
   instagram?: string;
@@ -42,13 +40,13 @@ interface User {
   skills?: string[];
   images?: string[];
   videos?: string[];
-  hobbies?: string[];
+  hobbies?: string[]; // Ajouté pour les hobbies
   sex?: string;
   isVerified: boolean;
-  company?: string;
-  companyId?: string;
-  companies?: string[];
-  socialMediaLinks?: SocialMediaLinks;
+  company?: string; // Pour les utilisateurs travaillant dans une seule entreprise
+  companyId?: string; // Pour les utilisateurs travaillant dans une seule entreprise
+  companies?: string[]; // Pour les utilisateurs gérant plusieurs entreprises
+  socialMediaLinks?: socialMediaLinks; // Liens de réseaux sociaux
 }
 
 interface AuthState {
@@ -161,20 +159,6 @@ const authSlice = createSlice({
       state.user = JSON.parse(localStorage.getItem('user') || 'null');
       state.token = localStorage.getItem('token');
       state.refreshToken = localStorage.getItem('refreshToken');
-    },
-    saveUserToCookies: (state) => {
-      if (state.user) {
-        Cookies.set('user', JSON.stringify(state.user), { expires: 7 });
-      }
-    },
-    removeUserFromCookies: (state) => {
-      Cookies.remove('user');
-    },
-    loadUserFromCookies: (state) => {
-      const user = Cookies.get('user');
-      if (user) {
-        state.user = JSON.parse(user);
-      }
     }
   },
   extraReducers: (builder) => {
@@ -280,7 +264,7 @@ const authSlice = createSlice({
   }
 });
 
-export const { logout, initializeAuthState, saveUserToCookies, removeUserFromCookies, loadUserFromCookies } = authSlice.actions;
+export const { logout, initializeAuthState } = authSlice.actions;
 
 export default authSlice.reducer;
 

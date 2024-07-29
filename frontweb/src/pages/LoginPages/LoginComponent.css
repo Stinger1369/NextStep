@@ -1,10 +1,7 @@
 .LoginComponent-container {
   display: flex;
   flex-direction: column;
-
   align-items: center;
-  min-height: 85vh; /* Ajustez cette valeur pour laisser de la place pour le footer */
-  background-color: #f5f5f5;
   padding: 20px;
 }
 
@@ -124,6 +121,7 @@
 
 .LoginComponent-counters {
   display: flex;
+  flex-direction: column;
   justify-content: space-around;
   margin: 20px 0;
 }
@@ -149,9 +147,77 @@
 .LoginComponent-complete-profile-button:hover {
   background-color: #0056b3;
 }
+
 .LoginComponent-welcome-back {
   text-align: center;
   font-size: 1.2rem;
   color: #007bff;
   margin-bottom: 20px;
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+  .LoginComponent-card,
+  .LoginComponent-user-info {
+    max-width: 100%;
+    padding: 20px;
+  }
+   .LoginComponent-welcome-text {
+    font-size: 0.8rem;
+  }
+  .LoginComponent-button {
+    padding: 8px;
+  }
+
+  .LoginComponent-form-field {
+    margin-bottom: 10px;
+  }
+
+  .LoginComponent-input {
+    padding: 8px;
+  }
+}
+@media (max-width: 768px) {
+  .LoginComponent-card,
+  .LoginComponent-user-info {
+    max-width: 100%;
+    padding: 20px;
+  }
+   .LoginComponent-welcome-text {
+    font-size: 0.8rem;
+  }
+  .LoginComponent-button {
+    padding: 8px;
+  }
+
+  .LoginComponent-form-field {
+    margin-bottom: 10px;
+  }
+
+  .LoginComponent-input {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .LoginComponent-welcome-text {
+    font-size: 0.8rem;
+  }
+
+  .LoginComponent-card-title {
+    font-size: 1.2rem;
+  }
+
+  .LoginComponent-profile-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .LoginComponent-complete-profile-button {
+    padding: 8px 16px;
+  }
+
+  .LoginComponent-welcome-back {
+    font-size: 1rem;
+  }
 }

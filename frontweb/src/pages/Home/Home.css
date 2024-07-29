@@ -1,25 +1,10 @@
+/* General Container */
 .home-container {
   padding: 20px;
   background-color: #f8f9fa;
 }
 
-.home-card {
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 15px;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.home-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
+/* Main Content */
 .home-main-content {
   text-align: center;
   padding: 20px;
@@ -30,11 +15,35 @@
   margin-bottom: 20px;
 }
 
+/* Sidebar Components */
 .home-sidebar {
   display: flex;
   flex-direction: column;
 }
 
+.home-component {
+  margin-bottom: 20px;
+}
+
+/* Skill Development Link */
+.skill-development-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.skill-development-link:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Styles */
 @media (max-width: 768px) {
   .home-main-content {
     order: 2;
@@ -45,5 +54,15 @@
     order: 1;
     width: 100%;
     margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-main-content {
+    padding: 15px;
+  }
+
+  .skill-development-link {
+    padding: 10px;
   }
 }

@@ -6,13 +6,12 @@ import { Modal, Button } from 'react-bootstrap';
 import logo from '../../assests/Images/nextstep.webp';
 import defaultProfilePicture from '../../assests/Images/Profile.png';
 import { RootState, AppDispatch } from '../../redux/store';
-import { saveUserToCookies, removeUserFromCookies, logout } from '../../redux/features/auth/authSlice';
 import { performLogout } from '../../redux/features/auth/authLogout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import SearchDropdown from '../SearchDropdown/SearchDropdown';
-import LogoutConfirmationModal from '../LogoutConfirmationModal';
 import './NavbarGlobal.css';
+import Cookies from 'js-cookie';
 
 interface User {
   _id: string;
@@ -29,26 +28,23 @@ const NavbarGlobal: React.FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [cookiesUpdated, setCookiesUpdated] = useState(false); // État local pour surveiller les cookies
   const dropdownRef: RefObject<HTMLDivElement> = useRef(null);
   const menuRef: RefObject<HTMLDivElement> = useRef(null);
   const closeMenuTimeoutRef = useRef<number | null>(null);
 
-  const handleLogout = () => {
-    setShowLogoutConfirmation(true);
-  };
-
-  const handleLogoutSave = async () => {
-    dispatch(saveUserToCookies());
+  const handleLogout = async (saveData: boolean) => {
+    if (saveData && user) {
+      Cookies.set('userName', user.firstName || '');
+      Cookies.set('userEmail', user.email);
+    } else {
+      Cookies.remove('userName');
+      Cookies.remove('userEmail');
+    }
     await dispatch(performLogout());
-    setShowLogoutConfirmation(false);
-    navigate('/');
-  };
-
-  const handleLogoutDontSave = async () => {
-    dispatch(removeUserFromCookies());
-    await dispatch(performLogout());
-    setShowLogoutConfirmation(false);
+    setShowLogoutModal(false);
+    setCookiesUpdated(!cookiesUpdated); // Met à jour l'état local
     navigate('/');
   };
 
@@ -119,6 +115,8 @@ const NavbarGlobal: React.FC = () => {
     navigate('/profile-edit-user/personal-info');
   };
 
+  const handleCloseLogoutModal = () => setShowLogoutModal(false);
+
   const userProfilePicture = user?.images && user.images.length > 0 ? user.images[0] : defaultProfilePicture;
 
   return (
@@ -160,7 +158,7 @@ const NavbarGlobal: React.FC = () => {
                     <hr className="dropdown-divider NavbarGlobal-dropdown-divider" />
                   </li>
                   <li>
-                    <button className="dropdown-item NavbarGlobal-dropdown-item" onClick={handleLogout}>
+                    <button className="dropdown-item NavbarGlobal-dropdown-item" onClick={() => setShowLogoutModal(true)}>
                       <FaSignOutAlt /> Logout
                     </button>
                   </li>
@@ -213,8 +211,6 @@ const NavbarGlobal: React.FC = () => {
         </div>
       </nav>
 
-      <LogoutConfirmationModal show={showLogoutConfirmation} handleClose={() => setShowLogoutConfirmation(false)} handleSave={handleLogoutSave} handleDontSave={handleLogoutDontSave} />
-
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>Complete Your Profile</Modal.Title>
@@ -226,6 +222,21 @@ const NavbarGlobal: React.FC = () => {
           </Button>
           <Button variant="primary" onClick={handleCompleteProfile}>
             Complete Profile
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showLogoutModal} onHide={handleCloseLogoutModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Save Data</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Do you want to save your data in cookies for future login?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => handleLogout(false)}>
+            No
+          </Button>
+          <Button variant="primary" onClick={() => handleLogout(true)}>
+            Yes
           </Button>
         </Modal.Footer>
       </Modal>

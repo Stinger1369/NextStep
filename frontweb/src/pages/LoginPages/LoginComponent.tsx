@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
-import { login, loadUserFromCookies } from '../../redux/features/auth/authSlice';
+import { login } from '../../redux/features/auth/authSlice';
 import { createUserAndSetCurrent } from '../../redux/features/websocket/users/userWebsocketThunks/userWebsocketThunks';
 import { AxiosError } from 'axios';
 import './LoginComponent.css';
@@ -16,12 +16,8 @@ const LoginComponent: React.FC = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
   useEffect(() => {
-    dispatch(loadUserFromCookies());
-  }, [dispatch]);
-
-  useEffect(() => {
     if (user?.images && user.images.length > 0) {
-      setProfileImage(user.images[0]);
+      setProfileImage(user.images[0]); // Set the first image as profile image
     }
   }, [user]);
 
@@ -134,11 +130,11 @@ const LoginComponent: React.FC = () => {
       {user ? (
         <div className="LoginComponent-user-info">
           {profileImage && <img src={profileImage} alt="Profile" className="LoginComponent-profile-image" />}
-          <p>Welcome, {user.firstName ? user.firstName : user.email}!</p>
-          <p>Profession: {user.profession || 'Not specified'}</p>
+          <p className="LoginComponent-welcome-text">Welcome, {user.firstName ? user.firstName : user.email}!</p>
+          <p className="LoginComponent-profession">Profession: {user.profession || 'Not specified'}</p>
           <div className="LoginComponent-counters">
             <div className="LoginComponent-counter">
-              <p>Profile Pro Visits</p>
+              <p>Profile Pro Visits </p>
               <p>123</p>
             </div>
             <div className="LoginComponent-counter">
@@ -150,7 +146,9 @@ const LoginComponent: React.FC = () => {
               <p>789</p>
             </div>
           </div>
-          <button onClick={() => navigate('/role-selection')}>Complete your profile</button>
+          <button className="LoginComponent-complete-profile-button" onClick={() => navigate('/role-selection')}>
+            Complete your profile
+          </button>
         </div>
       ) : (
         <form onSubmit={formik.handleSubmit} className="LoginComponent-form">
