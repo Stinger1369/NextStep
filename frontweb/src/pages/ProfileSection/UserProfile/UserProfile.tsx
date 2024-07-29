@@ -229,7 +229,7 @@ const UserProfile: React.FC = () => {
             <ul>{user.hobbies?.map((hobby, index) => <li key={index}>{hobby}</li>)}</ul>
           </div>
         </div>
-        <div className="col-md-6 vertical-line">
+        <div className="col-md-6 UserProfile-vertical-line">
           <h3 className="text-secondary">Experience</h3>
           <div>
             <strong>Experience:</strong>

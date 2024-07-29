@@ -83,16 +83,12 @@ const AboutSection: React.FC = () => {
                 </button>
               )}
             </div>
-            <div className="vertical-line"></div>
+            <div className="about-vertical-line"></div>
             <div className="about-text text-left">
               <h1>
                 {user.profession} {`${user.firstName} ${user.lastName}`}
               </h1>
-              <div className="card">
-                <div className="card-body">
-                  <p className="card-text">{user.bio}</p>
-                </div>
-              </div>
+              <p className="bio-text">{user.bio}</p>
             </div>
           </div>
           {isModalOpen && (

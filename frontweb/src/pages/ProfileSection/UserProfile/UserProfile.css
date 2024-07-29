@@ -66,7 +66,7 @@
   overflow-x: auto;
 }
 
-.user-profile-container .vertical-line {
+.user-profile-container .UserProfile-vertical-line {
   border-left: 1px solid #ccc;
   padding-left: 15px;
 }

@@ -1,0 +1,124 @@
+.PortfolioProfile-section {
+  padding: 20px;
+}
+
+.PortfolioProfile-header {
+  margin-bottom: 20px;
+}
+
+.PortfolioProfile-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.PortfolioProfile-card {
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  padding: 20px;
+  text-align: left;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.PortfolioProfile-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.PortfolioProfile-card-body {
+  padding: 20px;
+}
+
+.PortfolioProfile-card-title {
+  margin-bottom: 15px;
+}
+
+/* Specific styles for each card */
+.contact-card {
+  flex: 1 1 20%;
+  background-color: #ffebee; /* Light red */
+}
+
+.experience-card {
+  flex: 1 1 70%;
+  background-color: #e3f2fd; /* Light blue */
+}
+
+.education-card {
+  flex: 1 1 70%;
+  background-color: #e8f5e9; /* Light green */
+}
+
+.social-media-card {
+  flex: 1 1 15%;
+  background-color: #f3e5f5; /* Light purple */
+}
+
+.PortfolioProfile-body .list-inline-item {
+  margin-right: 10px;
+}
+
+.PortfolioProfile-body .fab {
+  margin-right: 5px;
+}
+
+@media (max-width: 768px) {
+  .PortfolioProfile-section {
+    padding: 10px;
+  }
+
+  .PortfolioProfile-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .PortfolioProfile-header p {
+    font-size: 1rem;
+  }
+
+  .PortfolioProfile-body {
+    gap: 10px;
+  }
+
+  .PortfolioProfile-card {
+    flex: 1 1 100%;
+  }
+
+  .PortfolioProfile-card-body {
+    padding: 15px;
+  }
+
+  .PortfolioProfile-card-title {
+    font-size: 1.2rem;
+  }
+
+  .PortfolioProfile-body .list-inline-item {
+    margin-right: 5px;
+  }
+
+  .PortfolioProfile-body .fab {
+    margin-right: 3px;
+  }
+}
+
+@media (max-width: 576px) {
+  .PortfolioProfile-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .PortfolioProfile-header p {
+    font-size: 0.9rem;
+  }
+
+  .PortfolioProfile-card-body {
+    padding: 10px;
+  }
+
+  .PortfolioProfile-card-title {
+    font-size: 1rem;
+  }
+
+  .PortfolioProfile-body .fab {
+    margin-right: 2px;
+  }
+}

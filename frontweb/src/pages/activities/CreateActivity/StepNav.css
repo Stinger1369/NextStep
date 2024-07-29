@@ -3,13 +3,19 @@
   display: flex;
   justify-content: space-around;
   margin-bottom: 1rem;
+  overflow-x: auto; /* Allow horizontal scroll on small screens */
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
 }
 
 .step-item {
-  padding: 0.5rem 1rem;
   cursor: pointer;
   border-bottom: 2px solid transparent;
   transition: border-bottom 0.3s;
+  white-space: nowrap; /* Prevent text from wrapping */
+  font-weight: bold;
+  font-size: 0.75rem;
 }
 
 .step-item.active {
@@ -18,4 +24,27 @@
 
 .step-item:hover {
   border-bottom: 2px solid #007bff;
+}
+
+/* Responsive styles for small screens */
+@media (max-width: 768px) {
+  .create-activity-container {
+    padding: 1rem;
+  }
+
+  .step-nav {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .step-item {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .create-activity-container {
+    display: block;
+  }
 }

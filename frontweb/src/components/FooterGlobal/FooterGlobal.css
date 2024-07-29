@@ -5,8 +5,6 @@
   padding: 10px 20px;
   background-color: #343a40;
   color: white;
-  position: fixed;
-  bottom: 0;
   width: 100%;
 }
 
@@ -34,4 +32,19 @@
 .footer-global .nav-links a:hover,
 .footer-global .social-links a:hover {
   color: #ffc107;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
 }

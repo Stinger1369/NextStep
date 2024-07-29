@@ -1,5 +1,3 @@
-// src/routes/AppRoutes.tsx
-
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -8,7 +6,7 @@ import About from '../pages/About/About';
 import LoginComponent from '../pages/LoginPages/LoginComponent';
 import RegisterComponent from '../pages/RegisterPages/RegisterComponent';
 import PasswordResetComponent from '../pages/PasswordReset/PasswordReset/PasswordResetComponent';
-import Navbar from '../components/Navbar/Navbar';
+import Navbar from '../components/NavbarGlobal/NavbarGlobal';
 import VerifyEmailComponent from '../components/VerifyEmail/EmailVerificationComponent';
 import PasswordResetRequestComponent from '../pages/PasswordReset/PasswordRequest/PasswordResetRequestComponent';
 import PersonalInfo from '../pages/ProfileSection/ProfileEditUser/ProfileScreen/PersonalInfo/PersonalInfo';
@@ -27,7 +25,7 @@ import UserProfile from '../pages/ProfileSection/UserProfile/UserProfile';
 import PublicUserProfile from '../pages/ProfileSection/PublicUserProfile/PublicUserProfile';
 import Portfolio from '../pages/Portfolio/Portfolio';
 import AboutSection from '../pages/Portfolio/About/About';
-import ProfileSection from '../pages/Portfolio/Profile/Profile';
+import ProfileSection from '../pages/Portfolio/PortfolioProfile/PortfolioProfile';
 import SkillsSection from '../pages/Portfolio/Skills/Skills';
 import BioSection from '../pages/Portfolio/Bio/Bio';
 import ContactSection from '../pages/Portfolio/Contact/Contact';
@@ -60,44 +58,46 @@ const AppRoutes: React.FC = () => {
   return (
     <>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/login" element={!user ? <LoginComponent /> : <Navigate to="/" />} />
-        <Route path="/register" element={!user ? <RegisterComponent /> : <Navigate to="/" />} />
-        <Route path="/password-reset" element={<PasswordResetComponent />} />
-        <Route path="/verify-email" element={<VerifyEmailComponent />} />
-        <Route path="/password-request-reset" element={<PasswordResetRequestComponent />} />
-        <Route path="/profile-edit-user/personal-info" element={user ? <PersonalInfo /> : <Navigate to="/login" />} />
-        <Route path="/profile-edit-user/address-info" element={user ? <AddressInfo /> : <Navigate to="/login" />} />
-        <Route path="/profile-edit-user/profession-info" element={user ? <ProfessionInfo /> : <Navigate to="/login" />} />
-        <Route path="/profile-edit-user/bio-skills-info" element={user ? <BioSkillsInfo /> : <Navigate to="/login" />} />
-        <Route path="/profile-edit-user/media-info" element={user ? <MediaInfo /> : <Navigate to="/login" />} />
-        <Route path="/role-selection" element={user ? <RoleSelection /> : <Navigate to="/login" />} />
-        <Route path="/edit-recruit/new/company-info" element={<RecruitCompanyInfo isNew />} />
-        <Route path="/edit-recruit/:companyId/company-info" element={<RecruitCompanyInfo />} />
-        <Route path="/edit-recruit/:companyId/address-info" element={<RecruitAddressInfo />} />
-        <Route path="/edit-recruit/:companyId/contact-info" element={<RecruitContactInfo />} />
-        <Route path="/edit-recruit/:companyId/other-info" element={<RecruitOtherInfo />} />
-        <Route path="/edit-recruit/:companyId/social-media-info" element={<RecruitSocialMediaInfo />} />
-        <Route path="/profile-edit-recruiter" element={user ? <ProfileEditRecruits /> : <Navigate to="/login" />} />
-        <Route path="/user-profile/:userId" element={user ? <UserProfile /> : <Navigate to="/login" />} />
-        <Route path="/notifications" element={user ? <Notifications /> : <Navigate to="/login" />} />
-        <Route path="/public-profile/:userId" element={<PublicUserProfile />} />
-        <Route path="/portfolio/:slug/*" element={<Portfolio />}>
-          <Route index element={<Navigate to="about" replace />} />
-          <Route path="about" element={<AboutSection />} />
-          <Route path="profile" element={<ProfileSection />} />
-          <Route path="skills" element={<SkillsSection />} />
-          <Route path="bio" element={<BioSection />} />
-          <Route path="contact" element={<ContactSection />} />
-        </Route>
-        <Route path="/members" element={user ? <Members /> : <Navigate to="/login" />} />
-        <Route path="/skill-development" element={<SkillDevelopment />} />
-        <Route path="/activities" element={<ActivityList />} />
-        <Route path="/create-activity" element={<CreateActivity />} />
-        <Route path="/activities/:id" element={<ActivityDetail />} />
-      </Routes>
+      <div className="main-content">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/login" element={!user ? <LoginComponent /> : <Navigate to="/" />} />
+          <Route path="/register" element={!user ? <RegisterComponent /> : <Navigate to="/" />} />
+          <Route path="/password-reset" element={<PasswordResetComponent />} />
+          <Route path="/verify-email" element={<VerifyEmailComponent />} />
+          <Route path="/password-request-reset" element={<PasswordResetRequestComponent />} />
+          <Route path="/profile-edit-user/personal-info" element={user ? <PersonalInfo /> : <Navigate to="/login" />} />
+          <Route path="/profile-edit-user/address-info" element={user ? <AddressInfo /> : <Navigate to="/login" />} />
+          <Route path="/profile-edit-user/profession-info" element={user ? <ProfessionInfo /> : <Navigate to="/login" />} />
+          <Route path="/profile-edit-user/bio-skills-info" element={user ? <BioSkillsInfo /> : <Navigate to="/login" />} />
+          <Route path="/profile-edit-user/media-info" element={user ? <MediaInfo /> : <Navigate to="/login" />} />
+          <Route path="/role-selection" element={user ? <RoleSelection /> : <Navigate to="/login" />} />
+          <Route path="/edit-recruit/new/company-info" element={<RecruitCompanyInfo isNew />} />
+          <Route path="/edit-recruit/:companyId/company-info" element={<RecruitCompanyInfo />} />
+          <Route path="/edit-recruit/:companyId/address-info" element={<RecruitAddressInfo />} />
+          <Route path="/edit-recruit/:companyId/contact-info" element={<RecruitContactInfo />} />
+          <Route path="/edit-recruit/:companyId/other-info" element={<RecruitOtherInfo />} />
+          <Route path="/edit-recruit/:companyId/social-media-info" element={<RecruitSocialMediaInfo />} />
+          <Route path="/profile-edit-recruiter" element={user ? <ProfileEditRecruits /> : <Navigate to="/login" />} />
+          <Route path="/user-profile/:userId" element={user ? <UserProfile /> : <Navigate to="/login" />} />
+          <Route path="/notifications" element={user ? <Notifications /> : <Navigate to="/login" />} />
+          <Route path="/public-profile/:userId" element={<PublicUserProfile />} />
+          <Route path="/portfolio/:slug/*" element={<Portfolio />}>
+            <Route index element={<Navigate to="about" replace />} />
+            <Route path="about" element={<AboutSection />} />
+            <Route path="profile" element={<ProfileSection />} />
+            <Route path="skills" element={<SkillsSection />} />
+            <Route path="bio" element={<BioSection />} />
+            <Route path="contact" element={<ContactSection />} />
+          </Route>
+          <Route path="/members" element={user ? <Members /> : <Navigate to="/login" />} />
+          <Route path="/skill-development" element={<SkillDevelopment />} />
+          <Route path="/activities" element={<ActivityList />} />
+          <Route path="/create-activity" element={<CreateActivity />} />
+          <Route path="/activities/:id" element={<ActivityDetail />} />
+        </Routes>
+      </div>
       {!isPortfolioPage && <FooterGlobal />}
     </>
   );

@@ -1,22 +1,18 @@
-.footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
+.PortfolioFooter {
   background-color: #343a40;
   color: white;
-  left: 0;
-  padding: 5px 0;
+  padding: 10px 0;
 }
 
-.footer .text-muted {
+.PortfolioFooter .text-muted {
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
-.footer a {
+.PortfolioFooter a {
   color: rgba(255, 255, 255, 0.8);
 }
 
-.footer a:hover {
+.PortfolioFooter a:hover {
   color: white;
 }
 

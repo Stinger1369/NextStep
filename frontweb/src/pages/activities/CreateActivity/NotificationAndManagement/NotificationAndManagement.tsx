@@ -5,7 +5,12 @@ import { IActivity } from '../../../../types';
 import './NotificationAndManagement.css';
 
 const NotificationAndManagement: React.FC = () => {
-  const { values, handleChange, handleBlur, touched, errors } = useFormikContext<IActivity>();
+  const { values, handleChange, handleBlur, setFieldValue, touched, errors } = useFormikContext<IActivity>();
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFieldValue(name, checked);
+  };
 
   return (
     <div className="notification-management-container">
@@ -13,13 +18,20 @@ const NotificationAndManagement: React.FC = () => {
         <div className="card-header">Notification and Management</div>
         <div className="card-body">
           <div className="form-group">
-            <label htmlFor="notificationSettings">Notification Settings</label>
-            <textarea id="notificationSettings" name="notificationSettings" onChange={handleChange} onBlur={handleBlur} value={JSON.stringify(values.notificationSettings)} className="form-control" />
-            {touched.notificationSettings && errors.notificationSettings && <div className="text-danger">{errors.notificationSettings}</div>}
+            <label htmlFor="emailNotification">Email Notification</label>
+            <input id="emailNotification" name="emailNotification" type="checkbox" onChange={handleCheckboxChange} onBlur={handleBlur} checked={values.emailNotification} />
+          </div>
+          <div className="form-group">
+            <label htmlFor="pushNotification">Push Notification</label>
+            <input id="pushNotification" name="pushNotification" type="checkbox" onChange={handleCheckboxChange} onBlur={handleBlur} checked={values.pushNotification} />
+          </div>
+          <div className="form-group">
+            <label htmlFor="smsNotification">SMS Notification</label>
+            <input id="smsNotification" name="smsNotification" type="checkbox" onChange={handleCheckboxChange} onBlur={handleBlur} checked={values.smsNotification} />
           </div>
           <div className="form-group">
             <label htmlFor="manageParityIsSelected">Manage Parity</label>
-            <input id="manageParityIsSelected" name="manageParityIsSelected" type="checkbox" onChange={handleChange} onBlur={handleBlur} checked={values.manageParityIsSelected} />
+            <input id="manageParityIsSelected" name="manageParityIsSelected" type="checkbox" onChange={handleCheckboxChange} onBlur={handleBlur} checked={values.manageParityIsSelected} />
           </div>
           {values.manageParityIsSelected && (
             <>

@@ -89,6 +89,9 @@ const CreateActivity: React.FC = () => {
     likes: [],
     comments: [],
     notificationSettings: new Map(),
+    emailNotification: false,
+    pushNotification: false,
+    smsNotification: false,
     interactions: []
   };
 

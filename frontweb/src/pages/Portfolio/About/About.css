@@ -1,46 +1,52 @@
 .about-section-container {
-  display: flex;
+   flex: 1;
   align-items: center;
   padding: 20px;
+  flex-direction: column; /* Stack elements vertically by default */
 }
 
-.about-section-container .about-FlexBlock {
+.about-FlexBlock {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically by default */
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.about-images {
+  position: relative;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
+  width: 100%;
+  max-width: 500px; /* Optional: Set a max width for the image container */
+  margin-bottom: 20px; /* Space between image and text */
 }
 
-.about-section-container .about-images {
+.image-container {
   position: relative;
-  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.about-section-container .image-container {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.about-section-container .about-image {
-  max-width: 80%;
-  max-height: 80%;
+.about-image {
+  width: 100%; /* Image takes full width of container */
+  max-width: 100%;
+  height: auto;
   object-fit: cover;
   cursor: pointer;
 }
 
-.about-section-container .about-image-button {
+.about-image-button {
   background: none;
   border: none;
   padding: 0;
   position: relative;
 }
 
-.about-section-container .prev-button,
-.about-section-container .next-button {
+.prev-button,
+.next-button {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -51,33 +57,64 @@
   z-index: 1;
 }
 
-.about-section-container .prev-button {
+.prev-button {
   left: 5px; /* Ensure the button stays close to the image */
 }
 
-.about-section-container .next-button {
+.next-button {
   right: 5px; /* Ensure the button stays close to the image */
 }
 
-.about-section-container .vertical-line {
-  width: 2px;
-  background-color: #000;
-  margin: 0 20px;
-  height: 100%; /* Ensure the line takes full height of the about-text */
+.about-vertical-line {
+  display: none; /* Hide vertical line by default */
 }
 
-.about-section-container .about-text {
+.about-text {
   flex: 2;
-  padding-left: 20px;
   text-align: left;
+  word-break: break-word; /* Ensure long words break to fit within the container */
+  width: 100%;
+  max-width: 700px; /* Limit the width of the text container for better readability */
+  margin-top: 20px; /* Space between image and text in vertical layout */
 }
 
-.about-section-container .card {
+.bio-text {
   background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent for a better look */
   border: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add some shadow for depth */
+  padding: 15px;
 }
 
-body.no-scroll {
+/* body.no-scroll {
   overflow: hidden;
+} */
+
+/* Media query for larger screens */
+@media (min-width: 768px) {
+  .about-section-container {
+    flex-direction: row; /* Align elements horizontally for larger screens */
+  }
+
+  .about-FlexBlock {
+    flex-direction: row; /* Align elements horizontally for larger screens */
+  }
+
+  .about-images {
+    margin-bottom: 0; /* Remove bottom margin when elements are aligned horizontally */
+    flex: 1;
+  }
+
+  .about-vertical-line {
+    display: block; /* Show vertical line for larger screens */
+    width: 2px;
+    background-color: #000;
+    margin: 0 20px;
+    height: auto; /* Ensure the line takes full height of the about-text */
+  }
+
+  .about-text {
+    max-width: 600px; /* Limit the width of the text container */
+    padding-left: 20px;
+    margin-top: 0; /* Remove top margin when elements are aligned horizontally */
+  }
 }

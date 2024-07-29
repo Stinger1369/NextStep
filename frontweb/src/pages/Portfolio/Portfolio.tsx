@@ -4,7 +4,7 @@ import axiosInstance from '../../axiosConfig';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Portfolio.css';
 import PortfolioNavBar from './PortfolioNavBar/PortfolioNavBar';
-import Footer from './Footer/Footer';
+import PortfolioFooter from './PortfolioFooter/PortfolioFooter';
 
 interface User {
   firstName: string;
@@ -75,7 +75,7 @@ const Portfolio: React.FC = () => {
       {user ? (
         <>
           <Outlet context={{ user }} />
-          <Footer firstName={user.firstName} lastName={user.lastName} email={user.email} socialMediaLinks={user.socialMediaLinks} />
+          <PortfolioFooter firstName={user.firstName} lastName={user.lastName} email={user.email} socialMediaLinks={user.socialMediaLinks} />
         </>
       ) : (
         <p>Loading...</p>

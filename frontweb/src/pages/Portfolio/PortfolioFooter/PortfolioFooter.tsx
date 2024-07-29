@@ -1,9 +1,9 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import './Footer.css';
+import './PortfolioFooter.css';
 
-interface FooterProps {
+interface PortfolioFooterProps {
   firstName: string;
   lastName: string;
   email: string;
@@ -16,9 +16,9 @@ interface FooterProps {
   };
 }
 
-const Footer: React.FC<FooterProps> = ({ firstName, lastName, email, socialMediaLinks }) => {
+const PortfolioFooter: React.FC<PortfolioFooterProps> = ({ firstName, lastName, email, socialMediaLinks }) => {
   return (
-    <footer className="footer mt-auto text-center">
+    <div className="PortfolioFooter mt-auto text-center">
       <div className="container d-flex justify-content-between align-items-center">
         <div className="social-media-links">
           {socialMediaLinks?.github && (
@@ -62,8 +62,8 @@ const Footer: React.FC<FooterProps> = ({ firstName, lastName, email, socialMedia
           {/* Add more links as needed */}
         </div>
       </div>
-    </footer>
+    </div>
   );
 };
 
-export default Footer;
+export default PortfolioFooter;

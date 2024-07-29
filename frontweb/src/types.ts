@@ -86,6 +86,9 @@ export interface IActivity {
   manageParityInfoLine?: string;
   manageParityFriendsAllowed?: number;
   notificationSettings?: Map<string, Map<string, boolean>>;
+  emailNotification: boolean;
+  pushNotification: boolean;
+  smsNotification: boolean;
   interactions?: string[];
 }
 export interface Post {

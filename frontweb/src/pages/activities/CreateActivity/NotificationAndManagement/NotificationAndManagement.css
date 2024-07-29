@@ -49,6 +49,10 @@
   font-size: 1rem;
 }
 
+.notification-management-card input[type='checkbox'] {
+  margin-right: 0.5rem;
+}
+
 .notification-management-card .text-danger {
   color: red;
   font-size: 0.875rem;

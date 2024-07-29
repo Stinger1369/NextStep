@@ -9,10 +9,18 @@
   padding-bottom: 0.2rem;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+  transition: color 0.3s, background-color 0.3s;
 }
 
-.portfolio-navbar .navbar-toggler {
-  padding: 0.25rem 0.5rem;
+.portfolio-navbar .navbar-nav .nav-item .nav-link:hover {
+  color: #0056b3; /* Couleur au survol */
+  background-color: #e9ecef; /* Couleur de fond au survol */
+}
+
+.portfolio-navbar .navbar-nav .nav-item .nav-link.active {
+  color: #fff; /* Couleur active */
+  background-color: #007bff; /* Couleur de fond active */
+  border-radius: 0.25rem;
 }
 
 .portfolio-navbar .container-fluid {
