@@ -7,6 +7,7 @@ import { AppDispatch, RootState } from '../../redux/store';
 import { login } from '../../redux/features/auth/authSlice';
 import { createUserAndSetCurrent } from '../../redux/features/websocket/users/userWebsocketThunks/userWebsocketThunks';
 import { AxiosError } from 'axios';
+import Cookies from 'js-cookie';
 import './LoginComponent.css';
 
 const LoginComponent: React.FC = () => {
@@ -14,6 +15,14 @@ const LoginComponent: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [welcomeMessage, setWelcomeMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const userName = Cookies.get('userName');
+    if (userName) {
+      setWelcomeMessage(`Welcome back, ${userName}!`);
+    }
+  }, []);
 
   useEffect(() => {
     if (user?.images && user.images.length > 0) {
@@ -127,6 +136,7 @@ const LoginComponent: React.FC = () => {
 
   return (
     <div className="LoginComponent-container">
+      {welcomeMessage && <p className="LoginComponent-welcome-message">{welcomeMessage}</p>}
       {user ? (
         <div className="LoginComponent-user-info">
           {profileImage && <img src={profileImage} alt="Profile" className="LoginComponent-profile-image" />}
@@ -134,7 +144,7 @@ const LoginComponent: React.FC = () => {
           <p className="LoginComponent-profession">Profession: {user.profession || 'Not specified'}</p>
           <div className="LoginComponent-counters">
             <div className="LoginComponent-counter">
-              <p>Profile Pro Visits </p>
+              <p>Profile Pro Visits</p>
               <p>123</p>
             </div>
             <div className="LoginComponent-counter">

@@ -1,10 +1,11 @@
-// src/redux/features/auth/authSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '../../../axiosConfig';
 import { RootState } from '../../store';
 import { AxiosError } from 'axios';
-import { ApiError } from '../../../../src/types';
+import Cookies from 'js-cookie';
 import { updateUser } from '../user/userSlice';
+import { ApiError } from '../../../../src/types';
+
 // Définir les types et interfaces nécessaires
 interface Address {
   street?: string;
@@ -153,7 +154,9 @@ const authSlice = createSlice({
       localStorage.removeItem('user');
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
-      localStorage.clear();
+      Cookies.remove('user');
+      Cookies.remove('token');
+      Cookies.remove('refreshToken');
     },
     initializeAuthState: (state) => {
       state.user = JSON.parse(localStorage.getItem('user') || 'null');
@@ -183,6 +186,9 @@ const authSlice = createSlice({
           localStorage.setItem('user', JSON.stringify(action.payload.user));
           localStorage.setItem('token', action.payload.token);
           localStorage.setItem('refreshToken', action.payload.refreshToken);
+          Cookies.set('user', JSON.stringify(action.payload.user), { expires: 7, secure: true, sameSite: 'Strict' });
+          Cookies.set('token', action.payload.token, { expires: 7, secure: true, sameSite: 'Strict' });
+          Cookies.set('refreshToken', action.payload.refreshToken, { expires: 7, secure: true, sameSite: 'Strict' });
         }
       )
       .addCase(login.rejected, (state, action) => {
@@ -210,6 +216,8 @@ const authSlice = createSlice({
         state.refreshToken = action.payload.refreshToken;
         localStorage.setItem('token', action.payload.token);
         localStorage.setItem('refreshToken', action.payload.refreshToken);
+        Cookies.set('token', action.payload.token, { expires: 7, secure: true, sameSite: 'Strict' });
+        Cookies.set('refreshToken', action.payload.refreshToken, { expires: 7, secure: true, sameSite: 'Strict' });
       })
       .addCase(refreshToken.rejected, (state, action) => {
         state.status = 'failed';
@@ -259,6 +267,7 @@ const authSlice = createSlice({
         if (state.user && state.user._id === action.payload._id) {
           state.user = action.payload;
           localStorage.setItem('user', JSON.stringify(action.payload));
+          Cookies.set('user', JSON.stringify(action.payload), { expires: 7, secure: true, sameSite: 'Strict' });
         }
       });
   }

@@ -12,6 +12,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 import SearchDropdown from '../SearchDropdown/SearchDropdown';
 import './NavbarGlobal.css';
 import Cookies from 'js-cookie';
+import LogoutConfirmationModal from '../LogoutConfirmationModal';
 
 interface User {
   _id: string;
@@ -226,20 +227,7 @@ const NavbarGlobal: React.FC = () => {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={showLogoutModal} onHide={handleCloseLogoutModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Save Data</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Do you want to save your data in cookies for future login?</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => handleLogout(false)}>
-            No
-          </Button>
-          <Button variant="primary" onClick={() => handleLogout(true)}>
-            Yes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <LogoutConfirmationModal show={showLogoutModal} handleClose={handleCloseLogoutModal} handleSave={() => handleLogout(true)} handleDontSave={() => handleLogout(false)} />
     </>
   );
 };
