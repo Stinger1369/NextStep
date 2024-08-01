@@ -9,12 +9,10 @@ interface Address {
   country?: string;
 }
 
-interface SocialMediaLinks {
-  github?: string;
-  twitter?: string;
-  instagram?: string;
-  facebook?: string;
-  discord?: string;
+interface SocialMediaLink {
+  // Change to an array of links
+  platform: string;
+  url: string;
 }
 
 export interface IUser extends Document {
@@ -45,7 +43,7 @@ export interface IUser extends Document {
   company?: string;
   companyId?: string;
   companies?: mongoose.Types.ObjectId[];
-  socialMediaLinks?: SocialMediaLinks;
+  socialMediaLinks?: SocialMediaLink[]; // Updated to an array of SocialMediaLink
   slug: string;
 }
 
@@ -86,14 +84,13 @@ const UserSchema: Schema = new Schema({
   company: { type: String },
   companyId: { type: String },
   companies: [{ type: Schema.Types.ObjectId, ref: "Company" }],
-  socialMediaLinks: {
-    github: { type: String },
-    twitter: { type: String },
-    instagram: { type: String },
-    facebook: { type: String },
-    discord: { type: String },
-  },
-  slug: { type: String, unique: true},
+  socialMediaLinks: [
+    {
+      platform: { type: String, required: true },
+      url: { type: String, required: true },
+    },
+  ], // Updated to an array of objects
+  slug: { type: String, unique: true },
 });
 
 UserSchema.pre<IUser>("save", function (next) {

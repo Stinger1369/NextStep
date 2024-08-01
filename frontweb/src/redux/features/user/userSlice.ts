@@ -12,15 +12,13 @@ interface Address {
   country?: string;
 }
 
-interface socialMediaLinks {
-  github?: string;
-  twitter?: string;
-  instagram?: string;
-  facebook?: string;
-  discord?: string;
+// Modification ici pour SocialMediaLink comme un tableau
+interface SocialMediaLink {
+  platform: string;
+  url: string;
 }
 
-interface User {
+export interface User {
   _id: string;
   firstName?: string;
   lastName?: string;
@@ -43,7 +41,7 @@ interface User {
   company?: string;
   companyId?: string;
   companies?: string[];
-  socialMediaLinks?: socialMediaLinks;
+  socialMediaLinks?: SocialMediaLink[]; // Update here to match the new structure
 }
 
 interface UserState {

@@ -63,6 +63,7 @@ const MediaInfo: React.FC = () => {
 
         setIsSubmitting(false);
         setShowSuccessMessage(true);
+        formik.setFieldValue('images', []); // Clear the images from formik after submission
       }
     }
   });
@@ -80,8 +81,8 @@ const MediaInfo: React.FC = () => {
   }, [userData]);
 
   useEffect(() => {
-    setIsSaveDisabled(formik.values.images.length === 0 || (userData?.images?.length ?? 0) >= 5);
-  }, [formik.values.images, userData]);
+    setIsSaveDisabled(croppingImage !== null || formik.values.images.length === 0 || (userData?.images?.length ?? 0) >= 5);
+  }, [croppingImage, formik.values.images, userData]);
 
   const handleSingleImageUpload = async (image: { imageName: string; imageBase64: string }) => {
     if (user?._id && userData) {
@@ -94,6 +95,7 @@ const MediaInfo: React.FC = () => {
         };
         console.log('Updating user with media info:', updatedValues);
         await dispatch(updateUser({ id: user._id, userData: updatedValues }));
+        formik.setFieldValue('images', []); // Reset images after upload
       } catch (error) {
         if (error instanceof Error) {
           console.error('Error adding image:', error.message);
@@ -126,6 +128,7 @@ const MediaInfo: React.FC = () => {
         }));
 
         handleImageErrors(fixedResults);
+        formik.setFieldValue('images', []); // Reset images after upload
       } catch (error) {
         if (error instanceof Error) {
           console.error('Error adding images:', error.message);
@@ -144,7 +147,7 @@ const MediaInfo: React.FC = () => {
     const previews = validFiles.map((file) => URL.createObjectURL(file));
     setImagePreviews((prevPreviews) => [...prevPreviews, ...previews]);
     formik.setFieldValue('images', validFiles);
-    setIsSaveDisabled(validFiles.length === 0);
+    setIsSaveDisabled(validFiles.length === 0 && !croppingImage);
   };
 
   const handleDeleteImage = async (imageUrl: string, e: React.MouseEvent) => {
@@ -203,6 +206,9 @@ const MediaInfo: React.FC = () => {
     setCroppingImage(null);
     setCroppingFile(null);
     setCurrentImageIndex(null);
+
+    // Enable save button after cropping is done
+    setIsSaveDisabled(false);
   };
 
   const openCropModal = (src: string, index: number) => {

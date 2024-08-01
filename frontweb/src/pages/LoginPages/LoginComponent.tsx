@@ -10,6 +10,9 @@ import { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import './LoginComponent.css';
 
+// Importer l'interface User depuis authSlice ou userSlice
+import { User } from '../../redux/features/auth/authSlice'; // Ou userSlice si nécessaire
+
 const LoginComponent: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
@@ -105,17 +108,31 @@ const LoginComponent: React.FC = () => {
     }
   };
 
-  const isProfileComplete = (user: any): boolean => {
-    const requiredFields = ['firstName', 'lastName', 'email', 'profession', 'phone', 'dateOfBirth', 'bio'];
-    const addressFields = ['street', 'city', 'state', 'zipCode', 'country'];
+  const isProfileComplete = (user: User): boolean => {
+    const requiredFields: (keyof User)[] = ['firstName', 'lastName', 'email', 'profession', 'phone', 'dateOfBirth', 'bio'];
+    const addressFields: (keyof NonNullable<User['address']>)[] = ['street', 'city', 'state', 'zipCode', 'country'];
+
     const hasRequiredFields = requiredFields.every((field) => !!user[field]);
-    const hasAddressFields = user.address && addressFields.every((field) => !!user.address[field]);
+    const hasAddressFields = user.address && addressFields.every((field) => user.address && !!user.address[field]);
     const hasMedia = user.images && user.images.length > 0;
     const hasExperience = user.experience && user.experience.length > 0;
     const hasEducation = user.education && user.education.length > 0;
     const hasSkills = user.skills && user.skills.length > 0;
 
-    return hasRequiredFields && hasAddressFields && hasMedia && hasExperience && hasEducation && hasSkills;
+    return (
+      hasRequiredFields !== undefined &&
+      hasAddressFields !== undefined &&
+      hasMedia !== undefined &&
+      hasExperience !== undefined &&
+      hasEducation !== undefined &&
+      hasSkills !== undefined &&
+      hasRequiredFields &&
+      hasAddressFields &&
+      hasMedia &&
+      hasExperience &&
+      hasEducation &&
+      hasSkills
+    );
   };
 
   const formik = useFormik({

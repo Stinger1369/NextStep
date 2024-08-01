@@ -1,0 +1,23 @@
+.skills-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.skills-card h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.skills-card ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.skills-card li {
+  margin-bottom: 5px;
+  padding-left: 10px;
+  border-left: 2px solid #28a745;
+}

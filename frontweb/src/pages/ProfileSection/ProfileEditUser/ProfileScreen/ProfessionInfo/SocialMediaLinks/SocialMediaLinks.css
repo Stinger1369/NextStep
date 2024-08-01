@@ -1,0 +1,33 @@
+/* SocialMediaLinks.css */
+
+.social-media-links {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.social-media-links .form-group {
+  margin-bottom: 15px;
+}
+
+.social-media-links label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.social-media-links .form-control {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.social-media-links .btn {
+  margin-top: 10px;
+}
+
+.social-media-links .text-danger {
+  color: red;
+  font-size: 0.9rem;
+}

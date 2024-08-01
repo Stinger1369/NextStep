@@ -1,3 +1,5 @@
+// src/pages/ProfileSection/UserProfile/UserProfile.tsx
+
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
@@ -7,8 +9,17 @@ import { ThemeStatus } from '../../../redux/features/theme/themeSlice';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './UserProfile.css';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import ModalUserProfile from '../../../components/ModalUserProfile/ModalUserProfile';
+import ProfileHeader from './ProfileHeader/ProfileHeader';
+import ImageCarousel from './ImageCarousel/ImageCarousel';
+import PersonalInformation from './PersonalInformation/PersonalInformation';
+import ProfessionalInformation from './ProfessionalInformation/ProfessionalInformation';
+import SocialMediaLinks from './SocialMediaLinks/SocialMediaLinks';
+import VideoGallery from './VideoGallery/VideoGallery';
+import Experience from './Experience/Experience';
+import SkillsUserProfile from './SkillsUserProfile/SkillsUserProfile';
+import ProfileActions from './ProfileActions/ProfileActions'; // Import ProfileActions component
+import { User } from '../../../redux/features/user/userSlice';
 
 const UserProfile: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -18,13 +29,12 @@ const UserProfile: React.FC = () => {
   const authUser = useSelector((state: RootState) => state.auth.user);
   const user = useSelector((state: RootState) => state.user.user);
   const themeStatus = useSelector((state: RootState) => state.theme.themeStatus);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImageIndex, setModalImageIndex] = useState(0);
   const [themeLink, setThemeLink] = useState<HTMLLinkElement | null>(null);
   const [key, setKey] = useState(0);
 
-  // Lire la profession depuis le localStorage
+  // Read the profession from localStorage
   const profession = localStorage.getItem('userProfession') || location.state?.profession;
 
   useEffect(() => {
@@ -62,13 +72,13 @@ const UserProfile: React.FC = () => {
     removeTheme();
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = `/themes/${theme}.css?${new Date().getTime()}`; // Ajoute un paramètre unique pour forcer le rechargement
+    link.href = `/themes/${theme}.css?${new Date().getTime()}`; // Add a unique parameter to force reload
     document.head.appendChild(link);
     setThemeLink(link);
   };
 
   const removeTheme = () => {
-    // Supprimer tous les liens de thèmes existants
+    // Remove all existing theme links
     const themeLinks = document.querySelectorAll('link[href*="/themes/"]');
     themeLinks.forEach((link) => link.parentNode?.removeChild(link));
     setThemeLink(null);
@@ -92,18 +102,6 @@ const UserProfile: React.FC = () => {
     navigate('/profile-edit-user/personal-info');
   };
 
-  const handleNextImage = () => {
-    if (user?.images && user.images.length > 0) {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % user.images!.length);
-    }
-  };
-
-  const handlePrevImage = () => {
-    if (user?.images && user.images.length > 0) {
-      setCurrentImageIndex((prevIndex) => (prevIndex - 1 + user.images!.length) % user.images!.length);
-    }
-  };
-
   const openModal = (index: number) => {
     setModalImageIndex(index);
     setIsModalOpen(true);
@@ -113,149 +111,87 @@ const UserProfile: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  const handleNextModalImage = () => {
-    if (user?.images && user.images.length > 0) {
-      setModalImageIndex((prevIndex) => (prevIndex + 1) % user.images!.length);
-    }
-  };
-
-  const handlePrevModalImage = () => {
-    if (user?.images && user.images.length > 0) {
-      setModalImageIndex((prevIndex) => (prevIndex - 1 + user.images!.length) % user.images!.length);
-    }
-  };
-
   if (!user) {
-    return <div>Loading...</div>;
+    return <div className="loading-container">Loading...</div>;
   }
 
+  // Get the user's social media links
+  const socialMediaLinks = user.socialMediaLinks || [];
+
   return (
-    <div key={key} className="user-profile-container container mt-5">
-      <div className="profile-header position-relative">
-        <button className="btn btn-outline-secondary toggle-theme-btn" onClick={toggleTheme} style={{ position: 'absolute', right: '140px', top: '10px', zIndex: 1000 }}>
-          {themeStatus.theme_enabled ? 'Disable Theme' : 'Enable Theme'}
-        </button>
-        {authUser?._id === user._id && (
-          <button className="btn btn-outline-primary edit-profile-btn" onClick={handleEditProfile} style={{ position: 'absolute', right: '10px', top: '10px', zIndex: 1000 }}>
-            Edit My Profile
-          </button>
-        )}
-        {user.images && user.images.length > 0 && (
-          <div className="carousel mb-3">
-            {user.images.length > 1 && (
-              <button className="carousel-control-prev" onClick={handlePrevImage} aria-label="Previous image">
-                <FaArrowLeft />
-              </button>
-            )}
-            <div className="carousel-image-container">
-              {user.images.map((image, index) => (
-                <button
-                  key={index}
-                  className={`carousel-image ${index === currentImageIndex ? 'active' : ''}`}
-                  onClick={() => openModal(index)}
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      openModal(index);
-                    }
-                  }}
-                  aria-label={`Image ${index + 1}`}
-                  style={{ background: 'none', border: 'none', padding: 0 }}
-                >
-                  <img src={image} alt={`User ${index + 1}`} className="carousel-image-content" />
-                </button>
-              ))}
-            </div>
-            {user.images.length > 1 && (
-              <button className="carousel-control-next" onClick={handleNextImage} aria-label="Next image">
-                <FaArrowRight />
-              </button>
-            )}
-          </div>
-        )}
-        <h2 className="text-primary mt-3">
-          {user.firstName} {user.lastName}
-        </h2>
-        <p className="text-muted">{user.profession}</p>
-      </div>
-      <div className="Personal-Information">
-        <div className="profile-section">
-          <h3 className="text-secondary">Personal Information</h3>
-          <p>
-            <strong>Email:</strong> {user.email}
-          </p>
-          <p>
-            <strong>Phone:</strong> {user.phone}
-          </p>
-          <p>
-            <strong>Address:</strong> {user.address?.street}, {user.address?.city}, {user.address?.state}, {user.address?.zipCode}, {user.address?.country}
-          </p>
-        </div>
-        <div className="separator"></div>
-        <div className="social-media-links">
-          <h3 className="text-secondary">Social Media Links</h3>
-          <p>
-            <strong>Github:</strong> {user.socialMediaLinks?.github}
-          </p>
-          <p>
-            <strong>Twitter:</strong> {user.socialMediaLinks?.twitter}
-          </p>
-          <p>
-            <strong>Instagram:</strong> {user.socialMediaLinks?.instagram}
-          </p>
-          <p>
-            <strong>Facebook:</strong> {user.socialMediaLinks?.facebook}
-          </p>
-          <p>
-            <strong>Discord:</strong> {user.socialMediaLinks?.discord}
-          </p>
+    <div key={key} className="user-profile-container">
+      {/* Profile Header Card */}
+      <div className="userProfile-card">
+        <div className="userProfile-card-body">
+          {/* Pass only the user prop to ProfileHeader */}
+          <ProfileHeader user={user} />
         </div>
       </div>
-      <div className="row profile-section mt-4">
-        <div className="col-md-6">
-          <h3 className="text-secondary">Professional Information</h3>
-          <p>
-            <strong>Profession:</strong> {user.profession}
-          </p>
-          <p>
-            <strong>Bio:</strong> {user.bio}
-          </p>
-          <div>
-            <strong>Education:</strong>
-            <ul>{user.education?.map((edu, index) => <li key={index}>{edu}</li>)}</ul>
-          </div>
-          <div className="hobbies-section">
-            <h3 className="text-secondary">Hobbies</h3>
-            <ul>{user.hobbies?.map((hobby, index) => <li key={index}>{hobby}</li>)}</ul>
-          </div>
-        </div>
-        <div className="col-md-6 UserProfile-vertical-line">
-          <h3 className="text-secondary">Experience</h3>
-          <div>
-            <strong>Experience:</strong>
-            <ul>{user.experience?.map((exp, index) => <li key={index}>{exp}</li>)}</ul>
-          </div>
-          <div>
-            <strong>Skills:</strong>
-            <ul>{user.skills?.map((skill, index) => <li key={index}>{skill}</li>)}</ul>
-          </div>
+
+      {/* Profile Actions Card */}
+      <div className="userProfile-card">
+        <div className="userProfile-card-body">
+          <ProfileActions themeEnabled={themeStatus.theme_enabled} toggleTheme={toggleTheme} showEditButton={authUser?._id === user._id} handleEditProfile={handleEditProfile} />
         </div>
       </div>
-      <div className="profile-section mt-4">
-        <h3 className="text-secondary">Videos</h3>
-        {user.videos && user.videos.length > 0 ? (
-          <div className="video-gallery d-flex overflow-auto">
-            {user.videos.map((video, index) => (
-              <video key={index} controls className="video-thumbnail mr-2 mb-2">
-                <track kind="captions" />
-              </video>
-            ))}
-          </div>
-        ) : (
-          <p>No videos available</p>
-        )}
+
+      {/* Image Carousel Card */}
+      <div className="userProfile-card">
+        <div className="userProfile-card-body">{user.images && <ImageCarousel images={user.images} openModal={openModal} />}</div>
       </div>
-      {user.images && <ModalUserProfile images={user.images} currentIndex={modalImageIndex} isOpen={isModalOpen} onClose={closeModal} onNext={handleNextModalImage} onPrev={handlePrevModalImage} />}
+
+      {/* Personal Information Card */}
+      <div className="userProfile-card">
+        <div className="userProfile-card-body">
+          <PersonalInformation user={user} />
+        </div>
+      </div>
+
+      {/* Social Media Links Card */}
+      <div className="userProfile-card">
+        <div className="userProfile-card-body">
+          <SocialMediaLinks socialMediaLinks={socialMediaLinks} />
+        </div>
+      </div>
+
+      {/* Professional Information Card */}
+      <div className="userProfile-card">
+        <div className="userProfile-card-body">
+          <ProfessionalInformation user={user} />
+        </div>
+      </div>
+
+      {/* Experience Card */}
+      <div className="userProfile-card">
+        <div className="userProfile-card-body">
+          <Experience experience={user.experience} />
+        </div>
+      </div>
+
+      {/* Skills Card */}
+      <div className="userProfile-card">
+        <div className="userProfile-card-body">
+          <SkillsUserProfile skills={user.skills} />
+        </div>
+      </div>
+
+      {/* Video Gallery Card */}
+      <div className="userProfile-card">
+        <div className="userProfile-card-body">
+          <VideoGallery videos={user.videos || []} />
+        </div>
+      </div>
+
+      {user.images && (
+        <ModalUserProfile
+          images={user.images}
+          currentIndex={modalImageIndex}
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onNext={() => setModalImageIndex((prevIndex) => (prevIndex + 1) % user.images!.length)}
+          onPrev={() => setModalImageIndex((prevIndex) => (prevIndex - 1 + user.images!.length) % user.images!.length)}
+        />
+      )}
     </div>
   );
 };

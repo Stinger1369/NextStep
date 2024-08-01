@@ -1,0 +1,43 @@
+.carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-image-container {
+  display: flex;
+  overflow: hidden;
+  max-width: 100%;
+  justify-content: center;
+}
+
+.carousel-image {
+  transition: transform 0.3s ease-in-out;
+  cursor: pointer;
+  outline: none;
+}
+
+.carousel-image.active {
+  transform: scale(1.05);
+}
+
+.carousel-image-content {
+  max-height: 300px;
+  max-width: 100%;
+  border-radius: 5px;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  color: #333;
+  cursor: pointer;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  color: #007bff;
+}

@@ -1,0 +1,20 @@
+.social-media-links {
+  margin-top: 20px;
+}
+
+.social-media-links p {
+  margin: 10px 0;
+}
+
+.text-secondary {
+  color: #6c757d;
+}
+
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}

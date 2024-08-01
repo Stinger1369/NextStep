@@ -1,3 +1,5 @@
+// redux/features/auth/authSlice.ts
+
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '../../../axiosConfig';
 import { RootState } from '../../store';
@@ -15,15 +17,13 @@ interface Address {
   country?: string;
 }
 
-interface socialMediaLinks {
-  github?: string;
-  twitter?: string;
-  instagram?: string;
-  facebook?: string;
-  discord?: string;
+// Modifiez ici pour SocialMediaLink comme un tableau
+interface SocialMediaLink {
+  platform: string;
+  url: string;
 }
 
-interface User {
+export interface User {
   _id: string;
   firstName?: string;
   lastName?: string;
@@ -41,13 +41,13 @@ interface User {
   skills?: string[];
   images?: string[];
   videos?: string[];
-  hobbies?: string[]; // Ajouté pour les hobbies
+  hobbies?: string[];
   sex?: string;
   isVerified: boolean;
-  company?: string; // Pour les utilisateurs travaillant dans une seule entreprise
-  companyId?: string; // Pour les utilisateurs travaillant dans une seule entreprise
-  companies?: string[]; // Pour les utilisateurs gérant plusieurs entreprises
-  socialMediaLinks?: socialMediaLinks; // Liens de réseaux sociaux
+  company?: string;
+  companyId?: string;
+  companies?: string[];
+  socialMediaLinks?: SocialMediaLink[]; // Update here to reflect the new structure
 }
 
 interface AuthState {
