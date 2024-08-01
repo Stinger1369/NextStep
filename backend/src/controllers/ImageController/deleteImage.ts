@@ -19,7 +19,10 @@ export const deleteImage = async (
       throw new Error("Invalid image name");
     }
 
-    await axios.delete(`${config.imageServerURL}/server-image/delete-image/${id}/${filename}`);
+    const imageServerURL = `${config.imageServerURL}/delete-image/${id}/${filename}`;
+    console.log(`Image server URL: ${imageServerURL}`);
+
+    await axios.delete(imageServerURL);
     console.log(`Image ${filename} deleted from image server for user ${id}`);
 
     const user: IUser | null = await User.findById(id);
@@ -40,6 +43,10 @@ export const deleteImage = async (
     console.error(`Error deleting image: ${err.message}`, err);
     res
       .status(500)
-      .json({ message: "Error deleting image", error: err.message });
+      .json({
+        message: "Error deleting image",
+        error: err.message,
+        details: err.response?.data,
+      });
   }
 };

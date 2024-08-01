@@ -17,5 +17,3 @@ export const config = {
   maxImagesPerUser: parseInt(process.env.MAX_IMAGES_PER_USER || "5", 10),
   serverDomain: process.env.SERVER_DOMAIN || "localhost",
 };
-
-// Utiliser config.serverDomain pour reconstruire l'URL complète

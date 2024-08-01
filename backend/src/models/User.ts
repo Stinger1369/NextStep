@@ -113,6 +113,8 @@ UserSchema.pre<IUser>("save", function (next) {
 
   if (this.firstName && this.lastName) {
     this.slug = `${this.firstName.toLowerCase()}-${this.lastName.toLowerCase()}`;
+  } else if (!this.slug) {
+    this.slug = `user-${new Date().getTime()}`; // Slug unique basé sur timestamp
   }
 
   next();

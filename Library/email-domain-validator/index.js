@@ -1,4 +1,3 @@
-// index.js
 const allowedDomains = [
   "gmail.com",
   "facebook.com",
@@ -25,7 +24,7 @@ const allowedDomains = [
   "sfr.fr",
   "t-online.de",
   "mail.ru",
-  // Ajoutez d'autres domaines ici
+  "hotmail.fr",
 ];
 
 function validateEmailDomain(email) {
@@ -38,7 +37,13 @@ function validateEmailDomain(email) {
     throw new Error("Invalid email format");
   }
 
-  return allowedDomains.includes(domain);
+  if (!allowedDomains.includes(domain)) {
+    throw new Error(
+      "Invalid email domain. We do not accept fake or temporary emails."
+    );
+  }
+
+  return true;
 }
 
 module.exports = {

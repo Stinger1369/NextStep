@@ -7,6 +7,7 @@ from io import BytesIO
 import base64
 from dotenv import load_dotenv
 import os
+import hashlib
 
 # Charger les variables d'environnement depuis le fichier .env
 load_dotenv()
@@ -51,8 +52,6 @@ def save_image(url, user_id):
             "base64": image_base64
         }
 
-        #print("Sending image data:", data)  # Log the data being sent
-
         try:
             image_response = requests.post(f"{IMAGE_SERVER_URL}/ajouter-image", json=data)
             if image_response.status_code == 200 and 'link' in image_response.json():
@@ -65,9 +64,20 @@ def save_image(url, user_id):
             print(f"Request failed: {e}")
     return ""
 
+# Fonction pour générer un slug unique
+def generate_unique_slug(first_name, last_name, existing_slugs):
+    base_slug = f"{first_name.lower()}-{last_name.lower()}"
+    slug = base_slug
+    counter = 1
+    while slug in existing_slugs:
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+    return slug
+
 # Fonction pour générer des profils avec des noms et prénoms de différentes cultures
 def generate_profiles(n):
     profiles = []
+    existing_slugs = set(collection.distinct("slug"))
     for _ in range(n):
         locale = random.choice(['fr', 'ar', 'en'])
         if locale == 'fr':
@@ -82,9 +92,15 @@ def generate_profiles(n):
         email = fake.email()
         email = email.split('@')[0] + '@gmail.com'  # Replace domain with gmail.com
 
+        first_name = fake.first_name()
+        last_name = fake.last_name()
+        slug = generate_unique_slug(first_name, last_name, existing_slugs)
+        existing_slugs.add(slug)
+
         profile = {
-            'firstName': fake.first_name(),
-            'lastName': fake.last_name(),
+            'firstName': first_name,
+            'lastName': last_name,
+            'slug': slug,
             'email': email,
             'password': fake.password(length=10),
             'userType': random.choice(["employer", "recruiter", "jobSeeker"]),
@@ -130,7 +146,7 @@ def generate_profiles(n):
     return profiles
 
 # Générer et insérer des profils dans MongoDB
-profiles = generate_profiles(100)
+profiles = generate_profiles(10)
 if profiles:
     collection.insert_many(profiles)
     print("Profiles insérés avec succès !")

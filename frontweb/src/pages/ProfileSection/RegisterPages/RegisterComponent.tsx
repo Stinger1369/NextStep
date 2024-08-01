@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { AppDispatch } from '../../redux/store';
-import { registerUser } from '../../redux/features/auth/authRegister';
+import { AppDispatch } from '../../../redux/store';
+import { registerUser } from '../../../redux/features/auth/authRegister';
 import './RegisterComponent.css';
 
 const RegisterComponent: React.FC = () => {

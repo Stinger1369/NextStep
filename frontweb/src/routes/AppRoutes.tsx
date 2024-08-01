@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import Home from '../pages/Home/Home';
 import About from '../pages/About/About';
 import LoginComponent from '../pages/LoginPages/LoginComponent';
-import RegisterComponent from '../pages/RegisterPages/RegisterComponent';
+import RegisterComponent from '../pages/ProfileSection/RegisterPages/RegisterComponent';
 import PasswordResetComponent from '../pages/PasswordReset/PasswordReset/PasswordResetComponent';
 import Navbar from '../components/NavbarGlobal/NavbarGlobal';
 import VerifyEmailComponent from '../components/VerifyEmail/EmailVerificationComponent';

@@ -105,6 +105,19 @@ const LoginComponent: React.FC = () => {
     }
   };
 
+  const isProfileComplete = (user: any): boolean => {
+    const requiredFields = ['firstName', 'lastName', 'email', 'profession', 'phone', 'dateOfBirth', 'bio'];
+    const addressFields = ['street', 'city', 'state', 'zipCode', 'country'];
+    const hasRequiredFields = requiredFields.every((field) => !!user[field]);
+    const hasAddressFields = user.address && addressFields.every((field) => !!user.address[field]);
+    const hasMedia = user.images && user.images.length > 0;
+    const hasExperience = user.experience && user.experience.length > 0;
+    const hasEducation = user.education && user.education.length > 0;
+    const hasSkills = user.skills && user.skills.length > 0;
+
+    return hasRequiredFields && hasAddressFields && hasMedia && hasExperience && hasEducation && hasSkills;
+  };
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -156,8 +169,8 @@ const LoginComponent: React.FC = () => {
               <p>789</p>
             </div>
           </div>
-          <button className="LoginComponent-complete-profile-button" onClick={() => navigate('/role-selection')}>
-            Complete your profile
+          <button className="LoginComponent-complete-profile-button" onClick={() => navigate(isProfileComplete(user) ? '/profile-edit-user/personal-info' : '/role-selection')}>
+            {isProfileComplete(user) ? 'Edit your profile' : 'Complete your profile'}
           </button>
         </div>
       ) : (

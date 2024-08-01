@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaTimes, FaTrash, FaPlus } from 'react-icons/fa';
+import { FaArrowLeft, FaTimes, FaTrash, FaPlus, FaEdit } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './MediaInfo.css';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ import { addImage, addImages, deleteImage } from '../../../../../redux/features/
 import { userFriendlyMessages } from '../../../../../utils/errorMessages';
 import { encodeFileToBase64 } from '../../../../../utils/fileUtils';
 import { handleImageErrors, ImageError } from '../../../../../utils/errorHandler';
+import FileUploadCrop from '../../../../../components/FileUploadAndCrop/CropImage/FileUploadCrop';
 
 interface FormValues {
   images: File[];
@@ -25,10 +26,12 @@ const MediaInfo: React.FC = () => {
   const imageError = useSelector((state: RootState) => state.images.error);
   const imageErrors = useSelector((state: RootState) => state.images.imageErrors);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [maxImagesError, setMaxImagesError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
+  const [croppingImage, setCroppingImage] = useState<string | null>(null);
+  const [croppingFile, setCroppingFile] = useState<File | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState<number | null>(null);
 
   const formik = useFormik<FormValues>({
     initialValues: { images: [] },
@@ -144,10 +147,11 @@ const MediaInfo: React.FC = () => {
     setIsSaveDisabled(validFiles.length === 0);
   };
 
-  const handleDeleteImage = async (imageUrl: string) => {
+  const handleDeleteImage = async (imageUrl: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Stop the event from propagating to parent elements
     if (user?._id) {
       try {
-        const imageName = imageUrl.split('/').pop();
+        const imageName = imageUrl.split('/').pop(); // Extract image name correctly
         if (!imageName) {
           throw new Error('Invalid image URL');
         }
@@ -162,6 +166,50 @@ const MediaInfo: React.FC = () => {
         }
       }
     }
+  };
+
+  const handleCropComplete = async (croppedImage: Blob) => {
+    const newFile = new File([croppedImage], croppingFile?.name || 'cropped.jpg', {
+      type: croppingFile?.type || 'image/jpeg'
+    });
+    const preview = URL.createObjectURL(newFile);
+    if (currentImageIndex !== null && userData?.images) {
+      const updatedPreviews = [...imagePreviews];
+      updatedPreviews[currentImageIndex] = preview;
+      setImagePreviews(updatedPreviews);
+      const base64 = await encodeFileToBase64(newFile);
+      if (user) {
+        try {
+          // First, delete the old image
+          const oldImageUrl = userData.images[currentImageIndex];
+          const oldImageName = oldImageUrl.split('/').pop();
+          if (oldImageName) {
+            await dispatch(deleteImage({ userId: user._id, imageName: oldImageName })).unwrap();
+          }
+
+          // Then, add the new cropped image
+          await dispatch(addImage({ userId: user._id, imageName: newFile.name, imageBase64: base64 })).unwrap();
+
+          // Refresh the user data to get the updated image URLs
+          await dispatch(getUserById(user._id));
+        } catch (error) {
+          console.error('Error updating image:', error);
+        }
+      }
+    } else {
+      setImagePreviews((prevPreviews) => [...prevPreviews, preview]);
+      formik.setFieldValue('images', [...formik.values.images, newFile]);
+    }
+    setCroppingImage(null);
+    setCroppingFile(null);
+    setCurrentImageIndex(null);
+  };
+
+  const openCropModal = (src: string, index: number) => {
+    setCroppingImage(src);
+    setCurrentImageIndex(index);
+    const file = formik.values.images[index];
+    setCroppingFile(file);
   };
 
   return (
@@ -192,9 +240,21 @@ const MediaInfo: React.FC = () => {
           ) : null}
           <div className="image-previews">
             {imagePreviews.map((src, index) => (
-              <div key={index} className="image-preview-container">
+              <div
+                key={index}
+                className="image-preview-container"
+                role="button"
+                tabIndex={0}
+                onClick={() => openCropModal(src, index)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    openCropModal(src, index);
+                  }
+                }}
+              >
                 <img src={src} alt={`Preview ${index}`} />
-                <FaTrash className="delete-icon" onClick={() => handleDeleteImage(src)} />
+                <FaEdit className="edit-icon" onClick={() => openCropModal(src, index)} />
+                <FaTrash className="delete-icon" onClick={(e) => handleDeleteImage(src, e)} />
                 {imageErrors
                   .filter((error) => error.imageName === src.split('/').pop())
                   .map((error, i) => (
@@ -212,17 +272,12 @@ const MediaInfo: React.FC = () => {
             {userFriendlyMessages[imageError.code as keyof typeof userFriendlyMessages] || imageError.message.split(':')[0]}
           </div>
         )}
-        {maxImagesError && (
-          <div className="alert alert-danger" role="alert">
-            {maxImagesError}
-          </div>
-        )}
 
         <div className="button-container">
           <button type="submit" className="btn btn-primary" disabled={isSaveDisabled || isSubmitting}>
             {isSubmitting ? 'Saving...' : 'Save'}
           </button>
-          <button className="btn btn-success ms-2" onClick={() => navigate(`/user-profile/${user?._id}`)}>
+          <button type="button" className="btn btn-success ms-2" onClick={() => navigate(`/user-profile/${user?._id}`)}>
             Finish
           </button>
         </div>
@@ -233,6 +288,8 @@ const MediaInfo: React.FC = () => {
           <p>Your image has been added successfully.</p>
         </div>
       )}
+
+      {croppingImage && <FileUploadCrop imageSrc={croppingImage} onCropComplete={handleCropComplete} onClose={() => setCroppingImage(null)} />}
     </div>
   );
 };
