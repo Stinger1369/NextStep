@@ -26,7 +26,8 @@ const BioSkillsInfo: React.FC = () => {
     if (userData) {
       formik.setValues({
         bio: userData.bio || '',
-        experience: userData.experience && userData.experience.length > 0 ? userData.experience : [''],
+        experience:
+          userData.experience && userData.experience.length > 0 ? userData.experience : [''],
         education: userData.education && userData.education.length > 0 ? userData.education : [''],
         skills: userData.skills && userData.skills.length > 0 ? userData.skills : ['']
       });
@@ -83,7 +84,10 @@ const BioSkillsInfo: React.FC = () => {
   return (
     <div className="bio-skills-container">
       <div className="header-icons">
-        <FaArrowLeft className="icon" onClick={() => navigate('/profile-edit-user/profession-info')} />
+        <FaArrowLeft
+          className="icon"
+          onClick={() => navigate('/profile-edit-user/profession-info')}
+        />
         <FaTimes className="icon" onClick={() => navigate('/')} />
       </div>
       <FormikProvider value={formik}>
@@ -91,7 +95,9 @@ const BioSkillsInfo: React.FC = () => {
           <div className="form-group">
             <label htmlFor="bio">Bio</label>
             <textarea id="bio" {...formik.getFieldProps('bio')} className="form-control" />
-            {formik.touched.bio && formik.errors.bio ? <div className="text-danger">{formik.errors.bio}</div> : null}
+            {formik.touched.bio && formik.errors.bio ? (
+              <div className="text-danger">{formik.errors.bio}</div>
+            ) : null}
           </div>
 
           <div className="form-group">
@@ -102,11 +108,23 @@ const BioSkillsInfo: React.FC = () => {
                 <div>
                   {formik.values.experience.map((exp, index) => (
                     <div key={index} className="mb-2">
-                      <input type="text" {...formik.getFieldProps(`experience.${index}`)} className="form-control mb-1" />
-                      <button type="button" className="btn btn-danger me-2" onClick={() => arrayHelpers.remove(index)}>
+                      <input
+                        type="text"
+                        {...formik.getFieldProps(`experience.${index}`)}
+                        className="form-control mb-1"
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-danger me-2"
+                        onClick={() => arrayHelpers.remove(index)}
+                      >
                         Remove
                       </button>
-                      <button type="button" className="btn btn-secondary" onClick={() => arrayHelpers.insert(index + 1, '')}>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => arrayHelpers.insert(index + 1, '')}
+                      >
                         Add
                       </button>
                     </div>
@@ -124,11 +142,23 @@ const BioSkillsInfo: React.FC = () => {
                 <div>
                   {formik.values.education.map((edu, index) => (
                     <div key={index} className="mb-2">
-                      <input type="text" {...formik.getFieldProps(`education.${index}`)} className="form-control mb-1" />
-                      <button type="button" className="btn btn-danger me-2" onClick={() => arrayHelpers.remove(index)}>
+                      <input
+                        type="text"
+                        {...formik.getFieldProps(`education.${index}`)}
+                        className="form-control mb-1"
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-danger me-2"
+                        onClick={() => arrayHelpers.remove(index)}
+                      >
                         Remove
                       </button>
-                      <button type="button" className="btn btn-secondary" onClick={() => arrayHelpers.insert(index + 1, '')}>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => arrayHelpers.insert(index + 1, '')}
+                      >
                         Add
                       </button>
                     </div>
@@ -146,11 +176,23 @@ const BioSkillsInfo: React.FC = () => {
                 <div>
                   {formik.values.skills.map((skill, index) => (
                     <div key={index} className="mb-2">
-                      <input type="text" {...formik.getFieldProps(`skills.${index}`)} className="form-control mb-1" />
-                      <button type="button" className="btn btn-danger me-2" onClick={() => arrayHelpers.remove(index)}>
+                      <input
+                        type="text"
+                        {...formik.getFieldProps(`skills.${index}`)}
+                        className="form-control mb-1"
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-danger me-2"
+                        onClick={() => arrayHelpers.remove(index)}
+                      >
                         Remove
                       </button>
-                      <button type="button" className="btn btn-secondary" onClick={() => arrayHelpers.insert(index + 1, '')}>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => arrayHelpers.insert(index + 1, '')}
+                      >
                         Add
                       </button>
                     </div>
@@ -161,7 +203,12 @@ const BioSkillsInfo: React.FC = () => {
           </div>
 
           <div className="button-container">
-            <button type="button" className="btn btn-secondary" onClick={handleSave} disabled={isSubmitting}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleSave}
+              disabled={isSubmitting}
+            >
               {isSubmitting ? 'Saving...' : 'Save'}
             </button>
             <button type="submit" className="btn btn-primary" disabled={isSubmitting}>

@@ -72,9 +72,19 @@ const AboutSection: React.FC = () => {
                   <i className="fas fa-chevron-left"></i>
                 </button>
               )}
-              <button type="button" className="about-image-button" onClick={handleImageClick} onKeyDown={handleKeyDown} aria-label={`Image of ${user.firstName} ${user.lastName}`}>
+              <button
+                type="button"
+                className="about-image-button"
+                onClick={handleImageClick}
+                onKeyDown={handleKeyDown}
+                aria-label={`Image of ${user.firstName} ${user.lastName}`}
+              >
                 <div className="image-container">
-                  <img src={user.images[currentIndex]} alt={`${user.firstName} ${user.lastName}`} className="about-image img-thumbnail" />
+                  <img
+                    src={user.images[currentIndex]}
+                    alt={`${user.firstName} ${user.lastName}`}
+                    className="about-image img-thumbnail"
+                  />
                 </div>
               </button>
               {user.images.length > 1 && (
@@ -97,12 +107,21 @@ const AboutSection: React.FC = () => {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title">{`${user.firstName} ${user.lastName}`}</h5>
-                    <button type="button" className="close" aria-label="Close" onClick={handleCloseModal}>
+                    <button
+                      type="button"
+                      className="close"
+                      aria-label="Close"
+                      onClick={handleCloseModal}
+                    >
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </div>
                   <div className="modal-body">
-                    <img src={user.images[currentIndex]} alt={`${user.firstName} ${user.lastName}`} className="img-fluid" />
+                    <img
+                      src={user.images[currentIndex]}
+                      alt={`${user.firstName} ${user.lastName}`}
+                      className="img-fluid"
+                    />
                   </div>
                 </div>
               </div>

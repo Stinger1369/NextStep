@@ -9,7 +9,11 @@ export interface ConversationGetAllSuccessData {
   conversations: Conversation[];
 }
 
-export function createConversation(receiverId: string, name: string, initialMessage: string): Promise<string> {
+export function createConversation(
+  receiverId: string,
+  name: string,
+  initialMessage: string
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const senderId = localStorage.getItem('currentUserId');
     const senderFirstName = localStorage.getItem('currentUserFirstName');
@@ -17,7 +21,13 @@ export function createConversation(receiverId: string, name: string, initialMess
     const receiverFirstName = localStorage.getItem('currentReceiverFirstName');
     const receiverLastName = localStorage.getItem('currentReceiverLastName');
 
-    if (!senderId || !senderFirstName || !senderLastName || !receiverFirstName || !receiverLastName) {
+    if (
+      !senderId ||
+      !senderFirstName ||
+      !senderLastName ||
+      !receiverFirstName ||
+      !receiverLastName
+    ) {
       reject(new Error('User or receiver details are missing'));
       return;
     }

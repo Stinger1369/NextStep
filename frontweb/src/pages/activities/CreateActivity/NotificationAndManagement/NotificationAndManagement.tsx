@@ -5,7 +5,8 @@ import { IActivity } from '../../../../types';
 import './NotificationAndManagement.css';
 
 const NotificationAndManagement: React.FC = () => {
-  const { values, handleChange, handleBlur, setFieldValue, touched, errors } = useFormikContext<IActivity>();
+  const { values, handleChange, handleBlur, setFieldValue, touched, errors } =
+    useFormikContext<IActivity>();
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
@@ -19,19 +20,47 @@ const NotificationAndManagement: React.FC = () => {
         <div className="card-body">
           <div className="form-group">
             <label htmlFor="emailNotification">Email Notification</label>
-            <input id="emailNotification" name="emailNotification" type="checkbox" onChange={handleCheckboxChange} onBlur={handleBlur} checked={values.emailNotification} />
+            <input
+              id="emailNotification"
+              name="emailNotification"
+              type="checkbox"
+              onChange={handleCheckboxChange}
+              onBlur={handleBlur}
+              checked={values.emailNotification}
+            />
           </div>
           <div className="form-group">
             <label htmlFor="pushNotification">Push Notification</label>
-            <input id="pushNotification" name="pushNotification" type="checkbox" onChange={handleCheckboxChange} onBlur={handleBlur} checked={values.pushNotification} />
+            <input
+              id="pushNotification"
+              name="pushNotification"
+              type="checkbox"
+              onChange={handleCheckboxChange}
+              onBlur={handleBlur}
+              checked={values.pushNotification}
+            />
           </div>
           <div className="form-group">
             <label htmlFor="smsNotification">SMS Notification</label>
-            <input id="smsNotification" name="smsNotification" type="checkbox" onChange={handleCheckboxChange} onBlur={handleBlur} checked={values.smsNotification} />
+            <input
+              id="smsNotification"
+              name="smsNotification"
+              type="checkbox"
+              onChange={handleCheckboxChange}
+              onBlur={handleBlur}
+              checked={values.smsNotification}
+            />
           </div>
           <div className="form-group">
             <label htmlFor="manageParityIsSelected">Manage Parity</label>
-            <input id="manageParityIsSelected" name="manageParityIsSelected" type="checkbox" onChange={handleCheckboxChange} onBlur={handleBlur} checked={values.manageParityIsSelected} />
+            <input
+              id="manageParityIsSelected"
+              name="manageParityIsSelected"
+              type="checkbox"
+              onChange={handleCheckboxChange}
+              onBlur={handleBlur}
+              checked={values.manageParityIsSelected}
+            />
           </div>
           {values.manageParityIsSelected && (
             <>
@@ -46,12 +75,24 @@ const NotificationAndManagement: React.FC = () => {
                   value={values.manageParityMalePercentage}
                   className="form-control"
                 />
-                {touched.manageParityMalePercentage && errors.manageParityMalePercentage && <div className="text-danger">{errors.manageParityMalePercentage}</div>}
+                {touched.manageParityMalePercentage && errors.manageParityMalePercentage && (
+                  <div className="text-danger">{errors.manageParityMalePercentage}</div>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="manageParityInfoLine">Parity Info Line</label>
-                <input id="manageParityInfoLine" name="manageParityInfoLine" type="text" onChange={handleChange} onBlur={handleBlur} value={values.manageParityInfoLine} className="form-control" />
-                {touched.manageParityInfoLine && errors.manageParityInfoLine && <div className="text-danger">{errors.manageParityInfoLine}</div>}
+                <input
+                  id="manageParityInfoLine"
+                  name="manageParityInfoLine"
+                  type="text"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.manageParityInfoLine}
+                  className="form-control"
+                />
+                {touched.manageParityInfoLine && errors.manageParityInfoLine && (
+                  <div className="text-danger">{errors.manageParityInfoLine}</div>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="manageParityFriendsAllowed">Friends Allowed by Parity</label>
@@ -64,7 +105,9 @@ const NotificationAndManagement: React.FC = () => {
                   value={values.manageParityFriendsAllowed}
                   className="form-control"
                 />
-                {touched.manageParityFriendsAllowed && errors.manageParityFriendsAllowed && <div className="text-danger">{errors.manageParityFriendsAllowed}</div>}
+                {touched.manageParityFriendsAllowed && errors.manageParityFriendsAllowed && (
+                  <div className="text-danger">{errors.manageParityFriendsAllowed}</div>
+                )}
               </div>
             </>
           )}

@@ -14,21 +14,27 @@ const handleAsyncError = (error: unknown): string => {
 };
 
 // Action asynchrone pour récupérer le statut du thème
-export const getThemeStatus = createAsyncThunk('theme/getThemeStatus', async ({ userId, profession }: { userId: string; profession: string }, thunkAPI) => {
-  try {
-    const response = await fetchThemeStatus(userId, profession);
-    return response.data;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(handleAsyncError(error));
+export const getThemeStatus = createAsyncThunk(
+  'theme/getThemeStatus',
+  async ({ userId, profession }: { userId: string; profession: string }, thunkAPI) => {
+    try {
+      const response = await fetchThemeStatus(userId, profession);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(handleAsyncError(error));
+    }
   }
-});
+);
 
 // Action asynchrone pour basculer le thème
-export const changeThemeStatus = createAsyncThunk('theme/changeThemeStatus', async ({ userId, profession }: { userId: string; profession: string }, thunkAPI) => {
-  try {
-    const response = await toggleTheme(userId, profession);
-    return response.data;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(handleAsyncError(error));
+export const changeThemeStatus = createAsyncThunk(
+  'theme/changeThemeStatus',
+  async ({ userId, profession }: { userId: string; profession: string }, thunkAPI) => {
+    try {
+      const response = await toggleTheme(userId, profession);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(handleAsyncError(error));
+    }
   }
-});
+);

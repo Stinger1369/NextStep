@@ -1,8 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
-import { createComment, getAllComments, CommentCreatedSuccessData } from '../../../websocket/commentWebSocket';
-import { fetchCommentsRequest, fetchCommentsSuccess, fetchCommentsFailure, addComment } from '../../../redux/features/websocket/comments/commentSlice';
+import {
+  createComment,
+  getAllComments,
+  CommentCreatedSuccessData
+} from '../../../websocket/commentWebSocket';
+import {
+  fetchCommentsRequest,
+  fetchCommentsSuccess,
+  fetchCommentsFailure,
+  addComment
+} from '../../../redux/features/websocket/comments/commentSlice';
 import { selectCommentsWithDatesByPostId } from '../../../redux/selectors';
 import { TextField, Button, Typography, CircularProgress } from '@mui/material';
 import CommentList from '../../../components/CommentCard/CommentList';
@@ -16,7 +25,9 @@ interface CommentSectionProps {
 
 const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   const [content, setContent] = useState('');
-  const comments = useSelector((state: RootState) => selectCommentsWithDatesByPostId(state, postId));
+  const comments = useSelector((state: RootState) =>
+    selectCommentsWithDatesByPostId(state, postId)
+  );
   const loading = useSelector((state: RootState) => state.comments.loading);
   const error = useSelector((state: RootState) => state.comments.error);
   const dispatch = useDispatch<AppDispatch>();
@@ -93,7 +104,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   return (
     <div className="comment-section">
       <div>
-        <TextField label="Write your comment here" multiline rows={2} value={content} onChange={(e) => setContent(e.target.value)} variant="outlined" fullWidth />
+        <TextField
+          label="Write your comment here"
+          multiline
+          rows={2}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          variant="outlined"
+          fullWidth
+        />
         <Button variant="contained" color="primary" onClick={handleCreateComment}>
           Comment
         </Button>

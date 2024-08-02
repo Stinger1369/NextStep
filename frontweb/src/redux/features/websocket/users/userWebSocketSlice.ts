@@ -52,6 +52,14 @@ const userWebSocketSlice = createSlice({
   }
 });
 
-export const { createUserRequest, createUserSuccess, createUserFailure, fetchUserRequest, fetchUserSuccess, fetchUserFailure, setCurrentUser } = userWebSocketSlice.actions;
+export const {
+  createUserRequest,
+  createUserSuccess,
+  createUserFailure,
+  fetchUserRequest,
+  fetchUserSuccess,
+  fetchUserFailure,
+  setCurrentUser
+} = userWebSocketSlice.actions;
 
 export default userWebSocketSlice.reducer;

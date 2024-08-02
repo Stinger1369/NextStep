@@ -1,5 +1,10 @@
 import { AppDispatch } from '../../../store';
-import { likePostSuccess, unlikePostSuccess, sharePostSuccess, repostPostSuccess } from './postSlice';
+import {
+  likePostSuccess,
+  unlikePostSuccess,
+  sharePostSuccess,
+  repostPostSuccess
+} from './postSlice';
 import { likeEntity, unlikeEntity } from '../../../../websocket/likeWebSocket';
 import { sendMessage } from '../../../../websocket/websocket';
 import { Like, Unlike, Share } from '../../../../types';

@@ -8,7 +8,10 @@ import './ProfessionInfo.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../../redux/store';
 import { updateUser, getUserById } from '../../../../../redux/features/user/userSlice';
-import { changeThemeStatus, getThemeStatus } from '../../../../../redux/features/theme/thunks/themeThunk';
+import {
+  changeThemeStatus,
+  getThemeStatus
+} from '../../../../../redux/features/theme/thunks/themeThunk';
 import { getProfessionTheme } from '../../../../../utils/professionHelper';
 
 import ProfessionCompanyInfo from './ProfessionCompanyInfo/ProfessionCompanyInfo';

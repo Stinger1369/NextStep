@@ -45,8 +45,6 @@ You can learn more in the [Create React App documentation](https://facebook.gith
 
 To learn React, check out the [React documentation](https://reactjs.org/).
 
-
-
 Informations personnelles (prénom, nom, sexe, téléphone, date de naissance)
 Adresse (rue, ville, état, code postal, pays)
 Profession et entreprise (profession, entreprise)

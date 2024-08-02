@@ -17,70 +17,85 @@ const initialState: ActivityState = {
   error: null
 };
 
-export const fetchActivities = createAsyncThunk('activities/fetchActivities', async (_, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.get<IActivity[]>('/activities');
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      return rejectWithValue(error.response.data);
-    } else {
-      return rejectWithValue('An unexpected error occurred');
+export const fetchActivities = createAsyncThunk(
+  'activities/fetchActivities',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get<IActivity[]>('/activities');
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        return rejectWithValue(error.response.data);
+      } else {
+        return rejectWithValue('An unexpected error occurred');
+      }
     }
   }
-});
+);
 
-export const fetchActivityById = createAsyncThunk('activities/fetchActivityById', async (id: string, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.get<IActivity>(`/activities/${id}`);
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      return rejectWithValue(error.response.data);
-    } else {
-      return rejectWithValue('An unexpected error occurred');
+export const fetchActivityById = createAsyncThunk(
+  'activities/fetchActivityById',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get<IActivity>(`/activities/${id}`);
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        return rejectWithValue(error.response.data);
+      } else {
+        return rejectWithValue('An unexpected error occurred');
+      }
     }
   }
-});
+);
 
-export const createActivity = createAsyncThunk('activities/createActivity', async (activity: IActivity, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.post<IActivity>('/activities', activity);
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      return rejectWithValue(error.response.data);
-    } else {
-      return rejectWithValue('An unexpected error occurred');
+export const createActivity = createAsyncThunk(
+  'activities/createActivity',
+  async (activity: IActivity, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post<IActivity>('/activities', activity);
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        return rejectWithValue(error.response.data);
+      } else {
+        return rejectWithValue('An unexpected error occurred');
+      }
     }
   }
-});
+);
 
-export const updateActivity = createAsyncThunk('activities/updateActivity', async ({ id, activity }: { id: string; activity: Partial<IActivity> }, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.put<IActivity>(`/activities/${id}`, activity);
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      return rejectWithValue(error.response.data);
-    } else {
-      return rejectWithValue('An unexpected error occurred');
+export const updateActivity = createAsyncThunk(
+  'activities/updateActivity',
+  async ({ id, activity }: { id: string; activity: Partial<IActivity> }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.put<IActivity>(`/activities/${id}`, activity);
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        return rejectWithValue(error.response.data);
+      } else {
+        return rejectWithValue('An unexpected error occurred');
+      }
     }
   }
-});
+);
 
-export const deleteActivity = createAsyncThunk('activities/deleteActivity', async (id: string, { rejectWithValue }) => {
-  try {
-    await axiosInstance.delete(`/activities/${id}`);
-    return id;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      return rejectWithValue(error.response.data);
-    } else {
-      return rejectWithValue('An unexpected error occurred');
+export const deleteActivity = createAsyncThunk(
+  'activities/deleteActivity',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await axiosInstance.delete(`/activities/${id}`);
+      return id;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        return rejectWithValue(error.response.data);
+      } else {
+        return rejectWithValue('An unexpected error occurred');
+      }
     }
   }
-});
+);
 
 const activitySlice = createSlice({
   name: 'activities',

@@ -40,8 +40,16 @@ const PasswordResetRequestComponent: React.FC = () => {
       {message && <div className="message">{message}</div>}
       <form onSubmit={formik.handleSubmit} className="password-reset-request-form">
         <div className="form-field">
-          <input type="text" id="email" {...formik.getFieldProps('email')} placeholder="Email or Phone" className={`input ${formik.touched.email && formik.errors.email ? 'error-input' : ''}`} />
-          {formik.touched.email && formik.errors.email ? <div className="error">{formik.errors.email}</div> : null}
+          <input
+            type="text"
+            id="email"
+            {...formik.getFieldProps('email')}
+            placeholder="Email or Phone"
+            className={`input ${formik.touched.email && formik.errors.email ? 'error-input' : ''}`}
+          />
+          {formik.touched.email && formik.errors.email ? (
+            <div className="error">{formik.errors.email}</div>
+          ) : null}
         </div>
         <button type="submit" className="submit-button" disabled={formik.isSubmitting}>
           {formik.isSubmitting ? 'Submitting...' : 'Submit'}

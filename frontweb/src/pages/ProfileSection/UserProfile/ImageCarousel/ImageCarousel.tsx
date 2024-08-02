@@ -29,7 +29,11 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ images, openModal }) => {
       {images.length > 0 && (
         <>
           {images.length > 1 && (
-            <button className="carousel-control-prev" onClick={handlePrevImage} aria-label="Previous image">
+            <button
+              className="carousel-control-prev"
+              onClick={handlePrevImage}
+              aria-label="Previous image"
+            >
               <FaArrowLeft />
             </button>
           )}
@@ -54,7 +58,11 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ images, openModal }) => {
           </div>
 
           {images.length > 1 && (
-            <button className="carousel-control-next" onClick={handleNextImage} aria-label="Next image">
+            <button
+              className="carousel-control-next"
+              onClick={handleNextImage}
+              aria-label="Next image"
+            >
               <FaArrowRight />
             </button>
           )}

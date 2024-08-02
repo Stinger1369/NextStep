@@ -1,5 +1,10 @@
 import { AppDispatch } from '../../../store';
-import { fetchNotificationsRequest, fetchNotificationsSuccess, fetchNotificationsFailure, addNotification } from './notificationSlice';
+import {
+  fetchNotificationsRequest,
+  fetchNotificationsSuccess,
+  fetchNotificationsFailure,
+  addNotification
+} from './notificationSlice';
 import { getAllNotificationsByUser } from '../../../../websocket/notificationWebSocket';
 import { Notification } from '../../../../types';
 

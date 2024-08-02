@@ -6,24 +6,34 @@ body {
   padding: 0;
 }
 
+/* Heading styles */
 h1,
 h2,
 h3 {
   color: #0073b1;
 }
 
-.home-job {
-  /* max-width: 200%;
-  margin: 20px auto; */
+/* Container for HomeJob */
+.PostNews-homeJob {
   background-color: #fff;
+  padding: 10px;
+  margin: 10px auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.create-post {
+/* Create post section */
+.PostNews-createPost {
   display: flex;
   align-items: center;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
 }
 
-.post-card {
+/* Post card styles */
+.PostNews-postCard {
   background: #fff;
   border-radius: 8px;
   margin-bottom: 20px;
@@ -31,35 +41,41 @@ h3 {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.post-card h3 {
+/* Post card heading */
+.PostNews-postCard h3 {
   margin-top: 0;
   font-size: 1.2em;
   color: #0073b1;
 }
 
-.post-card p {
+/* Post card paragraph */
+.PostNews-postCard p {
   margin: 10px 0;
   font-size: 1em;
   line-height: 1.6;
 }
 
-.post-card .post-meta {
+/* Post meta info */
+.PostNews-postMeta {
   font-size: 0.9em;
   color: #777;
 }
 
-.comment-section {
+/* Comment section styling */
+.PostNews-commentSection {
   background: #f3f2ef;
   border-radius: 8px;
   padding: 20px;
 }
 
-.comment-list {
+/* Comment list styling */
+.PostNews-commentList {
   list-style: none;
   padding: 0;
 }
 
-.comment-card {
+/* Individual comment card */
+.PostNews-commentCard {
   background: #fff;
   border-radius: 8px;
   margin-bottom: 10px;
@@ -67,24 +83,28 @@ h3 {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.comment-card p {
+/* Comment text */
+.PostNews-commentCard p {
   margin: 0;
   font-size: 0.9em;
   line-height: 1.4;
 }
 
-.comment-card .comment-meta {
+/* Comment metadata */
+.PostNews-commentMeta {
   font-size: 0.8em;
   color: #777;
 }
 
-.button-group {
+/* Button group styling */
+.PostNews-buttonGroup {
   display: flex;
   justify-content: space-around;
   padding: 10px 0;
 }
 
-.button-group button {
+/* Button styling */
+.PostNews-buttonGroup button {
   font-size: 1em;
   padding: 10px 20px;
   background-color: #0073b1;
@@ -96,15 +116,18 @@ h3 {
   align-items: center;
 }
 
-.button-group button:hover {
+/* Button hover effect */
+.PostNews-buttonGroup button:hover {
   background-color: #005582;
 }
 
-.button-group button svg {
+/* SVG icon inside button */
+.PostNews-buttonGroup button svg {
   margin-right: 5px;
 }
 
-.post-stats {
+/* Post stats styling */
+.PostNews-postStats {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -112,15 +135,18 @@ h3 {
   padding-top: 10px;
 }
 
-.post-stats div {
+/* Post stats section */
+.PostNews-postStats div {
   display: flex;
   align-items: center;
 }
 
-.post-stats div svg {
+/* SVG icon in post stats */
+.PostNews-postStats div svg {
   margin-right: 5px;
 }
 
-.post-stats .likes {
+/* Likes styling */
+.PostNews-likes {
   color: #0073b1;
 }

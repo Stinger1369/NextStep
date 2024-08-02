@@ -95,19 +95,22 @@ export const login = createAsyncThunk(
   }
 );
 
-export const register = createAsyncThunk('auth/register', async (formData: FormData, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.post('/auth/register', formData);
-    return response.data;
-  } catch (error) {
-    if (isAxiosError(error)) {
-      if (error.response) {
-        return rejectWithValue(error.response.data as ApiError);
+export const register = createAsyncThunk(
+  'auth/register',
+  async (formData: FormData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post('/auth/register', formData);
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        if (error.response) {
+          return rejectWithValue(error.response.data as ApiError);
+        }
       }
+      throw error;
     }
-    throw error;
   }
-});
+);
 
 export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, { getState }) => {
   const state = getState() as RootState;
@@ -121,27 +124,39 @@ export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, { ge
   throw new Error('No refresh token available');
 });
 
-export const requestPasswordReset = createAsyncThunk('auth/requestPasswordReset', async (email: string) => {
-  await axiosInstance.post('/auth/request-password-reset', { email });
-});
+export const requestPasswordReset = createAsyncThunk(
+  'auth/requestPasswordReset',
+  async (email: string) => {
+    await axiosInstance.post('/auth/request-password-reset', { email });
+  }
+);
 
-export const resendVerificationCode = createAsyncThunk('auth/resendVerificationCode', async (email: string) => {
-  await axiosInstance.post('/auth/resend-verification-code', {
-    email
-  });
-});
+export const resendVerificationCode = createAsyncThunk(
+  'auth/resendVerificationCode',
+  async (email: string) => {
+    await axiosInstance.post('/auth/resend-verification-code', {
+      email
+    });
+  }
+);
 
-export const resetPassword = createAsyncThunk('auth/resetPassword', async ({ email, code, newPassword }: { email: string; code: string; newPassword: string }) => {
-  await axiosInstance.post('/auth/reset-password', {
-    email,
-    code,
-    newPassword
-  });
-});
+export const resetPassword = createAsyncThunk(
+  'auth/resetPassword',
+  async ({ email, code, newPassword }: { email: string; code: string; newPassword: string }) => {
+    await axiosInstance.post('/auth/reset-password', {
+      email,
+      code,
+      newPassword
+    });
+  }
+);
 
-export const verifyEmail = createAsyncThunk('auth/verifyEmail', async ({ email, code }: { email: string; code: string }) => {
-  await axiosInstance.post('/auth/verify-email', { email, code });
-});
+export const verifyEmail = createAsyncThunk(
+  'auth/verifyEmail',
+  async ({ email, code }: { email: string; code: string }) => {
+    await axiosInstance.post('/auth/verify-email', { email, code });
+  }
+);
 
 const authSlice = createSlice({
   name: 'auth',
@@ -186,9 +201,21 @@ const authSlice = createSlice({
           localStorage.setItem('user', JSON.stringify(action.payload.user));
           localStorage.setItem('token', action.payload.token);
           localStorage.setItem('refreshToken', action.payload.refreshToken);
-          Cookies.set('user', JSON.stringify(action.payload.user), { expires: 7, secure: true, sameSite: 'Strict' });
-          Cookies.set('token', action.payload.token, { expires: 7, secure: true, sameSite: 'Strict' });
-          Cookies.set('refreshToken', action.payload.refreshToken, { expires: 7, secure: true, sameSite: 'Strict' });
+          Cookies.set('user', JSON.stringify(action.payload.user), {
+            expires: 7,
+            secure: true,
+            sameSite: 'Strict'
+          });
+          Cookies.set('token', action.payload.token, {
+            expires: 7,
+            secure: true,
+            sameSite: 'Strict'
+          });
+          Cookies.set('refreshToken', action.payload.refreshToken, {
+            expires: 7,
+            secure: true,
+            sameSite: 'Strict'
+          });
         }
       )
       .addCase(login.rejected, (state, action) => {
@@ -210,18 +237,31 @@ const authSlice = createSlice({
       .addCase(refreshToken.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(refreshToken.fulfilled, (state, action: PayloadAction<{ token: string; refreshToken: string }>) => {
-        state.status = 'succeeded';
-        state.token = action.payload.token;
-        state.refreshToken = action.payload.refreshToken;
-        localStorage.setItem('token', action.payload.token);
-        localStorage.setItem('refreshToken', action.payload.refreshToken);
-        Cookies.set('token', action.payload.token, { expires: 7, secure: true, sameSite: 'Strict' });
-        Cookies.set('refreshToken', action.payload.refreshToken, { expires: 7, secure: true, sameSite: 'Strict' });
-      })
+      .addCase(
+        refreshToken.fulfilled,
+        (state, action: PayloadAction<{ token: string; refreshToken: string }>) => {
+          state.status = 'succeeded';
+          state.token = action.payload.token;
+          state.refreshToken = action.payload.refreshToken;
+          localStorage.setItem('token', action.payload.token);
+          localStorage.setItem('refreshToken', action.payload.refreshToken);
+          Cookies.set('token', action.payload.token, {
+            expires: 7,
+            secure: true,
+            sameSite: 'Strict'
+          });
+          Cookies.set('refreshToken', action.payload.refreshToken, {
+            expires: 7,
+            secure: true,
+            sameSite: 'Strict'
+          });
+        }
+      )
       .addCase(refreshToken.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload ? (action.payload as ApiError).message : 'Failed to refresh token';
+        state.error = action.payload
+          ? (action.payload as ApiError).message
+          : 'Failed to refresh token';
       })
       .addCase(requestPasswordReset.pending, (state) => {
         state.status = 'loading';
@@ -231,7 +271,9 @@ const authSlice = createSlice({
       })
       .addCase(requestPasswordReset.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload ? (action.payload as ApiError).message : 'Failed to request password reset';
+        state.error = action.payload
+          ? (action.payload as ApiError).message
+          : 'Failed to request password reset';
       })
       .addCase(resendVerificationCode.pending, (state) => {
         state.status = 'loading';
@@ -241,7 +283,9 @@ const authSlice = createSlice({
       })
       .addCase(resendVerificationCode.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload ? (action.payload as ApiError).message : 'Failed to resend verification code';
+        state.error = action.payload
+          ? (action.payload as ApiError).message
+          : 'Failed to resend verification code';
       })
       .addCase(resetPassword.pending, (state) => {
         state.status = 'loading';
@@ -251,7 +295,9 @@ const authSlice = createSlice({
       })
       .addCase(resetPassword.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload ? (action.payload as ApiError).message : 'Failed to reset password';
+        state.error = action.payload
+          ? (action.payload as ApiError).message
+          : 'Failed to reset password';
       })
       .addCase(verifyEmail.pending, (state) => {
         state.status = 'loading';
@@ -261,13 +307,19 @@ const authSlice = createSlice({
       })
       .addCase(verifyEmail.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload ? (action.payload as ApiError).message : 'Failed to verify email';
+        state.error = action.payload
+          ? (action.payload as ApiError).message
+          : 'Failed to verify email';
       })
       .addCase(updateUser.fulfilled, (state, action: PayloadAction<User>) => {
         if (state.user && state.user._id === action.payload._id) {
           state.user = action.payload;
           localStorage.setItem('user', JSON.stringify(action.payload));
-          Cookies.set('user', JSON.stringify(action.payload), { expires: 7, secure: true, sameSite: 'Strict' });
+          Cookies.set('user', JSON.stringify(action.payload), {
+            expires: 7,
+            secure: true,
+            sameSite: 'Strict'
+          });
         }
       });
   }

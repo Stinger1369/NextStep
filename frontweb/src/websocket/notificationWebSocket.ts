@@ -1,7 +1,16 @@
 import { WebSocketMessage, Notification } from '../types';
-import { sendMessage, addEventListener, removeEventListener, initializeWebSocket, addErrorListener } from './websocket';
+import {
+  sendMessage,
+  addEventListener,
+  removeEventListener,
+  initializeWebSocket,
+  addErrorListener
+} from './websocket';
 
-export function subscribeToNotifications(userId: string, callback: (notification: Notification) => void): () => void {
+export function subscribeToNotifications(
+  userId: string,
+  callback: (notification: Notification) => void
+): () => void {
   const message: WebSocketMessage = {
     type: 'notification.subscribe',
     payload: { userId }

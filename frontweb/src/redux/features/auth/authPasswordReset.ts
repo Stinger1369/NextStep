@@ -9,10 +9,11 @@ export const performRequestPasswordReset = (email: string) => async (dispatch: A
   }
 };
 
-export const performResetPassword = (email: string, code: string, newPassword: string) => async (dispatch: AppDispatch) => {
-  try {
-    await dispatch(resetPassword({ email, code, newPassword })).unwrap();
-  } catch (error) {
-    console.error('Reset password error:', error);
-  }
-};
+export const performResetPassword =
+  (email: string, code: string, newPassword: string) => async (dispatch: AppDispatch) => {
+    try {
+      await dispatch(resetPassword({ email, code, newPassword })).unwrap();
+    } catch (error) {
+      console.error('Reset password error:', error);
+    }
+  };

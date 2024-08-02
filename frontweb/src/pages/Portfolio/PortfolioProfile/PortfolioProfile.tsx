@@ -50,10 +50,13 @@ const PortfolioProfile: React.FC = () => {
             {user.phone && <p>Phone: {user.phone}</p>}
             {user.address && (
               <p>
-                Address: {user.address.street}, {user.address.city}, {user.address.state}, {user.address.zipCode}, {user.address.country}
+                Address: {user.address.street}, {user.address.city}, {user.address.state},{' '}
+                {user.address.zipCode}, {user.address.country}
               </p>
             )}
-            {user.dateOfBirth && <p>Date of Birth: {new Date(user.dateOfBirth).toLocaleDateString()}</p>}
+            {user.dateOfBirth && (
+              <p>Date of Birth: {new Date(user.dateOfBirth).toLocaleDateString()}</p>
+            )}
           </div>
         </div>
 
@@ -107,21 +110,33 @@ const PortfolioProfile: React.FC = () => {
               )}
               {user.socialMediaLinks?.instagram && (
                 <li className="list-inline-item">
-                  <a href={user.socialMediaLinks.instagram} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={user.socialMediaLinks.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <i className="fab fa-instagram"></i> Instagram
                   </a>
                 </li>
               )}
               {user.socialMediaLinks?.facebook && (
                 <li className="list-inline-item">
-                  <a href={user.socialMediaLinks.facebook} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={user.socialMediaLinks.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <i className="fab fa-facebook"></i> Facebook
                   </a>
                 </li>
               )}
               {user.socialMediaLinks?.linkedin && (
                 <li className="list-inline-item">
-                  <a href={user.socialMediaLinks.linkedin} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={user.socialMediaLinks.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <i className="fab fa-linkedin"></i> LinkedIn
                   </a>
                 </li>

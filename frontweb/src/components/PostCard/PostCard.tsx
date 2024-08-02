@@ -6,7 +6,12 @@ import CommentSection from '../../pages/Home/PostScreen/CommentSection';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUser } from '../../redux/features/websocket/users/userWebsocketThunks/userWebsocketThunks';
 import { RootState, AppDispatch } from '../../redux/store';
-import { likePost, unlikePost, sharePost, repostPost } from '../../redux/features/websocket/posts/postThunks';
+import {
+  likePost,
+  unlikePost,
+  sharePost,
+  repostPost
+} from '../../redux/features/websocket/posts/postThunks';
 
 interface PostCardProps {
   post: Post;

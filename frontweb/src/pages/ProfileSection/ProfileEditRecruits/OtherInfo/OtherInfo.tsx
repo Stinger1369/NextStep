@@ -3,7 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { RootState, AppDispatch } from '../../../../redux/store';
-import { updateCompany, getCompanyById, createCompany } from '../../../../redux/features/company/companySlice';
+import {
+  updateCompany,
+  getCompanyById,
+  createCompany
+} from '../../../../redux/features/company/companySlice';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FaArrowLeft, FaTimes } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -26,7 +30,9 @@ const OtherInfo: React.FC = () => {
       formik.setValues({
         website: company.website || '',
         description: company.description || '',
-        foundedDate: company.foundedDate ? new Date(company.foundedDate).toISOString().substr(0, 10) : '',
+        foundedDate: company.foundedDate
+          ? new Date(company.foundedDate).toISOString().substr(0, 10)
+          : '',
         companySize: company.companySize || '',
         headquarterLocation: company.headquarterLocation || '',
         subsidiaries: company.subsidiaries ? company.subsidiaries.join(', ') : '',
@@ -93,43 +99,107 @@ const OtherInfo: React.FC = () => {
       <form onSubmit={formik.handleSubmit}>
         <div className="form-group">
           <label htmlFor="website">Website:</label>
-          <input id="website" name="website" value={formik.values.website} onChange={formik.handleChange} onBlur={formik.handleBlur} className="form-control" />
-          {formik.touched.website && formik.errors.website ? <div className="text-danger">{formik.errors.website}</div> : null}
+          <input
+            id="website"
+            name="website"
+            value={formik.values.website}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="form-control"
+          />
+          {formik.touched.website && formik.errors.website ? (
+            <div className="text-danger">{formik.errors.website}</div>
+          ) : null}
         </div>
         <div className="form-group">
           <label htmlFor="description">Description:</label>
-          <input id="description" name="description" value={formik.values.description} onChange={formik.handleChange} onBlur={formik.handleBlur} className="form-control" />
-          {formik.touched.description && formik.errors.description ? <div className="text-danger">{formik.errors.description}</div> : null}
+          <input
+            id="description"
+            name="description"
+            value={formik.values.description}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="form-control"
+          />
+          {formik.touched.description && formik.errors.description ? (
+            <div className="text-danger">{formik.errors.description}</div>
+          ) : null}
         </div>
         <div className="form-group">
           <label htmlFor="foundedDate">Founded Date:</label>
-          <input id="foundedDate" name="foundedDate" type="date" value={formik.values.foundedDate} onChange={formik.handleChange} onBlur={formik.handleBlur} className="form-control" />
-          {formik.touched.foundedDate && formik.errors.foundedDate ? <div className="text-danger">{formik.errors.foundedDate}</div> : null}
+          <input
+            id="foundedDate"
+            name="foundedDate"
+            type="date"
+            value={formik.values.foundedDate}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="form-control"
+          />
+          {formik.touched.foundedDate && formik.errors.foundedDate ? (
+            <div className="text-danger">{formik.errors.foundedDate}</div>
+          ) : null}
         </div>
         <div className="form-group">
           <label htmlFor="companySize">Company Size:</label>
-          <select id="companySize" name="companySize" value={formik.values.companySize} onChange={formik.handleChange} onBlur={formik.handleBlur} className="form-control">
+          <select
+            id="companySize"
+            name="companySize"
+            value={formik.values.companySize}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="form-control"
+          >
             <option value="">Select</option>
             <option value="small">Small</option>
             <option value="medium">Medium</option>
             <option value="large">Large</option>
           </select>
-          {formik.touched.companySize && formik.errors.companySize ? <div className="text-danger">{formik.errors.companySize}</div> : null}
+          {formik.touched.companySize && formik.errors.companySize ? (
+            <div className="text-danger">{formik.errors.companySize}</div>
+          ) : null}
         </div>
         <div className="form-group">
           <label htmlFor="headquarterLocation">Headquarter Location:</label>
-          <input id="headquarterLocation" name="headquarterLocation" value={formik.values.headquarterLocation} onChange={formik.handleChange} onBlur={formik.handleBlur} className="form-control" />
-          {formik.touched.headquarterLocation && formik.errors.headquarterLocation ? <div className="text-danger">{formik.errors.headquarterLocation}</div> : null}
+          <input
+            id="headquarterLocation"
+            name="headquarterLocation"
+            value={formik.values.headquarterLocation}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="form-control"
+          />
+          {formik.touched.headquarterLocation && formik.errors.headquarterLocation ? (
+            <div className="text-danger">{formik.errors.headquarterLocation}</div>
+          ) : null}
         </div>
         <div className="form-group">
           <label htmlFor="subsidiaries">Subsidiaries:</label>
-          <input id="subsidiaries" name="subsidiaries" value={formik.values.subsidiaries} onChange={formik.handleChange} onBlur={formik.handleBlur} className="form-control" />
-          {formik.touched.subsidiaries && formik.errors.subsidiaries ? <div className="text-danger">{formik.errors.subsidiaries}</div> : null}
+          <input
+            id="subsidiaries"
+            name="subsidiaries"
+            value={formik.values.subsidiaries}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="form-control"
+          />
+          {formik.touched.subsidiaries && formik.errors.subsidiaries ? (
+            <div className="text-danger">{formik.errors.subsidiaries}</div>
+          ) : null}
         </div>
         <div className="form-group">
           <label htmlFor="certifications">Certifications:</label>
-          <input id="certifications" name="certifications" value={formik.values.certifications} onChange={formik.handleChange} onBlur={formik.handleBlur} className="form-control" />
-          {formik.touched.certifications && formik.errors.certifications ? <div className="text-danger">{formik.errors.certifications}</div> : null}
+          <input
+            id="certifications"
+            name="certifications"
+            value={formik.values.certifications}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="form-control"
+          />
+          {formik.touched.certifications && formik.errors.certifications ? (
+            <div className="text-danger">{formik.errors.certifications}</div>
+          ) : null}
         </div>
         <div className="button-container">
           <button type="button" className="btn btn-secondary" onClick={handleSave}>

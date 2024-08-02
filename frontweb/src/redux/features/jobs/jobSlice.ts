@@ -40,10 +40,13 @@ export const createJob = createAsyncThunk('jobs/createJob', async (jobData: Part
   return response.data;
 });
 
-export const updateJob = createAsyncThunk('jobs/updateJob', async ({ id, jobData }: { id: string; jobData: Partial<Job> }) => {
-  const response = await axios.put(`/api/jobs/${id}`, jobData);
-  return response.data;
-});
+export const updateJob = createAsyncThunk(
+  'jobs/updateJob',
+  async ({ id, jobData }: { id: string; jobData: Partial<Job> }) => {
+    const response = await axios.put(`/api/jobs/${id}`, jobData);
+    return response.data;
+  }
+);
 
 export const deleteJob = createAsyncThunk('jobs/deleteJob', async (id: string) => {
   await axios.delete(`/api/jobs/${id}`);

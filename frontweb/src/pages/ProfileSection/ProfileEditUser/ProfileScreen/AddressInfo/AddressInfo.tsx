@@ -78,7 +78,10 @@ const AddressInfo: React.FC = () => {
   return (
     <div className="address-info-container">
       <div className="header-icons">
-        <FaArrowLeft className="icon" onClick={() => navigate('/profile-edit-user/personal-info')} />
+        <FaArrowLeft
+          className="icon"
+          onClick={() => navigate('/profile-edit-user/personal-info')}
+        />
         <FaTimes className="icon" onClick={() => navigate('/')} />
       </div>
       <form onSubmit={formik.handleSubmit} className="address-info-form">
@@ -86,8 +89,15 @@ const AddressInfo: React.FC = () => {
           <label htmlFor="street" className="form-label">
             Street
           </label>
-          <input type="text" id="street" {...formik.getFieldProps('street')} className="form-control" />
-          {formik.touched.street && formik.errors.street ? <div className="text-danger">{formik.errors.street}</div> : null}
+          <input
+            type="text"
+            id="street"
+            {...formik.getFieldProps('street')}
+            className="form-control"
+          />
+          {formik.touched.street && formik.errors.street ? (
+            <div className="text-danger">{formik.errors.street}</div>
+          ) : null}
         </div>
 
         <div className="mb-3">
@@ -95,35 +105,63 @@ const AddressInfo: React.FC = () => {
             City
           </label>
           <input type="text" id="city" {...formik.getFieldProps('city')} className="form-control" />
-          {formik.touched.city && formik.errors.city ? <div className="text-danger">{formik.errors.city}</div> : null}
+          {formik.touched.city && formik.errors.city ? (
+            <div className="text-danger">{formik.errors.city}</div>
+          ) : null}
         </div>
 
         <div className="mb-3">
           <label htmlFor="state" className="form-label">
             State
           </label>
-          <input type="text" id="state" {...formik.getFieldProps('state')} className="form-control" />
-          {formik.touched.state && formik.errors.state ? <div className="text-danger">{formik.errors.state}</div> : null}
+          <input
+            type="text"
+            id="state"
+            {...formik.getFieldProps('state')}
+            className="form-control"
+          />
+          {formik.touched.state && formik.errors.state ? (
+            <div className="text-danger">{formik.errors.state}</div>
+          ) : null}
         </div>
 
         <div className="mb-3">
           <label htmlFor="zipCode" className="form-label">
             Zip Code
           </label>
-          <input type="text" id="zipCode" {...formik.getFieldProps('zipCode')} className="form-control" />
-          {formik.touched.zipCode && formik.errors.zipCode ? <div className="text-danger">{formik.errors.zipCode}</div> : null}
+          <input
+            type="text"
+            id="zipCode"
+            {...formik.getFieldProps('zipCode')}
+            className="form-control"
+          />
+          {formik.touched.zipCode && formik.errors.zipCode ? (
+            <div className="text-danger">{formik.errors.zipCode}</div>
+          ) : null}
         </div>
 
         <div className="mb-3">
           <label htmlFor="country" className="form-label">
             Country
           </label>
-          <input type="text" id="country" {...formik.getFieldProps('country')} className="form-control" />
-          {formik.touched.country && formik.errors.country ? <div className="text-danger">{formik.errors.country}</div> : null}
+          <input
+            type="text"
+            id="country"
+            {...formik.getFieldProps('country')}
+            className="form-control"
+          />
+          {formik.touched.country && formik.errors.country ? (
+            <div className="text-danger">{formik.errors.country}</div>
+          ) : null}
         </div>
 
         <div className="button-container mt-3">
-          <button type="button" className="btn btn-secondary me-2" onClick={handleSave} disabled={isSubmitting}>
+          <button
+            type="button"
+            className="btn btn-secondary me-2"
+            onClick={handleSave}
+            disabled={isSubmitting}
+          >
             {isSubmitting ? 'Saving...' : 'Save'}
           </button>
           <button type="submit" className="btn btn-primary" disabled={isSubmitting}>

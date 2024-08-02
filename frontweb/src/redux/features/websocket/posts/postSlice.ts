@@ -83,7 +83,18 @@ const postSlice = createSlice({
   }
 });
 
-export const { fetchPostsRequest, fetchPostsSuccess, fetchPostsFailure, addPost, updatePost, deletePost, likePostSuccess, unlikePostSuccess, sharePostSuccess, repostPostSuccess } = postSlice.actions;
+export const {
+  fetchPostsRequest,
+  fetchPostsSuccess,
+  fetchPostsFailure,
+  addPost,
+  updatePost,
+  deletePost,
+  likePostSuccess,
+  unlikePostSuccess,
+  sharePostSuccess,
+  repostPostSuccess
+} = postSlice.actions;
 
 export default postSlice.reducer;
 

@@ -75,7 +75,12 @@ const Portfolio: React.FC = () => {
       {user ? (
         <>
           <Outlet context={{ user }} />
-          <PortfolioFooter firstName={user.firstName} lastName={user.lastName} email={user.email} socialMediaLinks={user.socialMediaLinks} />
+          <PortfolioFooter
+            firstName={user.firstName}
+            lastName={user.lastName}
+            email={user.email}
+            socialMediaLinks={user.socialMediaLinks}
+          />
         </>
       ) : (
         <p>Loading...</p>

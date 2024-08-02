@@ -23,7 +23,9 @@ const CoOrganizersAndParticipants: React.FC = () => {
               value={Array.isArray(values.coOrganizers) ? values.coOrganizers.join(', ') : ''}
               className="form-control"
             />
-            {touched.coOrganizers && errors.coOrganizers && <div className="text-danger">{errors.coOrganizers}</div>}
+            {touched.coOrganizers && errors.coOrganizers && (
+              <div className="text-danger">{errors.coOrganizers}</div>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="unApprovedUsers">Unapproved Users</label>
@@ -36,7 +38,9 @@ const CoOrganizersAndParticipants: React.FC = () => {
               value={Array.isArray(values.unApprovedUsers) ? values.unApprovedUsers.join(', ') : ''}
               className="form-control"
             />
-            {touched.unApprovedUsers && errors.unApprovedUsers && <div className="text-danger">{errors.unApprovedUsers}</div>}
+            {touched.unApprovedUsers && errors.unApprovedUsers && (
+              <div className="text-danger">{errors.unApprovedUsers}</div>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="unApprovedCoOrganizers">Unapproved Co-organizers</label>
@@ -46,10 +50,16 @@ const CoOrganizersAndParticipants: React.FC = () => {
               type="text"
               onChange={handleChange}
               onBlur={handleBlur}
-              value={Array.isArray(values.unApprovedCoOrganizers) ? values.unApprovedCoOrganizers.join(', ') : ''}
+              value={
+                Array.isArray(values.unApprovedCoOrganizers)
+                  ? values.unApprovedCoOrganizers.join(', ')
+                  : ''
+              }
               className="form-control"
             />
-            {touched.unApprovedCoOrganizers && errors.unApprovedCoOrganizers && <div className="text-danger">{errors.unApprovedCoOrganizers}</div>}
+            {touched.unApprovedCoOrganizers && errors.unApprovedCoOrganizers && (
+              <div className="text-danger">{errors.unApprovedCoOrganizers}</div>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="attendees">Attendees</label>
@@ -62,7 +72,9 @@ const CoOrganizersAndParticipants: React.FC = () => {
               value={Array.isArray(values.attendees) ? values.attendees.join(', ') : ''}
               className="form-control"
             />
-            {touched.attendees && errors.attendees && <div className="text-danger">{errors.attendees}</div>}
+            {touched.attendees && errors.attendees && (
+              <div className="text-danger">{errors.attendees}</div>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="waitingList">Waiting List</label>
@@ -75,7 +87,9 @@ const CoOrganizersAndParticipants: React.FC = () => {
               value={Array.isArray(values.waitingList) ? values.waitingList.join(', ') : ''}
               className="form-control"
             />
-            {touched.waitingList && errors.waitingList && <div className="text-danger">{errors.waitingList}</div>}
+            {touched.waitingList && errors.waitingList && (
+              <div className="text-danger">{errors.waitingList}</div>
+            )}
           </div>
         </div>
       </div>

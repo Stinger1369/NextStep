@@ -27,7 +27,12 @@ const SearchDropdown: React.FC = () => {
 
   return (
     <div className="search-dropdown" ref={dropdownRef}>
-      <button className="btn" onClick={toggleDropdown} aria-expanded={isOpen} aria-label="Toggle search dropdown">
+      <button
+        className="btn"
+        onClick={toggleDropdown}
+        aria-expanded={isOpen}
+        aria-label="Toggle search dropdown"
+      >
         <FaSearch />
       </button>
       {isOpen && (
@@ -35,13 +40,21 @@ const SearchDropdown: React.FC = () => {
           <a href="/search-site" onClick={() => console.log('Search the site clicked')}>
             Search the site
           </a>
-          <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" onClick={() => console.log('Search Google clicked')}>
+          <a
+            href="https://www.google.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => console.log('Search Google clicked')}
+          >
             Search Google
           </a>
           <a href="/search-jobs" onClick={() => console.log('Search for a job clicked')}>
             Search for a job
           </a>
-          <a href="/search-activities" onClick={() => console.log('Search for an activity clicked')}>
+          <a
+            href="/search-activities"
+            onClick={() => console.log('Search for an activity clicked')}
+          >
             Search for an activity
           </a>
           <a href="/search-members" onClick={() => console.log('Search for a member clicked')}>

@@ -12,7 +12,7 @@
 .user-profile-container h3,
 .user-profile-container h4,
 .user-profile-container h5,
-.user-profile-container h6  {
+.user-profile-container h6 {
   color: #2d4b23; /* Dark green */
 }
 
@@ -27,7 +27,7 @@ button {
 }
 
 /* Change button color on hover */
-.user-profile-container button:hover  {
+.user-profile-container button:hover {
   background-color: #507a3b; /* Darker green */
 }
 
@@ -68,17 +68,17 @@ t.user-profile-container form .form-group {
 }
 
 .user-profile-container table th,
-.user-profile-container table td{
+.user-profile-container table td {
   border: 1px solid #6ba45b; /* Medium green border */
   padding: 10px;
   text-align: left;
 }
 
-.user-profile-container table th{
+.user-profile-container table th {
   background-color: #507a3b; /* Darker green background for headers */
   color: #ffffff; /* White text */
 }
 
-.user-profile-container table tr:nth-child(even){
+.user-profile-container table tr:nth-child(even) {
   background-color: #f4f7f0; /* Light greenish background for even rows */
 }

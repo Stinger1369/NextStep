@@ -107,7 +107,11 @@ const CreateActivity: React.FC = () => {
   return (
     <div className="create-activity-container">
       <StepNav steps={stepTitles} currentStep={currentStep} onStepClick={handleStepClick} />
-      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
         {({ handleSubmit }) => (
           <Form>
             {steps[currentStep].component}

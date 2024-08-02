@@ -1,4 +1,12 @@
-import { WebSocketMessage, Post, PostCreatedSuccessData, PostGetAllSuccessData, Like, Share, Unlike } from '../types';
+import {
+  WebSocketMessage,
+  Post,
+  PostCreatedSuccessData,
+  PostGetAllSuccessData,
+  Like,
+  Share,
+  Unlike
+} from '../types';
 import { sendMessage, addEventListener, removeEventListener } from './websocket';
 import { likeEntity, unlikeEntity } from './likeWebSocket';
 

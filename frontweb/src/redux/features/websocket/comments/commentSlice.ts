@@ -71,7 +71,14 @@ const commentSlice = createSlice({
   }
 });
 
-export const { fetchCommentsRequest, fetchCommentsSuccess, fetchCommentsFailure, addComment, updateComment, deleteComment } = commentSlice.actions;
+export const {
+  fetchCommentsRequest,
+  fetchCommentsSuccess,
+  fetchCommentsFailure,
+  addComment,
+  updateComment,
+  deleteComment
+} = commentSlice.actions;
 
 export default commentSlice.reducer;
 

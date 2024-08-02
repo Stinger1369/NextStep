@@ -1,6 +1,4 @@
-/* src/pages/ProfileSection/UserProfile/components/ProfileActions/ProfileActions.css */
-
-.profile-actions {
+src/pages/ProfileSection/UserProfile/components/ProfileActions/ProfileActions.css .profile-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;

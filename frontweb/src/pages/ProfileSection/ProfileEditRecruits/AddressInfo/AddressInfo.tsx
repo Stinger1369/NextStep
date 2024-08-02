@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../redux/store';
-import { updateCompany, getCompanyById, createCompany } from '../../../../redux/features/company/companySlice';
+import {
+  updateCompany,
+  getCompanyById,
+  createCompany
+} from '../../../../redux/features/company/companySlice';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FaArrowLeft, FaTimes } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -76,23 +80,53 @@ const AddressInfo: React.FC = () => {
       <form>
         <div className="form-group">
           <label htmlFor="street">Street:</label>
-          <input id="street" name="street" value={address.street} onChange={handleChange} className="form-control" />
+          <input
+            id="street"
+            name="street"
+            value={address.street}
+            onChange={handleChange}
+            className="form-control"
+          />
         </div>
         <div className="form-group">
           <label htmlFor="city">City:</label>
-          <input id="city" name="city" value={address.city} onChange={handleChange} className="form-control" />
+          <input
+            id="city"
+            name="city"
+            value={address.city}
+            onChange={handleChange}
+            className="form-control"
+          />
         </div>
         <div className="form-group">
           <label htmlFor="state">State:</label>
-          <input id="state" name="state" value={address.state} onChange={handleChange} className="form-control" />
+          <input
+            id="state"
+            name="state"
+            value={address.state}
+            onChange={handleChange}
+            className="form-control"
+          />
         </div>
         <div className="form-group">
           <label htmlFor="zipCode">Zip Code:</label>
-          <input id="zipCode" name="zipCode" value={address.zipCode} onChange={handleChange} className="form-control" />
+          <input
+            id="zipCode"
+            name="zipCode"
+            value={address.zipCode}
+            onChange={handleChange}
+            className="form-control"
+          />
         </div>
         <div className="form-group">
           <label htmlFor="country">Country:</label>
-          <input id="country" name="country" value={address.country} onChange={handleChange} className="form-control" />
+          <input
+            id="country"
+            name="country"
+            value={address.country}
+            onChange={handleChange}
+            className="form-control"
+          />
         </div>
         <div className="button-container">
           <button type="button" className="btn btn-secondary" onClick={handleSave}>

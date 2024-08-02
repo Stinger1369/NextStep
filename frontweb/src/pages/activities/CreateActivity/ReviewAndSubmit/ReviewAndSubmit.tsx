@@ -41,7 +41,8 @@ const ReviewAndSubmit: React.FC = () => {
             <strong>Activity Type:</strong> {values.createAtivityType}
           </p>
           <p>
-            <strong>Address Only For Attendees:</strong> {values.addressOnlyForAttendees ? 'Yes' : 'No'}
+            <strong>Address Only For Attendees:</strong>{' '}
+            {values.addressOnlyForAttendees ? 'Yes' : 'No'}
           </p>
           <p>
             <strong>Invite Community:</strong> {values.inviteCommunity ? 'Yes' : 'No'}
@@ -78,7 +79,8 @@ const ReviewAndSubmit: React.FC = () => {
             <strong>Number of Friends:</strong> {values.friendsNumber}
           </p>
           <p>
-            <strong>Notify Previous Attendees:</strong> {values.notifyPreviousAttendees ? 'Yes' : 'No'}
+            <strong>Notify Previous Attendees:</strong>{' '}
+            {values.notifyPreviousAttendees ? 'Yes' : 'No'}
           </p>
           <p>
             <strong>Invite More:</strong> {values.inviteMore ? 'Yes' : 'No'}

@@ -36,7 +36,12 @@ const notificationSlice = createSlice({
   }
 });
 
-export const { fetchNotificationsRequest, fetchNotificationsSuccess, fetchNotificationsFailure, addNotification } = notificationSlice.actions;
+export const {
+  fetchNotificationsRequest,
+  fetchNotificationsSuccess,
+  fetchNotificationsFailure,
+  addNotification
+} = notificationSlice.actions;
 
 export default notificationSlice.reducer;
 

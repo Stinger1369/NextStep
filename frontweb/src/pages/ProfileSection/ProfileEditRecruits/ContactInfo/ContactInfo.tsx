@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../redux/store';
-import { updateCompany, getCompanyById, createCompany } from '../../../../redux/features/company/companySlice';
+import {
+  updateCompany,
+  getCompanyById,
+  createCompany
+} from '../../../../redux/features/company/companySlice';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FaArrowLeft, FaTimes } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -44,7 +48,12 @@ const ContactInfo: React.FC = () => {
       dispatch(updateCompany({ id: companyId, companyData: contactInfo }));
     } else {
       // Assuming you have the company info in the state to create a new company
-      dispatch(createCompany({ contactEmail: contactInfo.contactEmail, contactPhone: contactInfo.contactPhone }));
+      dispatch(
+        createCompany({
+          contactEmail: contactInfo.contactEmail,
+          contactPhone: contactInfo.contactPhone
+        })
+      );
     }
   };
 
@@ -68,11 +77,23 @@ const ContactInfo: React.FC = () => {
       <form>
         <div className="form-group">
           <label htmlFor="contactEmail">Email:</label>
-          <input id="contactEmail" name="contactEmail" value={contactInfo.contactEmail} onChange={handleChange} className="form-control" />
+          <input
+            id="contactEmail"
+            name="contactEmail"
+            value={contactInfo.contactEmail}
+            onChange={handleChange}
+            className="form-control"
+          />
         </div>
         <div className="form-group">
           <label htmlFor="contactPhone">Phone:</label>
-          <input id="contactPhone" name="contactPhone" value={contactInfo.contactPhone} onChange={handleChange} className="form-control" />
+          <input
+            id="contactPhone"
+            name="contactPhone"
+            value={contactInfo.contactPhone}
+            onChange={handleChange}
+            className="form-control"
+          />
         </div>
         <div className="button-container">
           <button type="button" className="btn btn-secondary" onClick={handleSave}>

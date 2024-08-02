@@ -1,7 +1,18 @@
 import React, { useState, useEffect, useRef, RefObject } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { FaHome, FaInfoCircle, FaUser, FaUserPlus, FaSignOutAlt, FaBriefcase, FaUsers, FaBell, FaCaretDown, FaBars } from 'react-icons/fa';
+import {
+  FaHome,
+  FaInfoCircle,
+  FaUser,
+  FaUserPlus,
+  FaSignOutAlt,
+  FaBriefcase,
+  FaUsers,
+  FaBell,
+  FaCaretDown,
+  FaBars
+} from 'react-icons/fa';
 import { Modal, Button } from 'react-bootstrap';
 import logo from '../../assests/Images/nextstep.webp';
 import defaultProfilePicture from '../../assests/Images/Profile.png';
@@ -58,7 +69,12 @@ const NavbarGlobal: React.FC = () => {
   };
 
   const isProfileComplete = (user: User) => {
-    return user.firstName !== undefined && user.lastName !== undefined && user.images !== undefined && user.images.length > 0;
+    return (
+      user.firstName !== undefined &&
+      user.lastName !== undefined &&
+      user.images !== undefined &&
+      user.images.length > 0
+    );
   };
 
   const handlePortfolioClick = () => {
@@ -118,7 +134,8 @@ const NavbarGlobal: React.FC = () => {
 
   const handleCloseLogoutModal = () => setShowLogoutModal(false);
 
-  const userProfilePicture = user?.images && user.images.length > 0 ? user.images[0] : defaultProfilePicture;
+  const userProfilePicture =
+    user?.images && user.images.length > 0 ? user.images[0] : defaultProfilePicture;
 
   return (
     <>
@@ -140,18 +157,36 @@ const NavbarGlobal: React.FC = () => {
               </>
             ) : (
               <div className="nav-item dropdown NavbarGlobal-dropdown" ref={dropdownRef}>
-                <button className="btn nav-link dropdown-toggle NavbarGlobal-dropdown-toggle" id="navbarDropdown" aria-expanded={dropdownOpen} onClick={toggleDropdown}>
-                  <img src={userProfilePicture} alt="User Profile" className="NavbarGlobal-profile-picture" />
+                <button
+                  className="btn nav-link dropdown-toggle NavbarGlobal-dropdown-toggle"
+                  id="navbarDropdown"
+                  aria-expanded={dropdownOpen}
+                  onClick={toggleDropdown}
+                >
+                  <img
+                    src={userProfilePicture}
+                    alt="User Profile"
+                    className="NavbarGlobal-profile-picture"
+                  />
                   {user.firstName ? user.firstName : user.email}
                 </button>
-                <ul className={`dropdown-menu NavbarGlobal-dropdown-menu${dropdownOpen ? ' show' : ''}`} aria-labelledby="navbarDropdown">
+                <ul
+                  className={`dropdown-menu NavbarGlobal-dropdown-menu${dropdownOpen ? ' show' : ''}`}
+                  aria-labelledby="navbarDropdown"
+                >
                   <li>
-                    <button className="dropdown-item NavbarGlobal-dropdown-item" onClick={handleProfileClick}>
+                    <button
+                      className="dropdown-item NavbarGlobal-dropdown-item"
+                      onClick={handleProfileClick}
+                    >
                       Profile
                     </button>
                   </li>
                   <li>
-                    <button className="dropdown-item NavbarGlobal-dropdown-item" onClick={handlePortfolioClick}>
+                    <button
+                      className="dropdown-item NavbarGlobal-dropdown-item"
+                      onClick={handlePortfolioClick}
+                    >
                       Portfolio
                     </button>
                   </li>
@@ -159,14 +194,24 @@ const NavbarGlobal: React.FC = () => {
                     <hr className="dropdown-divider NavbarGlobal-dropdown-divider" />
                   </li>
                   <li>
-                    <button className="dropdown-item NavbarGlobal-dropdown-item" onClick={() => setShowLogoutModal(true)}>
+                    <button
+                      className="dropdown-item NavbarGlobal-dropdown-item"
+                      onClick={() => setShowLogoutModal(true)}
+                    >
                       <FaSignOutAlt /> Logout
                     </button>
                   </li>
                 </ul>
               </div>
             )}
-            <button className="navbar-toggler NavbarGlobal-toggler" type="button" aria-controls="navbarNav" aria-expanded={menuOpen} aria-label="Toggle navigation" onClick={toggleMenu}>
+            <button
+              className="navbar-toggler NavbarGlobal-toggler"
+              type="button"
+              aria-controls="navbarNav"
+              aria-expanded={menuOpen}
+              aria-label="Toggle navigation"
+              onClick={toggleMenu}
+            >
               <FaBars />
             </button>
           </div>
@@ -216,7 +261,10 @@ const NavbarGlobal: React.FC = () => {
         <Modal.Header closeButton>
           <Modal.Title>Complete Your Profile</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Please complete your profile to access the portfolio. The more complete your profile is, the better your portfolio will be.</Modal.Body>
+        <Modal.Body>
+          Please complete your profile to access the portfolio. The more complete your profile is,
+          the better your portfolio will be.
+        </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
             Close
@@ -227,7 +275,12 @@ const NavbarGlobal: React.FC = () => {
         </Modal.Footer>
       </Modal>
 
-      <LogoutConfirmationModal show={showLogoutModal} handleClose={handleCloseLogoutModal} handleSave={() => handleLogout(true)} handleDontSave={() => handleLogout(false)} />
+      <LogoutConfirmationModal
+        show={showLogoutModal}
+        handleClose={handleCloseLogoutModal}
+        handleSave={() => handleLogout(true)}
+        handleDontSave={() => handleLogout(false)}
+      />
     </>
   );
 };

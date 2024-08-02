@@ -8,7 +8,12 @@ interface LogoutConfirmationModalProps {
   handleDontSave: () => void;
 }
 
-const LogoutConfirmationModal: React.FC<LogoutConfirmationModalProps> = ({ show, handleClose, handleSave, handleDontSave }) => {
+const LogoutConfirmationModal: React.FC<LogoutConfirmationModalProps> = ({
+  show,
+  handleClose,
+  handleSave,
+  handleDontSave
+}) => {
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>

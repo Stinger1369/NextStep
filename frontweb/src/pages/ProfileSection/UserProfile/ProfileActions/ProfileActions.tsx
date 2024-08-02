@@ -10,7 +10,12 @@ interface ProfileActionsProps {
   handleEditProfile: () => void;
 }
 
-const ProfileActions: React.FC<ProfileActionsProps> = ({ themeEnabled, toggleTheme, showEditButton, handleEditProfile }) => {
+const ProfileActions: React.FC<ProfileActionsProps> = ({
+  themeEnabled,
+  toggleTheme,
+  showEditButton,
+  handleEditProfile
+}) => {
   return (
     <div className="profile-actions">
       <button className="btn btn-outline-secondary toggle-theme-btn" onClick={toggleTheme}>

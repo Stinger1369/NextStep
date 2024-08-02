@@ -20,7 +20,13 @@ const isValidDate = (date: string): boolean => {
   return !isNaN(new Date(date).getTime());
 };
 
-export function createComment(content: string, postId: string, userId: string, userFirstName: string, userLastName: string): Promise<CommentCreatedSuccessData> {
+export function createComment(
+  content: string,
+  postId: string,
+  userId: string,
+  userFirstName: string,
+  userLastName: string
+): Promise<CommentCreatedSuccessData> {
   return new Promise((resolve, reject) => {
     if (!userId || !userFirstName || !userLastName) {
       reject(new Error('User ID, first name, or last name is missing'));

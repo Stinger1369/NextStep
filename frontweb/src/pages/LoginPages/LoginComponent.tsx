@@ -57,7 +57,11 @@ const LoginComponent: React.FC = () => {
     }
   };
 
-  const handleCreateUser = async (user: { email: string; firstName?: string; lastName?: string }) => {
+  const handleCreateUser = async (user: {
+    email: string;
+    firstName?: string;
+    lastName?: string;
+  }) => {
     try {
       const createdUser = await dispatch(
         createUserAndSetCurrent({
@@ -74,7 +78,13 @@ const LoginComponent: React.FC = () => {
     }
   };
 
-  const storeUserInfo = (user: { id: string; email: string; firstName: string; lastName: string; apiKey: string }) => {
+  const storeUserInfo = (user: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    apiKey: string;
+  }) => {
     localStorage.setItem('currentUserId', user.id);
     localStorage.setItem('currentUserEmail', user.email);
     localStorage.setItem('currentUserFirstName', user.firstName);
@@ -83,7 +93,10 @@ const LoginComponent: React.FC = () => {
     console.log('User info stored in localStorage:', user);
   };
 
-  const handleLoginError = (error: unknown, setErrors: (errors: Partial<{ email?: string; password?: string }>) => void) => {
+  const handleLoginError = (
+    error: unknown,
+    setErrors: (errors: Partial<{ email?: string; password?: string }>) => void
+  ) => {
     if (isAxiosError(error)) {
       if (error.message === 'Request failed with status code 404') {
         setErrors({
@@ -93,7 +106,11 @@ const LoginComponent: React.FC = () => {
         setErrors({
           password: 'Incorrect password. Forgot your password?'
         });
-      } else if (error.message === 'Request failed with status code 401' && isErrorWithResponseData(error) && error.response!.data.message === 'Email not verified') {
+      } else if (
+        error.message === 'Request failed with status code 401' &&
+        isErrorWithResponseData(error) &&
+        error.response!.data.message === 'Email not verified'
+      ) {
         setErrors({
           email: 'Your account is not verified. Please verify your account to continue.'
         });
@@ -109,11 +126,26 @@ const LoginComponent: React.FC = () => {
   };
 
   const isProfileComplete = (user: User): boolean => {
-    const requiredFields: (keyof User)[] = ['firstName', 'lastName', 'email', 'profession', 'phone', 'dateOfBirth', 'bio'];
-    const addressFields: (keyof NonNullable<User['address']>)[] = ['street', 'city', 'state', 'zipCode', 'country'];
+    const requiredFields: (keyof User)[] = [
+      'firstName',
+      'lastName',
+      'email',
+      'profession',
+      'phone',
+      'dateOfBirth',
+      'bio'
+    ];
+    const addressFields: (keyof NonNullable<User['address']>)[] = [
+      'street',
+      'city',
+      'state',
+      'zipCode',
+      'country'
+    ];
 
     const hasRequiredFields = requiredFields.every((field) => !!user[field]);
-    const hasAddressFields = user.address && addressFields.every((field) => user.address && !!user.address[field]);
+    const hasAddressFields =
+      user.address && addressFields.every((field) => user.address && !!user.address[field]);
     const hasMedia = user.images && user.images.length > 0;
     const hasExperience = user.experience && user.experience.length > 0;
     const hasEducation = user.education && user.education.length > 0;
@@ -169,9 +201,15 @@ const LoginComponent: React.FC = () => {
       {welcomeMessage && <p className="LoginComponent-welcome-message">{welcomeMessage}</p>}
       {user ? (
         <div className="LoginComponent-user-info">
-          {profileImage && <img src={profileImage} alt="Profile" className="LoginComponent-profile-image" />}
-          <p className="LoginComponent-welcome-text">Welcome, {user.firstName ? user.firstName : user.email}!</p>
-          <p className="LoginComponent-profession">Profession: {user.profession || 'Not specified'}</p>
+          {profileImage && (
+            <img src={profileImage} alt="Profile" className="LoginComponent-profile-image" />
+          )}
+          <p className="LoginComponent-welcome-text">
+            Welcome, {user.firstName ? user.firstName : user.email}!
+          </p>
+          <p className="LoginComponent-profession">
+            Profession: {user.profession || 'Not specified'}
+          </p>
           <div className="LoginComponent-counters">
             <div className="LoginComponent-counter">
               <p>Profile Pro Visits</p>
@@ -186,7 +224,14 @@ const LoginComponent: React.FC = () => {
               <p>789</p>
             </div>
           </div>
-          <button className="LoginComponent-complete-profile-button" onClick={() => navigate(isProfileComplete(user) ? '/profile-edit-user/personal-info' : '/role-selection')}>
+          <button
+            className="LoginComponent-complete-profile-button"
+            onClick={() =>
+              navigate(
+                isProfileComplete(user) ? '/profile-edit-user/personal-info' : '/role-selection'
+              )
+            }
+          >
             {isProfileComplete(user) ? 'Edit your profile' : 'Complete your profile'}
           </button>
         </div>
@@ -204,7 +249,11 @@ const LoginComponent: React.FC = () => {
               <div className="LoginComponent-error">
                 {formik.errors.email}
                 {formik.errors.email.includes('Email or phone does not exist.') && (
-                  <button type="button" className="LoginComponent-register-button" onClick={() => navigate('/register')}>
+                  <button
+                    type="button"
+                    className="LoginComponent-register-button"
+                    onClick={() => navigate('/register')}
+                  >
                     Register
                   </button>
                 )}
@@ -232,7 +281,9 @@ const LoginComponent: React.FC = () => {
               placeholder="Password"
               className={`LoginComponent-input ${formik.touched.password && formik.errors.password ? 'LoginComponent-error-input' : ''}`}
             />
-            {formik.touched.password && formik.errors.password ? <div className="LoginComponent-error">{formik.errors.password}</div> : null}
+            {formik.touched.password && formik.errors.password ? (
+              <div className="LoginComponent-error">{formik.errors.password}</div>
+            ) : null}
           </div>
           <button type="submit" className="LoginComponent-button" disabled={formik.isSubmitting}>
             {formik.isSubmitting ? 'Logging in...' : 'Login'}

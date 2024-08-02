@@ -14,13 +14,33 @@ const AdditionalOptions: React.FC = () => {
         <div className="card-body">
           <div className="form-group">
             <label htmlFor="buyTicketsLink">Buy Tickets Link</label>
-            <input id="buyTicketsLink" name="buyTicketsLink" type="text" onChange={handleChange} onBlur={handleBlur} value={values.buyTicketsLink ?? ''} className="form-control" />
-            {touched.buyTicketsLink && errors.buyTicketsLink && <div className="text-danger">{errors.buyTicketsLink}</div>}
+            <input
+              id="buyTicketsLink"
+              name="buyTicketsLink"
+              type="text"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.buyTicketsLink ?? ''}
+              className="form-control"
+            />
+            {touched.buyTicketsLink && errors.buyTicketsLink && (
+              <div className="text-danger">{errors.buyTicketsLink}</div>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="friendsNumber">Number of Friends</label>
-            <input id="friendsNumber" name="friendsNumber" type="number" onChange={handleChange} onBlur={handleBlur} value={values.friendsNumber ?? ''} className="form-control" />
-            {touched.friendsNumber && errors.friendsNumber && <div className="text-danger">{errors.friendsNumber}</div>}
+            <input
+              id="friendsNumber"
+              name="friendsNumber"
+              type="number"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.friendsNumber ?? ''}
+              className="form-control"
+            />
+            {touched.friendsNumber && errors.friendsNumber && (
+              <div className="text-danger">{errors.friendsNumber}</div>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="notifyPreviousAttendees">Notify Previous Attendees</label>
@@ -39,14 +59,30 @@ const AdditionalOptions: React.FC = () => {
           </div>
           <div className="form-group">
             <label htmlFor="inviteMore">Invite More</label>
-            <input id="inviteMore" name="inviteMore" type="checkbox" onChange={handleChange} onBlur={handleBlur} checked={values.inviteMore} className="form-check-input" />
+            <input
+              id="inviteMore"
+              name="inviteMore"
+              type="checkbox"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              checked={values.inviteMore}
+              className="form-check-input"
+            />
             <label htmlFor="inviteMore" className="form-check-label">
               Invite More
             </label>
           </div>
           <div className="form-group">
             <label htmlFor="requestCoOrga">Request Co-Organization</label>
-            <input id="requestCoOrga" name="requestCoOrga" type="checkbox" onChange={handleChange} onBlur={handleBlur} checked={values.requestCoOrga} className="form-check-input" />
+            <input
+              id="requestCoOrga"
+              name="requestCoOrga"
+              type="checkbox"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              checked={values.requestCoOrga}
+              className="form-check-input"
+            />
             <label htmlFor="requestCoOrga" className="form-check-label">
               Request Co-Organization
             </label>

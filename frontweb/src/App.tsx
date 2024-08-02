@@ -35,7 +35,7 @@ const App: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <div className="App">
+    <div className="app">
       <div className="content">
         <AppRoutes />
       </div>

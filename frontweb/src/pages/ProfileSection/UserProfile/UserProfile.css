@@ -1,5 +1,5 @@
 .user-profile-container {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
   background-color: #f4f4f4;
@@ -7,27 +7,55 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.layout-controls {
+  margin-bottom: 20px;
+}
+
+.userProfile-grid {
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+}
+
 .userProfile-card {
-  margin-bottom: 20px; /* Custom margin between cards */
   background-color: #ffffff;
   border: none;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+  position: relative;
+}
+
+.userProfile-card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .userProfile-card-body {
   padding: 20px;
+  min-height: 100px;
 }
 
-.userProfile-row {
+.drag-handle {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: move;
+  color: #888;
+  font-size: 20px;
+  z-index: 10;
+}
+
+.card-span-control {
+  margin-top: 10px;
   display: flex;
-  justify-content: space-between;
-  gap: 20px; /* Custom gap between columns */
-  margin-bottom: 20px; /* Space below row */
+  align-items: center;
 }
 
-.userProfile-col {
-  flex: 1;
+.card-span-control label {
+  margin-right: 8px;
 }
 
 .text-secondary {
@@ -38,4 +66,24 @@
   text-align: center;
   font-size: 18px;
   color: #555;
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .userProfile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .user-profile-container {
+    padding: 10px;
+  }
+
+  .userProfile-card {
+    margin-bottom: 15px;
+  }
+}
+
+.userProfile-card.ProfileHeader,
+.userProfile-card.ProfileActions {
+  grid-column: 1 / -1;
 }

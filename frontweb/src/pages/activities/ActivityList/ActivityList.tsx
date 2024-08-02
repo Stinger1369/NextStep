@@ -32,7 +32,8 @@ const ActivityList: React.FC = () => {
 
   if (error) {
     console.error('Error fetching activities:', error);
-    const errorMessage = typeof error === 'object' && error !== null ? JSON.stringify(error) : error;
+    const errorMessage =
+      typeof error === 'object' && error !== null ? JSON.stringify(error) : error;
     return <p>Error: {errorMessage}</p>;
   }
 
@@ -71,13 +72,21 @@ const ActivityList: React.FC = () => {
         <div className="col-md-6 activity-list-main-content">
           <h1>Activities</h1>
           <div className="position-relative">
-            <button type="button" className={`btn btn-primary mb-3`} onClick={handleCreateActivityClick}>
+            <button
+              type="button"
+              className={`btn btn-primary mb-3`}
+              onClick={handleCreateActivityClick}
+            >
               + Create Activity
             </button>
             {tooltipVisible && (
               <div className="tooltip">
                 You need to complete your profile to create an activity.
-                <button type="button" className="btn btn-link" onClick={() => navigate('/profile-edit-user/personal-info')}>
+                <button
+                  type="button"
+                  className="btn btn-link"
+                  onClick={() => navigate('/profile-edit-user/personal-info')}
+                >
                   Complete your profile
                 </button>
               </div>

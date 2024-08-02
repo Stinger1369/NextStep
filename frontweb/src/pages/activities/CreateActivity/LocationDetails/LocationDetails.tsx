@@ -14,21 +14,55 @@ const LocationDetails: React.FC = () => {
         <div className="card-body">
           <div className="form-group">
             <label htmlFor="location.address">Address</label>
-            <input id="location.address" name="location.address" type="text" onChange={handleChange} onBlur={handleBlur} value={values.location.address} className="form-control" />
-            {touched.location?.address && errors.location?.address && <div className="text-danger">{errors.location.address}</div>}
+            <input
+              id="location.address"
+              name="location.address"
+              type="text"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.location.address}
+              className="form-control"
+            />
+            {touched.location?.address && errors.location?.address && (
+              <div className="text-danger">{errors.location.address}</div>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="metroStation">Nearest Metro Station</label>
-            <input id="metroStation" name="metroStation" type="text" onChange={handleChange} onBlur={handleBlur} value={values.metroStation} className="form-control" />
-            {touched.metroStation && errors.metroStation && <div className="text-danger">{errors.metroStation}</div>}
+            <input
+              id="metroStation"
+              name="metroStation"
+              type="text"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.metroStation}
+              className="form-control"
+            />
+            {touched.metroStation && errors.metroStation && (
+              <div className="text-danger">{errors.metroStation}</div>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="isOnline">Online Activity</label>
-            <input id="isOnline" name="isOnline" type="checkbox" onChange={handleChange} onBlur={handleBlur} checked={values.isOnline} />
+            <input
+              id="isOnline"
+              name="isOnline"
+              type="checkbox"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              checked={values.isOnline}
+            />
           </div>
           <div className="form-group">
             <label htmlFor="addressOnlyForAttendees">Address Only For Attendees</label>
-            <input id="addressOnlyForAttendees" name="addressOnlyForAttendees" type="checkbox" onChange={handleChange} onBlur={handleBlur} checked={values.addressOnlyForAttendees} />
+            <input
+              id="addressOnlyForAttendees"
+              name="addressOnlyForAttendees"
+              type="checkbox"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              checked={values.addressOnlyForAttendees}
+            />
           </div>
         </div>
       </div>

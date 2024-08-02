@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../redux/store';
-import { getCompanyById, updateCompany, createCompany } from '../../../../redux/features/company/companySlice';
+import {
+  getCompanyById,
+  updateCompany,
+  createCompany
+} from '../../../../redux/features/company/companySlice';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FaArrowLeft, FaTimes } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -86,19 +90,44 @@ const RecruitCompanyInfo: React.FC<CompanyInfoProps> = ({ isNew }) => {
       <form>
         <div className="form-group">
           <label htmlFor="companyName">Company Name:</label>
-          <input id="companyName" name="companyName" value={companyInfo.companyName} onChange={handleChange} className="form-control" />
+          <input
+            id="companyName"
+            name="companyName"
+            value={companyInfo.companyName}
+            onChange={handleChange}
+            className="form-control"
+          />
         </div>
         <div className="form-group">
           <label htmlFor="companyRegistrationNumber">Registration Number:</label>
-          <input id="companyRegistrationNumber" name="companyRegistrationNumber" value={companyInfo.companyRegistrationNumber} onChange={handleChange} className="form-control" />
+          <input
+            id="companyRegistrationNumber"
+            name="companyRegistrationNumber"
+            value={companyInfo.companyRegistrationNumber}
+            onChange={handleChange}
+            className="form-control"
+          />
         </div>
         <div className="form-group">
           <label htmlFor="numberOfEmployees">Number of Employees:</label>
-          <input id="numberOfEmployees" name="numberOfEmployees" value={companyInfo.numberOfEmployees} onChange={handleChange} type="number" className="form-control" />
+          <input
+            id="numberOfEmployees"
+            name="numberOfEmployees"
+            value={companyInfo.numberOfEmployees}
+            onChange={handleChange}
+            type="number"
+            className="form-control"
+          />
         </div>
         <div className="form-group">
           <label htmlFor="industryType">Industry Type:</label>
-          <input id="industryType" name="industryType" value={companyInfo.industryType} onChange={handleChange} className="form-control" />
+          <input
+            id="industryType"
+            name="industryType"
+            value={companyInfo.industryType}
+            onChange={handleChange}
+            className="form-control"
+          />
         </div>
         <div className="button-container">
           <button type="button" className="btn btn-secondary" onClick={handleSave}>

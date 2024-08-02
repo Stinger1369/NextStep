@@ -25,7 +25,9 @@
   cursor: pointer;
   border-radius: 5px;
   font-family: 'Courier New', Courier, monospace;
-  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease; /* Smooth transitions */
   font-weight: bold;
 }
 

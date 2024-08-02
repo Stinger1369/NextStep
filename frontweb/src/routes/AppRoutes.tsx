@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Home from '../pages/Home/Home';
@@ -44,6 +44,10 @@ import SearchActivities from '../components/SearchDropdown/SearchActivities/Sear
 import SearchMembers from '../components/SearchDropdown/SearchMembers/SearchMembers';
 import '../App.css';
 import '../index.css';
+import './AppRoutes.css';
+
+// Import react-icons
+import { FaArrowsAltH, FaPencilAlt, FaEye } from 'react-icons/fa';
 
 const AppRoutes: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -59,52 +63,120 @@ const AppRoutes: React.FC = () => {
 
   const isPortfolioPage = location.pathname.includes('/portfolio');
 
+  // State for controlling drag-and-drop and view mode
+  const [isDragEnabled, setIsDragEnabled] = useState(true);
+  const [isFinalView, setIsFinalView] = useState(false);
+
+  const toggleDragAndDrop = () => {
+    setIsDragEnabled((prev) => !prev);
+  };
+
+  const toggleFinalView = () => {
+    setIsFinalView((prev) => !prev);
+  };
+
   return (
     <>
       <Navbar />
-      <div className="main-content">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/login" element={!user ? <LoginComponent /> : <Navigate to="/" />} />
-          <Route path="/register" element={!user ? <RegisterComponent /> : <Navigate to="/" />} />
-          <Route path="/password-reset" element={<PasswordResetComponent />} />
-          <Route path="/verify-email" element={<VerifyEmailComponent />} />
-          <Route path="/password-request-reset" element={<PasswordResetRequestComponent />} />
-          <Route path="/profile-edit-user/personal-info" element={user ? <PersonalInfo /> : <Navigate to="/login" />} />
-          <Route path="/profile-edit-user/address-info" element={user ? <AddressInfo /> : <Navigate to="/login" />} />
-          <Route path="/profile-edit-user/profession-info" element={user ? <ProfessionInfo /> : <Navigate to="/login" />} />
-          <Route path="/profile-edit-user/bio-skills-info" element={user ? <BioSkillsInfo /> : <Navigate to="/login" />} />
-          <Route path="/profile-edit-user/media-info" element={user ? <MediaInfo /> : <Navigate to="/login" />} />
-          <Route path="/role-selection" element={user ? <RoleSelection /> : <Navigate to="/login" />} />
-          <Route path="/edit-recruit/new/company-info" element={<RecruitCompanyInfo isNew />} />
-          <Route path="/edit-recruit/:companyId/company-info" element={<RecruitCompanyInfo />} />
-          <Route path="/edit-recruit/:companyId/address-info" element={<RecruitAddressInfo />} />
-          <Route path="/edit-recruit/:companyId/contact-info" element={<RecruitContactInfo />} />
-          <Route path="/edit-recruit/:companyId/other-info" element={<RecruitOtherInfo />} />
-          <Route path="/edit-recruit/:companyId/social-media-info" element={<RecruitSocialMediaInfo />} />
-          <Route path="/profile-edit-recruiter" element={user ? <ProfileEditRecruits /> : <Navigate to="/login" />} />
-          <Route path="/user-profile/:userId" element={user ? <UserProfile /> : <Navigate to="/login" />} />
-          <Route path="/notifications" element={user ? <Notifications /> : <Navigate to="/login" />} />
-          <Route path="/public-profile/:userId" element={<PublicUserProfile />} />
-          <Route path="/portfolio/:slug/*" element={<Portfolio />}>
-            <Route index element={<Navigate to="about" replace />} />
-            <Route path="about" element={<AboutSection />} />
-            <Route path="profile" element={<ProfileSection />} />
-            <Route path="skills" element={<SkillsSection />} />
-            <Route path="bio" element={<BioSection />} />
-            <Route path="contact" element={<ContactSection />} />
-          </Route>
-          <Route path="/members" element={user ? <Members /> : <Navigate to="/login" />} />
-          <Route path="/skill-development" element={<SkillDevelopment />} />
-          <Route path="/activities" element={<ActivityList />} />
-          <Route path="/create-activity" element={<CreateActivity />} />
-          <Route path="/activities/:id" element={<ActivityDetail />} />
-          <Route path="/search-site" element={<SearchSite />} />
-          <Route path="/search-jobs" element={<SearchJobs />} />
-          <Route path="/search-activities" element={<SearchActivities />} />
-          <Route path="/search-members" element={<SearchMembers />} />
-        </Routes>
+      <div className="AppRoutes-mainContent">
+        {/* Controls for drag-and-drop and final view */}
+        {location.pathname.startsWith('/user-profile') && (
+          <div className="AppRoutes-controls">
+            <button
+              onClick={toggleDragAndDrop}
+              aria-label={isDragEnabled ? 'Disable Drag and Drop' : 'Enable Drag and Drop'}
+            >
+              <FaArrowsAltH size={20} />
+            </button>
+            <button
+              onClick={toggleFinalView}
+              aria-label={isFinalView ? 'Edit Profile Layout' : 'View Final Profile'}
+            >
+              {isFinalView ? <FaPencilAlt size={20} /> : <FaEye size={20} />}
+            </button>
+          </div>
+        )}
+
+        <div className="AppRoutes-pageContent">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/login" element={!user ? <LoginComponent /> : <Navigate to="/" />} />
+            <Route path="/register" element={!user ? <RegisterComponent /> : <Navigate to="/" />} />
+            <Route path="/password-reset" element={<PasswordResetComponent />} />
+            <Route path="/verify-email" element={<VerifyEmailComponent />} />
+            <Route path="/password-request-reset" element={<PasswordResetRequestComponent />} />
+            <Route
+              path="/profile-edit-user/personal-info"
+              element={user ? <PersonalInfo /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/profile-edit-user/address-info"
+              element={user ? <AddressInfo /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/profile-edit-user/profession-info"
+              element={user ? <ProfessionInfo /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/profile-edit-user/bio-skills-info"
+              element={user ? <BioSkillsInfo /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/profile-edit-user/media-info"
+              element={user ? <MediaInfo /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/role-selection"
+              element={user ? <RoleSelection /> : <Navigate to="/login" />}
+            />
+            <Route path="/edit-recruit/new/company-info" element={<RecruitCompanyInfo isNew />} />
+            <Route path="/edit-recruit/:companyId/company-info" element={<RecruitCompanyInfo />} />
+            <Route path="/edit-recruit/:companyId/address-info" element={<RecruitAddressInfo />} />
+            <Route path="/edit-recruit/:companyId/contact-info" element={<RecruitContactInfo />} />
+            <Route path="/edit-recruit/:companyId/other-info" element={<RecruitOtherInfo />} />
+            <Route
+              path="/edit-recruit/:companyId/social-media-info"
+              element={<RecruitSocialMediaInfo />}
+            />
+            <Route
+              path="/profile-edit-recruiter"
+              element={user ? <ProfileEditRecruits /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/user-profile/:userId"
+              element={
+                user ? (
+                  <UserProfile isDragEnabled={isDragEnabled} isFinalView={isFinalView} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/notifications"
+              element={user ? <Notifications /> : <Navigate to="/login" />}
+            />
+            <Route path="/public-profile/:userId" element={<PublicUserProfile />} />
+            <Route path="/portfolio/:slug/*" element={<Portfolio />}>
+              <Route index element={<Navigate to="about" replace />} />
+              <Route path="about" element={<AboutSection />} />
+              <Route path="profile" element={<ProfileSection />} />
+              <Route path="skills" element={<SkillsSection />} />
+              <Route path="bio" element={<BioSection />} />
+              <Route path="contact" element={<ContactSection />} />
+            </Route>
+            <Route path="/members" element={user ? <Members /> : <Navigate to="/login" />} />
+            <Route path="/skill-development" element={<SkillDevelopment />} />
+            <Route path="/activities" element={<ActivityList />} />
+            <Route path="/create-activity" element={<CreateActivity />} />
+            <Route path="/activities/:id" element={<ActivityDetail />} />
+            <Route path="/search-site" element={<SearchSite />} />
+            <Route path="/search-jobs" element={<SearchJobs />} />
+            <Route path="/search-activities" element={<SearchActivities />} />
+            <Route path="/search-members" element={<SearchMembers />} />
+          </Routes>
+        </div>
       </div>
       {!isPortfolioPage && <FooterGlobal />}
     </>

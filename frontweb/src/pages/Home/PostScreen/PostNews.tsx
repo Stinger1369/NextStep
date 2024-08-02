@@ -2,8 +2,18 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
 import { createPost, getAllPosts } from '../../../websocket/postWebSocket';
-import { initializeWebSocket, addEventListener, removeEventListener, addErrorListener } from '../../../websocket/websocket';
-import { fetchPostsRequest, fetchPostsSuccess, fetchPostsFailure, addPost } from '../../../redux/features/websocket/posts/postSlice';
+import {
+  initializeWebSocket,
+  addEventListener,
+  removeEventListener,
+  addErrorListener
+} from '../../../websocket/websocket';
+import {
+  fetchPostsRequest,
+  fetchPostsSuccess,
+  fetchPostsFailure,
+  addPost
+} from '../../../redux/features/websocket/posts/postSlice';
 import { fetchUser } from '../../../redux/features/websocket/users/userWebsocketThunks/userWebsocketThunks';
 import { setCurrentUser } from '../../../redux/features/websocket/users/userWebSocketSlice';
 import { selectPostsWithDates } from '../../../redux/selectors';
@@ -120,11 +130,11 @@ const PostNews: React.FC = () => {
   }
 
   return (
-    <Box className="home-job" sx={{ padding: '10px', margin: '10px auto', borderRadius: '8px', boxShadow: 2 }}>
+    <Box className="PostNews-homeJob">
       <Typography variant="h5" component="div" sx={{ marginBottom: '10px', textAlign: 'center' }}>
         HomeJob
       </Typography>
-      <Box className="create-post" sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px', borderRadius: '20px', padding: '10px', border: '1px solid #ddd' }}>
+      <Box className="PostNews-createPost">
         <TextField
           placeholder="Commencer un post"
           multiline

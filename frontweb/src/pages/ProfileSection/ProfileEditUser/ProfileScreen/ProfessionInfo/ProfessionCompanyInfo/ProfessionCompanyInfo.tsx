@@ -9,7 +9,8 @@ interface FormValues {
 }
 
 const ProfessionCompanyInfo: React.FC = () => {
-  const { getFieldProps, touched, errors }: FormikProps<FormValues> = useFormikContext<FormValues>();
+  const { getFieldProps, touched, errors }: FormikProps<FormValues> =
+    useFormikContext<FormValues>();
 
   return (
     <div className="profession-company-info">
@@ -23,13 +24,17 @@ const ProfessionCompanyInfo: React.FC = () => {
             </option>
           ))}
         </select>
-        {touched.profession && errors.profession ? <div className="text-danger">{errors.profession}</div> : null}
+        {touched.profession && errors.profession ? (
+          <div className="text-danger">{errors.profession}</div>
+        ) : null}
       </div>
 
       <div className="form-group">
         <label htmlFor="company">Company</label>
         <input type="text" id="company" {...getFieldProps('company')} className="form-control" />
-        {touched.company && errors.company ? <div className="text-danger">{errors.company}</div> : null}
+        {touched.company && errors.company ? (
+          <div className="text-danger">{errors.company}</div>
+        ) : null}
       </div>
     </div>
   );

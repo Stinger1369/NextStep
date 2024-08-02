@@ -29,7 +29,9 @@ const PasswordResetComponent: React.FC = () => {
     },
     validationSchema: Yup.object({
       code: Yup.string().required('Required'),
-      newPassword: Yup.string().min(6, 'Password must be at least 6 characters').required('Required')
+      newPassword: Yup.string()
+        .min(6, 'Password must be at least 6 characters')
+        .required('Required')
     }),
     onSubmit: async (values, { setSubmitting }) => {
       if (!email) {
@@ -58,8 +60,16 @@ const PasswordResetComponent: React.FC = () => {
       {message && <div className="message">{message}</div>}
       <form onSubmit={formik.handleSubmit} className="password-reset-form">
         <div className="form-field">
-          <input type="text" id="code" {...formik.getFieldProps('code')} placeholder="Verification Code" className={`input ${formik.touched.code && formik.errors.code ? 'error-input' : ''}`} />
-          {formik.touched.code && formik.errors.code ? <div className="error">{formik.errors.code}</div> : null}
+          <input
+            type="text"
+            id="code"
+            {...formik.getFieldProps('code')}
+            placeholder="Verification Code"
+            className={`input ${formik.touched.code && formik.errors.code ? 'error-input' : ''}`}
+          />
+          {formik.touched.code && formik.errors.code ? (
+            <div className="error">{formik.errors.code}</div>
+          ) : null}
         </div>
         <div className="form-field">
           <input
@@ -69,7 +79,9 @@ const PasswordResetComponent: React.FC = () => {
             placeholder="New Password"
             className={`input ${formik.touched.newPassword && formik.errors.newPassword ? 'error-input' : ''}`}
           />
-          {formik.touched.newPassword && formik.errors.newPassword ? <div className="error">{formik.errors.newPassword}</div> : null}
+          {formik.touched.newPassword && formik.errors.newPassword ? (
+            <div className="error">{formik.errors.newPassword}</div>
+          ) : null}
         </div>
         <button type="submit" className="submit-button" disabled={formik.isSubmitting}>
           {formik.isSubmitting ? 'Submitting...' : 'Submit'}

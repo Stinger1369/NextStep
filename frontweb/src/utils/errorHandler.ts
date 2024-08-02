@@ -15,7 +15,9 @@ export const handleImageErrors = (results: ImageError[]) => {
   if (failedImages.length > 0) {
     failedImages.forEach((failedImage) => {
       const errorMessage = failedImage.message || 'Unknown error occurred';
-      console.error(`Error with image "${failedImage.imageName}": ${userFriendlyMessages[failedImage.code as keyof typeof userFriendlyMessages] || errorMessage}`);
+      console.error(
+        `Error with image "${failedImage.imageName}": ${userFriendlyMessages[failedImage.code as keyof typeof userFriendlyMessages] || errorMessage}`
+      );
     });
   }
 };

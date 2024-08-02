@@ -1,9 +1,21 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
-import { subscribeToNotifications, initializeWebSocket, addErrorListener, unsubscribeFromNotifications } from '../../websocket/notificationWebSocket';
-import { fetchNotifications, addNewNotification } from '../../redux/features/websocket/notification/notificationActions';
-import { selectNotifications, selectNotificationsLoading, selectNotificationsError } from '../../redux/features/websocket/notification/notificationSlice';
+import {
+  subscribeToNotifications,
+  initializeWebSocket,
+  addErrorListener,
+  unsubscribeFromNotifications
+} from '../../websocket/notificationWebSocket';
+import {
+  fetchNotifications,
+  addNewNotification
+} from '../../redux/features/websocket/notification/notificationActions';
+import {
+  selectNotifications,
+  selectNotificationsLoading,
+  selectNotificationsError
+} from '../../redux/features/websocket/notification/notificationSlice';
 import './Notifications.css';
 
 const Notifications: React.FC = () => {
@@ -61,7 +73,9 @@ const Notifications: React.FC = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  const sortedNotifications = [...notifications].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const sortedNotifications = [...notifications].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   return (
     <div className="notifications-container">

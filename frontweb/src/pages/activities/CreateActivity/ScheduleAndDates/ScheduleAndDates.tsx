@@ -14,13 +14,37 @@ const ScheduleAndDates: React.FC = () => {
         <div className="card-body">
           <div className="form-group">
             <label htmlFor="date">Date</label>
-            <input id="date" name="date" type="date" onChange={handleChange} onBlur={handleBlur} value={values.date} className="form-control" />
+            <input
+              id="date"
+              name="date"
+              type="date"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.date}
+              className="form-control"
+            />
             {touched.date && errors.date && <div className="text-danger">{errors.date}</div>}
           </div>
           <div className="form-group">
             <label htmlFor="startTime.hour">Start Time</label>
-            <input id="startTime.hour" name="startTime.hour" type="number" onChange={handleChange} onBlur={handleBlur} value={values.startTime.hour} className="form-control" />
-            <input id="startTime.minute" name="startTime.minute" type="number" onChange={handleChange} onBlur={handleBlur} value={values.startTime.minute} className="form-control" />
+            <input
+              id="startTime.hour"
+              name="startTime.hour"
+              type="number"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.startTime.hour}
+              className="form-control"
+            />
+            <input
+              id="startTime.minute"
+              name="startTime.minute"
+              type="number"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.startTime.minute}
+              className="form-control"
+            />
             {touched.startTime && errors.startTime && (
               <div className="text-danger">
                 {errors.startTime.hour} {errors.startTime.minute}
@@ -29,8 +53,24 @@ const ScheduleAndDates: React.FC = () => {
           </div>
           <div className="form-group">
             <label htmlFor="endTime.hour">End Time</label>
-            <input id="endTime.hour" name="endTime.hour" type="number" onChange={handleChange} onBlur={handleBlur} value={values.endTime.hour} className="form-control" />
-            <input id="endTime.minute" name="endTime.minute" type="number" onChange={handleChange} onBlur={handleBlur} value={values.endTime.minute} className="form-control" />
+            <input
+              id="endTime.hour"
+              name="endTime.hour"
+              type="number"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.endTime.hour}
+              className="form-control"
+            />
+            <input
+              id="endTime.minute"
+              name="endTime.minute"
+              type="number"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.endTime.minute}
+              className="form-control"
+            />
             {touched.endTime && errors.endTime && (
               <div className="text-danger">
                 {errors.endTime.hour} {errors.endTime.minute}
@@ -39,7 +79,14 @@ const ScheduleAndDates: React.FC = () => {
           </div>
           <div className="form-group">
             <label htmlFor="repeatEvent">Repeat Event</label>
-            <input id="repeatEvent" name="repeatEvent" type="checkbox" onChange={handleChange} onBlur={handleBlur} checked={values.repeatEvent} />
+            <input
+              id="repeatEvent"
+              name="repeatEvent"
+              type="checkbox"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              checked={values.repeatEvent}
+            />
           </div>
           {values.repeatEvent && (
             <>
@@ -54,7 +101,9 @@ const ScheduleAndDates: React.FC = () => {
                   value={values.repeatEventFrequency ?? ''}
                   className="form-control"
                 />
-                {touched.repeatEventFrequency && errors.repeatEventFrequency && <div className="text-danger">{errors.repeatEventFrequency}</div>}
+                {touched.repeatEventFrequency && errors.repeatEventFrequency && (
+                  <div className="text-danger">{errors.repeatEventFrequency}</div>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="repeatEventDays">Repeat Days</label>
@@ -64,10 +113,14 @@ const ScheduleAndDates: React.FC = () => {
                   type="text"
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  value={Array.isArray(values.repeatEventDays) ? values.repeatEventDays.join(', ') : ''}
+                  value={
+                    Array.isArray(values.repeatEventDays) ? values.repeatEventDays.join(', ') : ''
+                  }
                   className="form-control"
                 />
-                {touched.repeatEventDays && errors.repeatEventDays && <div className="text-danger">{errors.repeatEventDays}</div>}
+                {touched.repeatEventDays && errors.repeatEventDays && (
+                  <div className="text-danger">{errors.repeatEventDays}</div>
+                )}
               </div>
             </>
           )}

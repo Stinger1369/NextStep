@@ -43,9 +43,30 @@ const RegisterComponent: React.FC = () => {
     <div className="register-container">
       {error && <div className="error">{error}</div>}
       <form onSubmit={handleSubmit} className="register-form">
-        <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email or Phone" className="register-input" required />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="register-input" required />
-        <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm Password" className="register-input" required />
+        <input
+          type="text"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email or Phone"
+          className="register-input"
+          required
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          className="register-input"
+          required
+        />
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Confirm Password"
+          className="register-input"
+          required
+        />
         <button type="submit" className="register-button">
           Register
         </button>

@@ -21,11 +21,23 @@ const Hobbies: React.FC<HobbiesProps> = () => {
             <div>
               {values.hobbies.map((hobby, index) => (
                 <div key={index} className="mb-2">
-                  <input type="text" {...getFieldProps(`hobbies.${index}`)} className="form-control mb-1" />
-                  <button type="button" className="btn btn-danger me-2" onClick={() => arrayHelpers.remove(index)}>
+                  <input
+                    type="text"
+                    {...getFieldProps(`hobbies.${index}`)}
+                    className="form-control mb-1"
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-danger me-2"
+                    onClick={() => arrayHelpers.remove(index)}
+                  >
                     Remove
                   </button>
-                  <button type="button" className="btn btn-secondary" onClick={() => arrayHelpers.insert(index + 1, '')}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => arrayHelpers.insert(index + 1, '')}
+                  >
                     Add
                   </button>
                 </div>

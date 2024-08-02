@@ -20,7 +20,8 @@ const PersonalInformation: React.FC<PersonalInformationProps> = ({ user }) => {
           <strong>Phone:</strong> {user.phone}
         </p>
         <p>
-          <strong>Address:</strong> {user.address?.street}, {user.address?.city}, {user.address?.state}, {user.address?.zipCode}, {user.address?.country}
+          <strong>Address:</strong> {user.address?.street}, {user.address?.city},{' '}
+          {user.address?.state}, {user.address?.zipCode}, {user.address?.country}
         </p>
       </div>
       <div className="separator"></div>

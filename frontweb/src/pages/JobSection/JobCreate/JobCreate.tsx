@@ -26,7 +26,9 @@ const JobCreate: React.FC = () => {
       requirements: Yup.string().required('Requirements are required'),
       company: Yup.string().required('Company ID is required'),
       location: Yup.string().required('Location is required'),
-      salary: Yup.number().required('Salary is required').positive('Salary must be a positive number')
+      salary: Yup.number()
+        .required('Salary is required')
+        .positive('Salary must be a positive number')
     }),
     onSubmit: async (values) => {
       const requirementsArray = values.requirements.split(',').map((req) => req.trim());
@@ -50,33 +52,92 @@ const JobCreate: React.FC = () => {
       <form onSubmit={formik.handleSubmit}>
         <div>
           <label htmlFor="title">Title</label>
-          <input id="title" type="text" name="title" value={formik.values.title} onChange={formik.handleChange} onBlur={formik.handleBlur} required />
-          {formik.touched.title && formik.errors.title ? <div className="text-danger">{formik.errors.title}</div> : null}
+          <input
+            id="title"
+            type="text"
+            name="title"
+            value={formik.values.title}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            required
+          />
+          {formik.touched.title && formik.errors.title ? (
+            <div className="text-danger">{formik.errors.title}</div>
+          ) : null}
         </div>
         <div>
           <label htmlFor="description">Description</label>
-          <textarea id="description" name="description" value={formik.values.description} onChange={formik.handleChange} onBlur={formik.handleBlur} required />
-          {formik.touched.description && formik.errors.description ? <div className="text-danger">{formik.errors.description}</div> : null}
+          <textarea
+            id="description"
+            name="description"
+            value={formik.values.description}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            required
+          />
+          {formik.touched.description && formik.errors.description ? (
+            <div className="text-danger">{formik.errors.description}</div>
+          ) : null}
         </div>
         <div>
           <label htmlFor="requirements">Requirements (comma separated)</label>
-          <input id="requirements" type="text" name="requirements" value={formik.values.requirements} onChange={formik.handleChange} onBlur={formik.handleBlur} required />
-          {formik.touched.requirements && formik.errors.requirements ? <div className="text-danger">{formik.errors.requirements}</div> : null}
+          <input
+            id="requirements"
+            type="text"
+            name="requirements"
+            value={formik.values.requirements}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            required
+          />
+          {formik.touched.requirements && formik.errors.requirements ? (
+            <div className="text-danger">{formik.errors.requirements}</div>
+          ) : null}
         </div>
         <div>
           <label htmlFor="company">Company ID</label>
-          <input id="company" type="text" name="company" value={formik.values.company} onChange={formik.handleChange} onBlur={formik.handleBlur} required />
-          {formik.touched.company && formik.errors.company ? <div className="text-danger">{formik.errors.company}</div> : null}
+          <input
+            id="company"
+            type="text"
+            name="company"
+            value={formik.values.company}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            required
+          />
+          {formik.touched.company && formik.errors.company ? (
+            <div className="text-danger">{formik.errors.company}</div>
+          ) : null}
         </div>
         <div>
           <label htmlFor="location">Location</label>
-          <input id="location" type="text" name="location" value={formik.values.location} onChange={formik.handleChange} onBlur={formik.handleBlur} required />
-          {formik.touched.location && formik.errors.location ? <div className="text-danger">{formik.errors.location}</div> : null}
+          <input
+            id="location"
+            type="text"
+            name="location"
+            value={formik.values.location}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            required
+          />
+          {formik.touched.location && formik.errors.location ? (
+            <div className="text-danger">{formik.errors.location}</div>
+          ) : null}
         </div>
         <div>
           <label htmlFor="salary">Salary</label>
-          <input id="salary" type="number" name="salary" value={formik.values.salary} onChange={formik.handleChange} onBlur={formik.handleBlur} required />
-          {formik.touched.salary && formik.errors.salary ? <div className="text-danger">{formik.errors.salary}</div> : null}
+          <input
+            id="salary"
+            type="number"
+            name="salary"
+            value={formik.values.salary}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            required
+          />
+          {formik.touched.salary && formik.errors.salary ? (
+            <div className="text-danger">{formik.errors.salary}</div>
+          ) : null}
         </div>
         <button type="submit">Create</button>
       </form>

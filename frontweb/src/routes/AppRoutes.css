@@ -1,0 +1,56 @@
+/* AppRoutes global container */
+.AppRoutes-mainContent {
+  display: flex;
+  padding-top: 20px;
+}
+
+/* AppRoutes controls column */
+.AppRoutes-controls {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 0;
+  z-index: 1000;
+  width: 50px; /* Adjusted for partial visibility */
+  overflow: hidden;
+  transition: width 0.3s ease-in-out;
+}
+
+.AppRoutes-controls:hover {
+  width: 80px; /* Expand width on hover */
+}
+
+/* Individual button style */
+.AppRoutes-controls button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Align icon to the start for partial visibility */
+  font-size: 18px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  width: 60px; /* Full width of button */
+  height: 60px;
+  transform: translateX(-20px); /* Partially visible */
+  opacity: 0.7; /* Slightly visible */
+}
+
+/* Hover effect to show full button */
+.AppRoutes-controls button:hover {
+  transform: translateX(0); /* Move to original position */
+  opacity: 1; /* Fully visible */
+}
+
+.AppRoutes-pageContent {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-left: 20px; /* Account for expanded control width */
+}

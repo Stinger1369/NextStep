@@ -41,7 +41,8 @@ const PublicUserProfile: React.FC = () => {
           <strong>Phone:</strong> {user.phone}
         </p>
         <p>
-          <strong>Address:</strong> {user.address?.street}, {user.address?.city}, {user.address?.state}, {user.address?.zipCode}, {user.address?.country}
+          <strong>Address:</strong> {user.address?.street}, {user.address?.city},{' '}
+          {user.address?.state}, {user.address?.zipCode}, {user.address?.country}
         </p>
       </div>
       <div className="profile-section">
@@ -57,16 +58,25 @@ const PublicUserProfile: React.FC = () => {
                 <strong>Employees:</strong> {company.numberOfEmployees}
               </p>
               <p>
-                <strong>Address:</strong> {company.address.street}, {company.address.city}, {company.address.state}, {company.address.zipCode}, {company.address.country}
+                <strong>Address:</strong> {company.address.street}, {company.address.city},{' '}
+                {company.address.state}, {company.address.zipCode}, {company.address.country}
               </p>
               <p>
                 <strong>Contact:</strong> {company.contactEmail} | {company.contactPhone}
               </p>
               <div className="social-media-links">
-                {company.socialMediaLinks?.linkedin && <a href={company.socialMediaLinks.linkedin}>LinkedIn</a>}
-                {company.socialMediaLinks?.facebook && <a href={company.socialMediaLinks.facebook}>Facebook</a>}
-                {company.socialMediaLinks?.twitter && <a href={company.socialMediaLinks.twitter}>Twitter</a>}
-                {company.socialMediaLinks?.instagram && <a href={company.socialMediaLinks.instagram}>Instagram</a>}
+                {company.socialMediaLinks?.linkedin && (
+                  <a href={company.socialMediaLinks.linkedin}>LinkedIn</a>
+                )}
+                {company.socialMediaLinks?.facebook && (
+                  <a href={company.socialMediaLinks.facebook}>Facebook</a>
+                )}
+                {company.socialMediaLinks?.twitter && (
+                  <a href={company.socialMediaLinks.twitter}>Twitter</a>
+                )}
+                {company.socialMediaLinks?.instagram && (
+                  <a href={company.socialMediaLinks.instagram}>Instagram</a>
+                )}
               </div>
             </li>
           ))}

@@ -11,12 +11,14 @@ export const selectPostsWithDates = createSelector(
     }))
 );
 
-export const selectCommentsWithDatesByPostId = createSelector([(state: RootState) => state.comments.comments, (_, postId: string) => postId], (comments, postId) =>
-  comments
-    .filter((comment) => comment.postId === postId)
-    .map((comment) => ({
-      ...comment,
-      createdAt: new Date(comment.createdAt),
-      updatedAt: new Date(comment.updatedAt)
-    }))
+export const selectCommentsWithDatesByPostId = createSelector(
+  [(state: RootState) => state.comments.comments, (_, postId: string) => postId],
+  (comments, postId) =>
+    comments
+      .filter((comment) => comment.postId === postId)
+      .map((comment) => ({
+        ...comment,
+        createdAt: new Date(comment.createdAt),
+        updatedAt: new Date(comment.updatedAt)
+      }))
 );

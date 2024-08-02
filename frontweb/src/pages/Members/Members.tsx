@@ -35,8 +35,19 @@ const Members: React.FC = () => {
         {users
           .filter((user) => user.firstName && user.lastName)
           .map((user) => (
-            <div key={user._id} className="member-card" onClick={() => handleUserClick(user._id)} onKeyDown={(event) => handleKeyDown(event, user._id)} tabIndex={0} role="button">
-              <img src={user.images && user.images.length > 0 ? user.images[0] : '/default-avatar.png'} alt={`${user.firstName} ${user.lastName}`} className="member-image" />
+            <div
+              key={user._id}
+              className="member-card"
+              onClick={() => handleUserClick(user._id)}
+              onKeyDown={(event) => handleKeyDown(event, user._id)}
+              tabIndex={0}
+              role="button"
+            >
+              <img
+                src={user.images && user.images.length > 0 ? user.images[0] : '/default-avatar.png'}
+                alt={`${user.firstName} ${user.lastName}`}
+                className="member-image"
+              />
               <div className="member-info">
                 <p>
                   {user.firstName} {user.lastName}
