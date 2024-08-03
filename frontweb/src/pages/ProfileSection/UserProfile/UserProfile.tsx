@@ -1,12 +1,9 @@
-// src/pages/ProfileSection/UserProfile/UserProfile.tsx
-
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
-import { getUserById } from '../../../redux/features/user/userSlice';
-import { getThemeStatus, changeThemeStatus } from '../../../redux/features/theme/thunks/themeThunk';
-import { ThemeStatus } from '../../../redux/features/theme/themeSlice';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { getUserById, updateUser } from '../../../redux/features/user/userSlice';
+import { getThemeStatus } from '../../../redux/features/theme/thunks/themeThunk';
+import { useParams, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './UserProfile.css';
 import ModalUserProfile from '../../../components/ModalUserProfile/ModalUserProfile';
@@ -18,8 +15,7 @@ import SocialMediaLinks from './SocialMediaLinks/SocialMediaLinks';
 import VideoGallery from './VideoGallery/VideoGallery';
 import Experience from './Experience/Experience';
 import SkillsUserProfile from './SkillsUserProfile/SkillsUserProfile';
-import ProfileActions from './ProfileActions/ProfileActions';
-import DragAndDrop from './DragAndDrop'; // Import the new component
+import DragAndDrop from './DragAndDrop';
 
 interface UserProfileProps {
   isDragEnabled: boolean;
@@ -28,20 +24,18 @@ interface UserProfileProps {
 
 const UserProfile: React.FC<UserProfileProps> = ({ isDragEnabled, isFinalView }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const location = useLocation();
-  const authUser = useSelector((state: RootState) => state.auth.user);
   const user = useSelector((state: RootState) => state.user.user);
   const themeStatus = useSelector((state: RootState) => state.theme.themeStatus);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImageIndex, setModalImageIndex] = useState(0);
-  const [themeLink, setThemeLink] = useState<HTMLLinkElement | null>(null);
   const [key, setKey] = useState(0);
+  const [themeLink, setThemeLink] = useState<HTMLLinkElement | null>(null);
 
   const initialCardOrder: string[] = [
     'ProfileHeader',
-    'ProfileActions',
     'ImageCarousel',
     'PersonalInformation',
     'SocialMediaLinks',
@@ -62,7 +56,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ isDragEnabled, isFinalView })
       ? JSON.parse(saved)
       : {
           ProfileHeader: 1,
-          ProfileActions: 1,
           ImageCarousel: 1,
           PersonalInformation: 1,
           SocialMediaLinks: 1,
@@ -85,7 +78,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isDragEnabled, isFinalView })
     if (user) {
       dispatch(getThemeStatus({ userId: user._id, profession: profession || 'No Profession' }));
     }
-  }, [user, dispatch, profession]);
+  }, [dispatch, user, profession]);
 
   useEffect(() => {
     if (themeStatus) {
@@ -93,38 +86,47 @@ const UserProfile: React.FC<UserProfileProps> = ({ isDragEnabled, isFinalView })
     }
   }, [themeStatus]);
 
-  const applyTheme = useCallback((themeStatus: ThemeStatus) => {
+  const applyTheme = useCallback((themeStatus: { theme_enabled: boolean; theme: string }) => {
     if (themeStatus.theme_enabled) {
+      console.log(`Activating theme: ${themeStatus.theme}`); // Ajout du log lors de l'activation du thème
       loadTheme(themeStatus.theme);
     } else {
+      console.log('Disabling theme'); // Ajout du log lors de la désactivation du thème
       removeTheme();
     }
   }, []);
 
-  const loadTheme = useCallback((theme: string) => {
-    removeTheme();
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = `/themes/${theme}.css?${new Date().getTime()}`;
-    document.head.appendChild(link);
-    setThemeLink(link);
-  }, []);
+ const loadTheme = useCallback((theme: string) => {
+   console.log(`Tentative de chargement du thème : ${theme}`); // Log lors de la tentative de chargement
+   removeTheme(); // Supprime les styles existants
 
-  const removeTheme = useCallback(() => {
-    const themeLinks = document.querySelectorAll('link[href*="/themes/"]');
-    themeLinks.forEach((link) => link.parentNode?.removeChild(link));
-    setThemeLink(null);
-  }, []);
+   const link = document.createElement('link');
+   link.rel = 'stylesheet';
+   link.href = `/themes/${theme}.css?${new Date().getTime()}`;
+   link.id = 'theme-stylesheet';
 
-  const toggleTheme = useCallback(async () => {
-    if (userId && user) {
-      await dispatch(changeThemeStatus({ userId, profession: profession || 'No Profession' }));
-      await dispatch(
-        getThemeStatus({ userId: user._id, profession: profession || 'No Profession' })
-      );
-      setKey((prevKey) => prevKey + 1);
-    }
-  }, [userId, user, profession, dispatch]);
+   link.onload = () => {
+     console.log(`Thème ${theme} chargé avec succès.`); // Log après le chargement réussi
+   };
+
+   link.onerror = () => {
+     console.error(`Échec du chargement du thème ${theme}.`); // Log en cas d'erreur de chargement
+   };
+
+   document.head.appendChild(link);
+   setThemeLink(link);
+ }, []);
+
+ const removeTheme = useCallback(() => {
+   console.log('Suppression du thème existant'); // Log lors de la suppression du thème
+   const existingLink = document.getElementById('theme-stylesheet');
+   if (existingLink) {
+     existingLink.parentNode?.removeChild(existingLink);
+     console.log('Thème existant supprimé'); // Confirmation de la suppression
+   }
+   setThemeLink(null);
+ }, []);
+
 
   useEffect(() => {
     return () => {
@@ -133,13 +135,32 @@ const UserProfile: React.FC<UserProfileProps> = ({ isDragEnabled, isFinalView })
   }, [removeTheme]);
 
   useEffect(() => {
+    setKey((prevKey) => prevKey + 1);
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem('columnCount', columnCount.toString());
     localStorage.setItem('cardSpans', JSON.stringify(cardSpans));
   }, [columnCount, cardSpans]);
 
-  const handleEditProfile = useCallback(() => {
-    navigate('/profile-edit-user/personal-info');
-  }, [navigate]);
+  const handleSaveProfileLayout = useCallback(async () => {
+    if (user) {
+      try {
+        const updatedData = {
+          ...user,
+          cardOrder,
+          columnCount,
+          cardSpans
+        };
+
+        await dispatch(updateUser({ id: user._id, userData: updatedData })); // Correct import used here
+        alert('La mise en page du profil a été enregistrée avec succès !');
+      } catch (error) {
+        console.error("Erreur lors de l'enregistrement de la mise en page :", error);
+        alert("Une erreur s'est produite lors de l'enregistrement de la mise en page.");
+      }
+    }
+  }, [user, cardOrder, columnCount, cardSpans, dispatch]);
 
   const openModal = useCallback((index: number) => {
     setModalImageIndex(index);
@@ -160,15 +181,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ isDragEnabled, isFinalView })
     switch (cardId) {
       case 'ProfileHeader':
         return <ProfileHeader user={user} />;
-      case 'ProfileActions':
-        return (
-          <ProfileActions
-            themeEnabled={themeStatus.theme_enabled}
-            toggleTheme={toggleTheme}
-            showEditButton={authUser?._id === user._id}
-            handleEditProfile={handleEditProfile}
-          />
-        );
       case 'ImageCarousel':
         return user.images && user.images.length > 0 ? (
           <ImageCarousel images={user.images} openModal={openModal} />
@@ -216,6 +228,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ isDragEnabled, isFinalView })
               </option>
             ))}
           </select>
+          <button
+            className="btn btn-primary"
+            onClick={handleSaveProfileLayout}
+            style={{ marginLeft: '10px' }}
+          >
+            Enregistrer la mise en page
+          </button>
         </div>
       )}
 

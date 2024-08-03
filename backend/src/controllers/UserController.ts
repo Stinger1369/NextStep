@@ -1,4 +1,4 @@
-// controllers/userController.ts
+// controllers/UserController.ts
 
 import { Request, Response } from "express";
 import mongoose from "mongoose";
@@ -60,7 +60,10 @@ export const updateUser = async (req: Request, res: Response) => {
     sex,
     dateOfBirth,
     showAge,
-    socialMediaLinks, // Expecting an array now
+    socialMediaLinks,
+    cardOrder, // New field
+    cardSpans, // New field
+    columnCount, // New field
   } = req.body;
 
   try {
@@ -108,10 +111,13 @@ export const updateUser = async (req: Request, res: Response) => {
       ...(dateOfBirth && { dateOfBirth }),
       ...(age !== undefined && { age }),
       ...(showAge !== undefined && { showAge }),
-      ...(socialMediaLinks && { socialMediaLinks }), // Now handling as an array
+      ...(socialMediaLinks && { socialMediaLinks }),
+      ...(cardOrder && { cardOrder }), // Handling card order
+      ...(cardSpans && { cardSpans }), // Handling card spans
+      ...(columnCount && { columnCount }), // Handling column count
     };
 
-    // Mettre à jour le champ slug si le prénom ou le nom de famille a changé
+    // Update slug if first or last name changed
     if (firstName || lastName) {
       const user = await User.findById(id);
       if (user) {

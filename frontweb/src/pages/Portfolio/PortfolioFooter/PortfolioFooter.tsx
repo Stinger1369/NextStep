@@ -1,96 +1,83 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
 import './PortfolioFooter.css';
+import { FaGithub, FaTwitter, FaInstagram, FaFacebook, FaDiscord, FaGlobe } from 'react-icons/fa';
+
+interface SocialMediaLink {
+  platform: string;
+  url: string;
+}
 
 interface PortfolioFooterProps {
   firstName: string;
   lastName: string;
   email: string;
-  socialMediaLinks?: {
-    github?: string;
-    twitter?: string;
-    instagram?: string;
-    facebook?: string;
-    discord?: string;
-  };
+  slug: string;
+  socialMediaLinks?: SocialMediaLink[];
 }
 
 const PortfolioFooter: React.FC<PortfolioFooterProps> = ({
   firstName,
   lastName,
   email,
-  socialMediaLinks
+  socialMediaLinks,
+  slug
 }) => {
+  const userSlug = slug || `${firstName.toLowerCase()}-${lastName.toLowerCase()}`;
+
+  // Helper function to get the icon component for a given social media platform
+  const getSocialMediaIcon = (platform: string) => {
+    switch (platform.toLowerCase()) {
+      case 'github':
+        return <FaGithub />;
+      case 'twitter':
+        return <FaTwitter />;
+      case 'instagram':
+        return <FaInstagram />;
+      case 'facebook':
+        return <FaFacebook />;
+      case 'discord':
+        return <FaDiscord />;
+      default:
+        return <FaGlobe />; // Default icon for unknown platforms
+    }
+  };
+
   return (
     <div className="PortfolioFooter mt-auto text-center">
-      <div className="container d-flex justify-content-between align-items-center">
-        <div className="social-media-links">
-          {socialMediaLinks?.github && (
-            <a
-              href={socialMediaLinks.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mx-2"
-            >
-              <i className="fab fa-github"></i>
-            </a>
-          )}
-          {socialMediaLinks?.twitter && (
-            <a
-              href={socialMediaLinks.twitter}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mx-2"
-            >
-              <i className="fab fa-twitter"></i>
-            </a>
-          )}
-          {socialMediaLinks?.instagram && (
-            <a
-              href={socialMediaLinks.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mx-2"
-            >
-              <i className="fab fa-instagram"></i>
-            </a>
-          )}
-          {socialMediaLinks?.facebook && (
-            <a
-              href={socialMediaLinks.facebook}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mx-2"
-            >
-              <i className="fab fa-facebook"></i>
-            </a>
-          )}
-          {socialMediaLinks?.discord && (
-            <a
-              href={socialMediaLinks.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mx-2"
-            >
-              <i className="fab fa-discord"></i>
-            </a>
-          )}
+      <div className="PortfolioFooter-container d-flex justify-content-between align-items-center">
+        <div className="PortfolioFooter-social-media-links">
+          {socialMediaLinks &&
+            socialMediaLinks.map((link, index) => (
+              <a
+                key={index}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="PortfolioFooter-social-link mx-1"
+                aria-label={link.platform}
+              >
+                {getSocialMediaIcon(link.platform)}
+              </a>
+            ))}
         </div>
-        <div className="text-center">
-          <span className="text-muted">
+
+        <div className="PortfolioFooter-text text-center">
+          <span className="PortfolioFooter-text-muted">
             &copy; {new Date().getFullYear()} {firstName} {lastName} -{' '}
-            <a href={`mailto:${email}`}>{email}</a>
+            <a href={`mailto:${email}`} className="PortfolioFooter-email-link">
+              {email}
+            </a>
           </span>
         </div>
-        <div className="useful-links">
-          <a href="/portfolio/bilel-zaaraoui/contact" className="mx-2 text-muted">
+
+        <div className="PortfolioFooter-useful-links">
+          <a href={`/portfolio/${userSlug}/contact`} className="PortfolioFooter-link mx-1">
             Contact
           </a>
-          <a href="/portfolio/bilel-zaaraoui/about" className="mx-2 text-muted">
+          <a href={`/portfolio/${userSlug}/about`} className="PortfolioFooter-link mx-1">
             About
           </a>
-          {/* Add more links as needed */}
         </div>
       </div>
     </div>

@@ -1,5 +1,3 @@
-// redux/features/user/userSlice.ts
-
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '../../../axiosConfig';
 import { RootState } from '../../store';
@@ -12,7 +10,6 @@ interface Address {
   country?: string;
 }
 
-// Modification ici pour SocialMediaLink comme un tableau
 interface SocialMediaLink {
   platform: string;
   url: string;
@@ -41,7 +38,10 @@ export interface User {
   company?: string;
   companyId?: string;
   companies?: string[];
-  socialMediaLinks?: SocialMediaLink[]; // Update here to match the new structure
+  socialMediaLinks?: SocialMediaLink[];
+  cardOrder?: string[]; // New field
+  cardSpans?: Record<string, number>; // New field
+  columnCount?: number; // New field
 }
 
 interface UserState {
@@ -58,6 +58,7 @@ const initialState: UserState = {
   error: null
 };
 
+// Existing thunks
 export const getUsers = createAsyncThunk('user/getUsers', async () => {
   const response = await axiosInstance.get('/users');
   return response.data;
@@ -92,6 +93,46 @@ export const updateUser = createAsyncThunk(
 export const deleteUser = createAsyncThunk('user/deleteUser', async (id: string) => {
   await axiosInstance.delete(`/users/${id}`);
   return id;
+});
+
+// New Thunks for Layout
+export const updateUserLayout = createAsyncThunk(
+  'user/updateUserLayout',
+  async (
+    {
+      id,
+      layoutData
+    }: {
+      id: string;
+      layoutData: { cardOrder: string[]; cardSpans: Record<string, number>; columnCount: number };
+    },
+    { getState }
+  ) => {
+    const state = getState() as RootState;
+    const token = state.auth.token;
+
+    try {
+      const response = await axiosInstance.put(`/users/${id}`, layoutData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      console.log('User layout updated successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating user layout:', error);
+      throw error;
+    }
+  }
+);
+
+export const fetchUserLayout = createAsyncThunk('user/fetchUserLayout', async (id: string) => {
+  const response = await axiosInstance.get(`/users/${id}`);
+  return {
+    cardOrder: response.data.cardOrder || [],
+    cardSpans: response.data.cardSpans || {},
+    columnCount: response.data.columnCount || 3
+  };
 });
 
 const userSlice = createSlice({
@@ -143,6 +184,17 @@ const userSlice = createSlice({
       .addCase(deleteUser.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to delete user';
+      })
+      // Layout reducers
+      .addCase(updateUserLayout.fulfilled, (state, action: PayloadAction<User>) => {
+        state.user = { ...state.user, ...action.payload };
+      })
+      .addCase(fetchUserLayout.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user.cardOrder = action.payload.cardOrder;
+          state.user.cardSpans = action.payload.cardSpans;
+          state.user.columnCount = action.payload.columnCount;
+        }
       });
   }
 });

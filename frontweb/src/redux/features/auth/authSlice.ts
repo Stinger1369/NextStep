@@ -47,7 +47,10 @@ export interface User {
   company?: string;
   companyId?: string;
   companies?: string[];
-  socialMediaLinks?: SocialMediaLink[]; // Update here to reflect the new structure
+  socialMediaLinks?: SocialMediaLink[];
+  cardOrder?: string[];
+  cardSpans?: Record<string, number>;
+  columnCount?: number;
 }
 
 interface AuthState {

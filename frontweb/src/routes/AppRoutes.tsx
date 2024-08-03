@@ -1,6 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate
+} from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../redux/store';
 import Home from '../pages/Home/Home';
 import About from '../pages/About/About';
 import LoginComponent from '../pages/LoginPages/LoginComponent';
@@ -31,8 +39,8 @@ import BioSection from '../pages/Portfolio/Bio/Bio';
 import ContactSection from '../pages/Portfolio/Contact/Contact';
 import Notifications from '../components/Notifications/Notifications';
 import Members from '../pages/Members/Members';
-import { RootState, AppDispatch } from '../redux/store';
 import { getCompanies } from '../redux/features/company/companySlice';
+import { getThemeStatus, changeThemeStatus } from '../redux/features/theme/thunks/themeThunk';
 import FooterGlobal from '../components/FooterGlobal/FooterGlobal';
 import SkillDevelopment from '../pages/Home/SkillDevelopment/SkillDevelopment';
 import CreateActivity from '../pages/activities/CreateActivity/CreateActivity';
@@ -42,18 +50,19 @@ import SearchSite from '../components/SearchDropdown/SearchSite/SearchSite';
 import SearchJobs from '../components/SearchDropdown/SearchJobs/SearchJobs';
 import SearchActivities from '../components/SearchDropdown/SearchActivities/SearchActivities';
 import SearchMembers from '../components/SearchDropdown/SearchMembers/SearchMembers';
+import { FaArrowsAltH, FaPencilAlt, FaEye, FaToggleOn, FaToggleOff } from 'react-icons/fa'; // Add theme icons
+import 'bootstrap/dist/css/bootstrap.min.css';
 import '../App.css';
 import '../index.css';
 import './AppRoutes.css';
 
-// Import react-icons
-import { FaArrowsAltH, FaPencilAlt, FaEye } from 'react-icons/fa';
-
 const AppRoutes: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const status = useSelector((state: RootState) => state.company.status);
+  const themeStatus = useSelector((state: RootState) => state.theme.themeStatus);
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (status === 'idle' && user) {
@@ -75,11 +84,38 @@ const AppRoutes: React.FC = () => {
     setIsFinalView((prev) => !prev);
   };
 
+  const handleEditProfile = useCallback(() => {
+    console.log('Navigating to edit profile');
+    navigate('/profile-edit-user/personal-info');
+  }, [navigate]);
+
+  const toggleTheme = useCallback(() => {
+    if (user) {
+      const isCurrentlyEnabled = themeStatus.theme_enabled;
+      console.log(`Current theme state: ${isCurrentlyEnabled ? 'Enabled' : 'Disabled'}`); // Log current theme state
+
+      dispatch(
+        changeThemeStatus({ userId: user._id, profession: user.profession || 'No Profession' })
+      )
+        .then(() => {
+          dispatch(
+            getThemeStatus({ userId: user._id, profession: user.profession || 'No Profession' })
+          );
+
+          const newThemeState = !isCurrentlyEnabled;
+          console.log(`Theme ${newThemeState ? 'Enabled' : 'Disabled'} successfully`); // Log new theme state
+        })
+        .catch((error) => {
+          console.error('Failed to toggle theme:', error); // Log any errors
+        });
+    }
+  }, [dispatch, user, themeStatus]);
+
   return (
     <>
       <Navbar />
       <div className="AppRoutes-mainContent">
-        {/* Controls for drag-and-drop and final view */}
+        {/* Controls for drag-and-drop, view mode, and other profile actions */}
         {location.pathname.startsWith('/user-profile') && (
           <div className="AppRoutes-controls">
             <button
@@ -87,13 +123,29 @@ const AppRoutes: React.FC = () => {
               aria-label={isDragEnabled ? 'Disable Drag and Drop' : 'Enable Drag and Drop'}
             >
               <FaArrowsAltH size={20} />
+              {isDragEnabled ? 'Disable Drag' : 'Enable Drag'}
             </button>
             <button
               onClick={toggleFinalView}
               aria-label={isFinalView ? 'Edit Profile Layout' : 'View Final Profile'}
             >
               {isFinalView ? <FaPencilAlt size={20} /> : <FaEye size={20} />}
+              {isFinalView ? 'Edit Profile Layout' : 'View Final Profile'}
             </button>
+            <button
+              onClick={toggleTheme}
+              aria-label={themeStatus.theme_enabled ? 'Disable Theme' : 'Enable Theme'}
+              className="theme-toggle-button"
+            >
+              {themeStatus.theme_enabled ? <FaToggleOff size={20} /> : <FaToggleOn size={20} />}
+              {themeStatus.theme_enabled ? 'Disable Theme' : 'Enable Theme'}
+            </button>
+            {user && (
+              <button onClick={handleEditProfile} className="edit-profile-button">
+                <FaPencilAlt size={20} />
+                Edit My Profile
+              </button>
+            )}
           </div>
         )}
 

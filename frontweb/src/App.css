@@ -1,26 +1,30 @@
 html,
-body {
+body,
+#root {
   height: 100%;
   margin: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-#root {
+.app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-.App {
+.content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  flex: 1;
 }
 
-.main-content {
+.AppRoutes-mainContent {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Footer Styles */
 .footer-global {
   display: flex;
   justify-content: space-between;
@@ -29,30 +33,5 @@ body {
   background-color: #343a40;
   color: white;
   width: 100%;
-}
-
-.footer-global .nav-links,
-.footer-global .social-links {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  list-style: none;
-  padding: 0;
-  gap: 15px;
-}
-
-.footer-global .social-links a {
-  color: white;
-  text-decoration: none;
-  font-size: 1.5rem;
-}
-
-.footer-global .nav-links a {
-  color: white;
-  text-decoration: none;
-}
-
-.footer-global .nav-links a:hover,
-.footer-global .social-links a:hover {
-  color: #ffc107;
+  position: relative; /* Assurez-vous que c'est 'relative' pour qu'il reste en bas */
 }

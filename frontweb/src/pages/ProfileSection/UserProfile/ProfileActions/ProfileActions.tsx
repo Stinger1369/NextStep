@@ -1,7 +1,7 @@
 // src/pages/ProfileSection/UserProfile/components/ProfileActions/ProfileActions.tsx
 
 import React from 'react';
-import './ProfileActions.css'; // Import a new CSS file for ProfileActions
+import './ProfileActions.css'; // Import the CSS file for ProfileActions
 
 interface ProfileActionsProps {
   themeEnabled: boolean;
@@ -23,7 +23,13 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
       </button>
 
       {showEditButton && (
-        <button className="btn btn-outline-primary edit-profile-btn" onClick={handleEditProfile}>
+        <button
+          className="btn btn-outline-primary edit-profile-btn"
+          onClick={() => {
+            console.log('Edit Profile button clicked'); // Log to see if button is clicked
+            handleEditProfile(); // Call the edit profile handler
+          }}
+        >
           Edit My Profile
         </button>
       )}

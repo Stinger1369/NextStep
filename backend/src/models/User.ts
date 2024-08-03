@@ -10,7 +10,6 @@ interface Address {
 }
 
 interface SocialMediaLink {
-  // Change to an array of links
   platform: string;
   url: string;
 }
@@ -43,8 +42,13 @@ export interface IUser extends Document {
   company?: string;
   companyId?: string;
   companies?: mongoose.Types.ObjectId[];
-  socialMediaLinks?: SocialMediaLink[]; // Updated to an array of SocialMediaLink
+  socialMediaLinks?: SocialMediaLink[];
   slug: string;
+
+  // New fields for card settings
+  cardOrder?: string[];
+  cardSpans?: Record<string, number>;
+  columnCount?: number;
 }
 
 const UserSchema: Schema = new Schema({
@@ -89,8 +93,13 @@ const UserSchema: Schema = new Schema({
       platform: { type: String, required: true },
       url: { type: String, required: true },
     },
-  ], // Updated to an array of objects
+  ],
   slug: { type: String, unique: true },
+
+  // Fields for user profile customization
+  cardOrder: { type: [String], default: [] },
+  cardSpans: { type: Map, of: Number, default: {} },
+  columnCount: { type: Number, default: 3 },
 });
 
 UserSchema.pre<IUser>("save", function (next) {
@@ -111,7 +120,7 @@ UserSchema.pre<IUser>("save", function (next) {
   if (this.firstName && this.lastName) {
     this.slug = `${this.firstName.toLowerCase()}-${this.lastName.toLowerCase()}`;
   } else if (!this.slug) {
-    this.slug = `user-${new Date().getTime()}`; // Slug unique basé sur timestamp
+    this.slug = `user-${new Date().getTime()}`;
   }
 
   next();

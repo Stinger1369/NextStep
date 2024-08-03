@@ -27,16 +27,19 @@ interface SortableItemProps {
 
 /* eslint-disable react/prop-types */
 const SortableItem: React.FC<SortableItemProps> = React.memo(({ id, children, columnSpan }) => {
+  // Get the sortable hook
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id
   });
 
+  // Style configuration
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     gridColumn: `span ${columnSpan}`,
     opacity: isDragging ? 0.7 : undefined,
-    zIndex: isDragging ? 1000 : undefined
+    zIndex: isDragging ? 1000 : undefined,
+    cursor: isDragging ? 'grabbing' : 'pointer'
   };
 
   return (
@@ -44,7 +47,7 @@ const SortableItem: React.FC<SortableItemProps> = React.memo(({ id, children, co
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
+      {...listeners} // Correct placement of listeners and attributes
       aria-label={`Drag and drop item for ${id}`}
     >
       {children}
@@ -52,9 +55,10 @@ const SortableItem: React.FC<SortableItemProps> = React.memo(({ id, children, co
   );
 });
 
-// Ajoutez une ligne pour le nom d'affichage
+// Set display name for React component debugging
 SortableItem.displayName = 'SortableItem';
 
+// Interface for DragAndDrop props
 interface DragAndDropProps {
   items: string[];
   cardSpans: Record<string, number>;
@@ -79,6 +83,7 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({
     })
   );
 
+  // Handle drag end event
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
@@ -94,6 +99,7 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({
     [setCardOrder]
   );
 
+  // Render the drag and drop context
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
@@ -108,6 +114,7 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({
             return (
               <SortableItem key={cardId} id={cardId} columnSpan={cardSpans[cardId]}>
                 <div className={`userProfile-card`}>
+                  {/* Remove listeners from here */}
                   <div className="drag-handle" aria-label="Drag handle">
                     ☰
                   </div>

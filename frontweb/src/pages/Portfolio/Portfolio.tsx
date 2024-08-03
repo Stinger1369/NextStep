@@ -35,12 +35,9 @@ interface User {
   companyId?: string;
   companies?: string[];
   socialMediaLinks?: {
-    github?: string;
-    twitter?: string;
-    instagram?: string;
-    facebook?: string;
-    discord?: string;
-  };
+    platform: string;
+    url: string;
+  }[];
   slug: string;
 }
 
@@ -80,6 +77,7 @@ const Portfolio: React.FC = () => {
             lastName={user.lastName}
             email={user.email}
             socialMediaLinks={user.socialMediaLinks}
+            slug={user.slug}
           />
         </>
       ) : (
