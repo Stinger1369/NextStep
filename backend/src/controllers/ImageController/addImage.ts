@@ -60,8 +60,9 @@ export const addImage = async (req: Request, res: Response) => {
       });
     }
 
+    // Assuming the image server returns a complete URL, but we need only the relative path
     const relativeImagePath = response.data.link.replace(
-      `http://${config.serverDomain}:7000`,
+      `${config.imageServerURL}`,
       ""
     );
     console.log(

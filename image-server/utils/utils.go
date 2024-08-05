@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"image-server/config"
 	"log"
 	"os"
 	"os/exec"
@@ -10,7 +9,7 @@ import (
 
 const (
 	MaxImagesPerUser = 6
-	ServerBaseURL    = "http://135.125.244.65:7000/"
+	ServerBaseURL    = "http://localhost:7000/"
 
 	ErrInvalidRequestFormat  = "ERR001"
 	ErrEmptyUserID           = "ERR002"
@@ -27,7 +26,7 @@ const (
 	ErrImageAlreadyExists    = "ERR013"
 )
 
-// CheckImageForNSFW vérifie si une image contient du contenu NSFW en appelant un script Python via un script shell.
+// CheckImageForNSFW checks if an image contains NSFW content by calling a Python script via a shell script.
 func CheckImageForNSFW(filePath string) (bool, error) {
 	log.Printf("Checking image for NSFW: %s", filePath)
 
@@ -38,10 +37,13 @@ func CheckImageForNSFW(filePath string) (bool, error) {
 	}
 	defer logFile.Close()
 
-	scriptPath := config.GetEnv("NSFW_DETECTOR_SCRIPT_PATH", "utils/run_nsfw_detector.sh")
-	cmd := exec.Command("/bin/bash", scriptPath, filePath)
+	// Windows
+	scriptPath := "utils\\run_nsfw_detector.bat"
+	cmd := exec.Command("cmd.exe", "/C", scriptPath, filePath)
+
 	cmd.Stdout = logFile
 	cmd.Stderr = logFile
+
 	err = cmd.Run()
 	if err != nil {
 		log.Printf("Error executing command: %v", err)

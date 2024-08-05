@@ -11,9 +11,8 @@ export const config = {
   port: parseInt(process.env.PORT || "5000", 10),
   emailUser: process.env.EMAIL_USER || "defaultEmailUser",
   emailPass: process.env.EMAIL_PASS || "defaultEmailPass",
-  redisURL: process.env.REDIS_URL || "redis://redis:6379",
+  redisURL: process.env.REDIS_URL || "redis://localhost:6379",
   imageServerURL:
-    process.env.IMAGE_SERVER_URL || `http://${process.env.SERVER_DOMAIN}:7000`,
+    process.env.IMAGE_SERVER_URL || "http://localhost:7000/server-image", // Use localhost directly
   maxImagesPerUser: parseInt(process.env.MAX_IMAGES_PER_USER || "5", 10),
-  serverDomain: process.env.SERVER_DOMAIN || "localhost",
 };
