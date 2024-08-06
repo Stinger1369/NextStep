@@ -1,48 +1,65 @@
-.VideoUpload-form-group {
+/* Container for the form group in MediaInfoVideoUpload */
+.MediaInfoVideoUpload-form-group {
   margin-top: 20px;
 }
 
-.VideoUpload-options {
+/* Options container in MediaInfoVideoUpload */
+.MediaInfoVideoUpload-options {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.VideoUpload-upload-icon-container {
-  position: relative;
-  cursor: pointer;
-  padding: 10px;
-  border: 2px dashed #ccc;
-  display: flex;
+/* Button for opening video modal in MediaInfoVideoUpload */
+.MediaInfoVideoUpload-button {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 300px;
-  margin-right: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: none;
+  transition: background-color 0.3s ease;
 }
 
-.VideoUpload-upload-icon {
+/* Icon inside upload button in MediaInfoVideoUpload */
+.MediaInfoVideoUpload-upload-icon {
   font-size: 24px;
   color: #007bff;
 }
 
-.VideoUpload-upload-text {
+/* Text inside upload button in MediaInfoVideoUpload */
+.MediaInfoVideoUpload-upload-text {
   margin-left: 10px;
   font-size: 16px;
   color: #007bff;
 }
 
-.VideoUpload-form-control {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
+/* Stop recording button style in MediaInfoVideoUpload */
+.MediaInfoVideoUpload-stop-button {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.VideoUpload-text-danger {
+.MediaInfoVideoUpload-stop-button:hover {
+  background-color: #c82333;
+}
+
+/* Progress bar styling in MediaInfoVideoUpload */
+.MediaInfoVideoUpload-progress-bar {
+  margin-top: 10px;
+}
+
+/* Error message styling in MediaInfoVideoUpload */
+.MediaInfoVideoUpload-text-danger {
   color: red;
   margin-top: 5px;
+  font-weight: bold;
 }

@@ -16,14 +16,14 @@ const VideoModal: React.FC<VideoModalProps> = ({ show, onHide, onUpload, onRecor
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
 
-      // Check file size (max 2 minutes video file size estimation)
+      // Vérifie la taille du fichier (estimation de taille de fichier vidéo de 2 minutes maximum)
       const maxSize = 200 * 1024 * 1024; // Approx 200MB for 2-minute video
       if (file.size > maxSize) {
         setErrorMessage('The video must not exceed 2 minutes.');
       } else {
         setErrorMessage(null);
-        onUpload(file);
-        onHide(); // Close the modal after selecting a file
+        onUpload(file); // Envoie la vidéo après sélection du fichier
+        onHide(); // Ferme le modal après avoir sélectionné un fichier
       }
     }
   };
@@ -34,21 +34,23 @@ const VideoModal: React.FC<VideoModalProps> = ({ show, onHide, onUpload, onRecor
         <Modal.Title>Upload or Record Video</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className="video-options">
-          <label className="btn btn-primary">
+        <div className="VideoModal-options">
+          <label className="VideoModal-upload-button btn btn-primary">
             <input
               type="file"
               accept="video/*"
               style={{ display: 'none' }}
-              onChange={handleFileChange}
+              onChange={handleFileChange} // Gestionnaire de sélection de fichier
             />
             Select Video
           </label>
-          <Button variant="secondary" onClick={onRecord}>
+          <Button className="VideoModal-record-button" variant="secondary" onClick={onRecord}>
             Record Video
           </Button>
         </div>
-        {errorMessage && <div className="text-danger mt-2">{errorMessage}</div>}
+        {errorMessage && (
+          <div className="VideoModal-error-message text-danger mt-2">{errorMessage}</div>
+        )}
       </Modal.Body>
     </Modal>
   );

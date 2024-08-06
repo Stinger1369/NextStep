@@ -31,3 +31,33 @@
   cursor: pointer;
   font-size: 24px;
 }
+
+/* Video upload styles */
+.MediaInfoVideoUpload-form-group {
+  margin-bottom: 20px;
+}
+
+.MediaInfoVideoUpload-options {
+  display: flex;
+  align-items: center;
+}
+
+.MediaInfoVideoUpload-upload-icon {
+  margin-right: 10px;
+}
+
+.MediaInfoVideoUpload-upload-text {
+  font-weight: bold;
+}
+
+.MediaInfoVideoUpload-text-danger {
+  color: red;
+  margin-top: 10px;
+}
+
+.MediaInfo-video-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}

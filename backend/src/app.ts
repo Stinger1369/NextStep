@@ -9,8 +9,9 @@ import applicationRoutes from "./routes/applicationRoutes";
 import authRoutes from "./routes/authRoutes";
 import imageRoutes from "./routes/imageRoutes";
 import companyRoutes from "./routes/companyRoutes";
-import authMiddleware from "./middlewares/authMiddleware";
 import activityRoutes from "./routes/activityRoutes";
+import videoRoutes from "./routes/videoRoutes"; // Import the video routes
+import authMiddleware from "./middlewares/authMiddleware";
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.use("/api/jobs", authMiddleware, jobRoutes);
 app.use("/api/applications", authMiddleware, applicationRoutes);
 app.use("/api/images", authMiddleware, imageRoutes);
 app.use("/api/activities", authMiddleware, activityRoutes);
+app.use("/api/videos", authMiddleware, videoRoutes); // Register the video routes
 
 // Add a route for the root URL
 app.get("/", (req, res) => {

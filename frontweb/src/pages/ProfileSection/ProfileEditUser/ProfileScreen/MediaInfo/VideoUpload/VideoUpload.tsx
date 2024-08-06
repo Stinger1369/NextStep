@@ -1,5 +1,3 @@
-// VideoUpload.tsx
-
 import React, { useState } from 'react';
 import { FaVideo } from 'react-icons/fa';
 import VideoModal from './VideoModal/VideoModal';
@@ -17,6 +15,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ handleVideoUpload }) => {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Fonction pour démarrer l'enregistrement vidéo
   const handleRecord = async () => {
     setErrorMessage(null);
     setRecording(true);
@@ -35,7 +34,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ handleVideoUpload }) => {
         const file = new File([blob], 'recorded-video.webm', {
           type: 'video/webm'
         });
-        handleVideoUpload(file);
+        handleVideoUpload(file); // Envoie de la vidéo enregistrée
         setRecording(false);
         setMediaRecorder(null);
         setShowModal(false);
@@ -51,16 +50,18 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ handleVideoUpload }) => {
     }
   };
 
+  // Fonction pour arrêter l'enregistrement vidéo
   const stopRecording = () => {
     if (mediaRecorder) {
       mediaRecorder.stop();
     }
   };
 
+  // Fonction pour gérer l'upload de fichier vidéo
   const handleFileUpload = async (file: File) => {
-    handleVideoUpload(file);
+    handleVideoUpload(file); // Envoie de la vidéo sélectionnée
 
-    // Simulation de la progression du téléchargement
+    // Simulation de la progression de l'upload
     let progress = 0;
     const interval = setInterval(() => {
       progress += 10;
@@ -71,31 +72,48 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ handleVideoUpload }) => {
     }, 300);
   };
 
+  const handleModalClose = () => {
+    setShowModal(false);
+    setErrorMessage(null);
+    setUploadProgress(0);
+  };
+
   return (
-    <div className="VideoUpload-form-group">
+    <div className="MediaInfoVideoUpload-form-group">
       <label htmlFor="video">Télécharger ou enregistrer une vidéo (maximum 2 minutes)</label>
-      <div className="VideoUpload-options">
-        <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-          <FaVideo className="VideoUpload-upload-icon" />
-          <span className="VideoUpload-upload-text">Sélectionner une vidéo</span>
+      <div className="MediaInfoVideoUpload-options">
+        {/* Bouton pour ouvrir le modal vidéo */}
+        <button
+          className="MediaInfoVideoUpload-button btn btn-primary"
+          onClick={() => setShowModal(true)}
+        >
+          <FaVideo className="MediaInfoVideoUpload-upload-icon" />
+          <span className="MediaInfoVideoUpload-upload-text">Sélectionner une vidéo</span>
         </button>
         {recording && (
-          <button className="btn btn-danger" onClick={stopRecording}>
+          <button
+            className="MediaInfoVideoUpload-stop-button btn btn-danger"
+            onClick={stopRecording}
+          >
             Arrêter l'enregistrement
           </button>
         )}
       </div>
-      <ProgressBar now={uploadProgress} label={`${uploadProgress}%`} />
+      <ProgressBar
+        className="MediaInfoVideoUpload-progress-bar"
+        now={uploadProgress}
+        label={`${uploadProgress}%`}
+      />
 
       {showModal && (
         <VideoModal
           show={showModal}
-          onHide={() => setShowModal(false)}
+          onHide={handleModalClose}
           onUpload={handleFileUpload}
           onRecord={handleRecord}
         />
       )}
-      {errorMessage && <div className="VideoUpload-text-danger">{errorMessage}</div>}
+      {errorMessage && <div className="MediaInfoVideoUpload-text-danger">{errorMessage}</div>}
     </div>
   );
 };

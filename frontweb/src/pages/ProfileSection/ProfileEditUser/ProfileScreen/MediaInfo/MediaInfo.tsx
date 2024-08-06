@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './MediaInfo.css';
 import { RootState, AppDispatch } from '../../../../../redux/store';
-import { getUserById } from '../../../../../redux/features/user/userSlice';
 import FileUploadCrop from '../../../../../components/FileUploadAndCrop/CropImage/FileUploadCrop';
 import ImageUpload from './ImageUpload/ImageUpload';
 import ImagePreview from './ImagePreview/ImagePreview';
@@ -14,7 +13,7 @@ import NavigationIcons from './NavigationIcons/NavigationIcons';
 import VideoUpload from './VideoUpload/VideoUpload'; // Import the VideoUpload component
 import useImageHandlers from './hooks/useImageHandlers';
 import useImageEffects from './hooks/useImageEffects';
-import { encodeFileToBase64 } from '../../../../../utils/fileUtils'; // Ensure this import is correct
+import { encodeFileToBase64 } from '../../../../../utils/fileUtils';
 
 interface FormValues {
   images: File[];
@@ -33,8 +32,8 @@ interface UserData {
 const MediaInfo: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const user = useSelector((state: RootState) => state.auth.user) as User | null; // Ensure correct typing
-  const userData = useSelector((state: RootState) => state.user.user) as UserData | null; // Ensure correct typing
+  const user = useSelector((state: RootState) => state.auth.user) as User | null;
+  const userData = useSelector((state: RootState) => state.user.user) as UserData | null;
   const imageError = useSelector((state: RootState) => state.images.error);
   const imageErrors = useSelector((state: RootState) => state.images.imageErrors);
 
@@ -158,22 +157,21 @@ const MediaInfo: React.FC = () => {
     <div className="MediaInfo-container">
       <NavigationIcons navigate={navigate} />
       <form onSubmit={formik.handleSubmit} className="MediaInfo-form">
+        {/* Bouton pour uploader des images */}
         <ImageUpload
           formik={formik}
           handleImagesChange={handleImagesChange}
           isSaveDisabled={isSaveDisabled}
-          userData={userData || { images: [] }} // Provide a fallback for userData
+          userData={userData || { images: [] }}
         />
+
+        {/* Preview des images */}
         <ImagePreview
           imagePreviews={imagePreviews}
           imageErrors={imageErrors}
           openCropModal={openCropModal}
           handleDeleteImage={handleDeleteImage}
         />
-
-        {/* Add VideoUpload component */}
-        <VideoUpload handleVideoUpload={handleVideoUpload} />
-
         <div className="MediaInfo-button-container">
           <button
             type="submit"
@@ -191,6 +189,9 @@ const MediaInfo: React.FC = () => {
           </button>
         </div>
       </form>
+
+      {/* Bouton pour uploader des vidéos */}
+      <VideoUpload handleVideoUpload={handleVideoUpload} />
 
       {showSuccessMessage && (
         <div className="MediaInfo-success-message mt-3">

@@ -1,0 +1,32 @@
+/* Container for video options in VideoModal */
+.VideoModal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Upload button style in VideoModal */
+.VideoModal-upload-button {
+  display: inline-block;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 5px;
+}
+
+/* Record button style in VideoModal */
+.VideoModal-record-button {
+  display: inline-block;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+/* Error message styling in VideoModal */
+.VideoModal-error-message {
+  color: red;
+  margin-top: 10px;
+  font-weight: bold;
+}
