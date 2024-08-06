@@ -1,14 +1,17 @@
 package video
 
 import (
-    "path/filepath"
-    "github.com/gin-gonic/gin"
-    "log"
+	"github.com/gin-gonic/gin"
+	"image-server/utils"
+	"log"
+	"path/filepath"
 )
 
-func GetVideo(c *gin.Context) {
-    nom := c.Param("nom")
-    filePath := filepath.Join("public/videos", nom)
-    log.Printf("Fetching video: %s", filePath)
-    c.File(filePath)
+// Renommer la fonction pour éviter le conflit
+func FetchVideo(c *gin.Context) {
+	userID := c.Param("user_id")
+	nom := c.Param("nom")
+	filePath := filepath.Join(utils.GetUserDir(userID, "videos"), nom)
+	log.Printf("Fetching video: %s", filePath)
+	c.File(filePath)
 }

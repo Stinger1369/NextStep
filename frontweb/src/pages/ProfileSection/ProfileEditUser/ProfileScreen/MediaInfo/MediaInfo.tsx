@@ -1,6 +1,4 @@
-// MediaInfo.tsx
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +11,7 @@ import FileUploadCrop from '../../../../../components/FileUploadAndCrop/CropImag
 import ImageUpload from './ImageUpload/ImageUpload';
 import ImagePreview from './ImagePreview/ImagePreview';
 import NavigationIcons from './NavigationIcons/NavigationIcons';
+import VideoUpload from './VideoUpload/VideoUpload'; // Import the VideoUpload component
 import useImageHandlers from './hooks/useImageHandlers';
 import useImageEffects from './hooks/useImageEffects';
 import { encodeFileToBase64 } from '../../../../../utils/fileUtils'; // Ensure this import is correct
@@ -116,56 +115,104 @@ const MediaInfo: React.FC = () => {
     croppingImage
   });
 
+  // New function to handle video upload
+  const handleVideoUpload = async (file: File) => {
+    if (!user || !user._id) {
+      console.error('User ID is missing');
+      return;
+    }
 
-return (
-  <div className="MediaInfo-container">
-    <NavigationIcons navigate={navigate} />
-    <form onSubmit={formik.handleSubmit} className="MediaInfo-form">
-      <ImageUpload
-        formik={formik}
-        handleImagesChange={handleImagesChange}
-        isSaveDisabled={isSaveDisabled}
-        userData={userData || { images: [] }} // Provide a fallback for userData
-      />
-      <ImagePreview
-        imagePreviews={imagePreviews}
-        imageErrors={imageErrors}
-        openCropModal={openCropModal}
-        handleDeleteImage={handleDeleteImage}
-      />
-      <div className="MediaInfo-button-container">
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={isSaveDisabled || isSubmitting}
-        >
-          {isSubmitting ? 'Saving...' : 'Save'}
-        </button>
-        <button
-          type="button"
-          className="btn btn-success ms-2"
-          onClick={() => navigate(`/user-profile/${user?._id}`)}
-        >
-          Finish
-        </button>
-      </div>
-    </form>
+    setIsSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append('video', file);
+      formData.append('user_id', user._id);
 
-    {showSuccessMessage && (
-      <div className="MediaInfo-success-message mt-3">
-        <p>Your image has been added successfully.</p>
-      </div>
-    )}
+      const response = await fetch('http://localhost:7000/server-video/ajouter-video', {
+        method: 'POST',
+        body: formData
+      });
 
-    {croppingImage && (
-      <FileUploadCrop
-        imageSrc={croppingImage}
-        onCropComplete={handleCropComplete}
-        onClose={() => setCroppingImage(null)}
-      />
-    )}
-  </div>
-);
+      if (!response.ok) {
+        throw new Error('Failed to upload video');
+      }
+
+      const result = await response.json();
+      console.log('Video uploaded successfully:', result.link);
+      setShowSuccessMessage(true);
+    } catch (error) {
+      console.error('Error uploading video:', error);
+    }
+    setIsSubmitting(false);
+  };
+
+  // Effect to clear the success message after a few seconds
+  useEffect(() => {
+    if (showSuccessMessage) {
+      const timer = setTimeout(() => setShowSuccessMessage(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessMessage]);
+
+  return (
+    <div className="MediaInfo-container">
+      <NavigationIcons navigate={navigate} />
+      <form onSubmit={formik.handleSubmit} className="MediaInfo-form">
+        <ImageUpload
+          formik={formik}
+          handleImagesChange={handleImagesChange}
+          isSaveDisabled={isSaveDisabled}
+          userData={userData || { images: [] }} // Provide a fallback for userData
+        />
+        <ImagePreview
+          imagePreviews={imagePreviews}
+          imageErrors={imageErrors}
+          openCropModal={openCropModal}
+          handleDeleteImage={handleDeleteImage}
+        />
+
+        {/* Add VideoUpload component */}
+        <VideoUpload handleVideoUpload={handleVideoUpload} />
+
+        <div className="MediaInfo-button-container">
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={isSaveDisabled || isSubmitting}
+          >
+            {isSubmitting ? 'Saving...' : 'Save'}
+          </button>
+          <button
+            type="button"
+            className="btn btn-success ms-2"
+            onClick={() => navigate(`/user-profile/${user?._id}`)}
+          >
+            Finish
+          </button>
+        </div>
+      </form>
+
+      {showSuccessMessage && (
+        <div className="MediaInfo-success-message mt-3">
+          <p>Your image or video has been added successfully.</p>
+        </div>
+      )}
+
+      {imageError && (
+        <div className="alert alert-danger mt-3" role="alert">
+          {imageError.message}
+        </div>
+      )}
+
+      {croppingImage && (
+        <FileUploadCrop
+          imageSrc={croppingImage}
+          onCropComplete={handleCropComplete}
+          onClose={() => setCroppingImage(null)}
+        />
+      )}
+    </div>
+  );
 };
 
 export default MediaInfo;

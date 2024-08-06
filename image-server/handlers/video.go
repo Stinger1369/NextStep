@@ -25,7 +25,7 @@ func AjouterVideo(c *gin.Context) {
         return
     }
 
-    c.JSON(http.StatusOK, gin.H{"link": "http://135.125.244.65:7000/server-video/video/" + filename})
+    c.JSON(http.StatusOK, gin.H{"link": "http://localhost:7000/server-video/video/" + filename})
 }
 
 func GetVideo(c *gin.Context) {

@@ -1,3 +1,5 @@
+// src/redux/features/images/imageSlice.ts
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { addImage } from './thunks/addImage';
 import { addImages } from './thunks/addImages';
@@ -6,6 +8,7 @@ import { updateImage } from './thunks/updateImage';
 import { ERROR_CODES } from '../../../utils/errorCodes';
 import { userFriendlyMessages } from '../../../utils/errorMessages';
 
+// Interface pour l'état des images
 interface ImageState {
   images: string[];
   loading: boolean;
@@ -13,11 +16,13 @@ interface ImageState {
   imageErrors: { imageName: string; message: string; code: string | null }[];
 }
 
+// Interface pour les erreurs
 interface ErrorPayload {
   message: string;
   code: string | null;
 }
 
+// Interface pour les données d'images ajoutées
 interface AddImagesPayload {
   imageName: string;
   status: string;
@@ -26,6 +31,7 @@ interface AddImagesPayload {
   code?: string;
 }
 
+// État initial
 const initialState: ImageState = {
   images: [],
   loading: false,
@@ -39,6 +45,7 @@ const extractErrorCode = (message: string): string | null => {
   return match ? match[1] : null;
 };
 
+// Créer un slice pour les images
 const imageSlice = createSlice({
   name: 'images',
   initialState,

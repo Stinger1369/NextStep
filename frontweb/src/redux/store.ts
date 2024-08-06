@@ -3,6 +3,7 @@ import authReducer from './features/auth/authSlice';
 import companyReducer from './features/company/companySlice';
 import userReducer from './features/user/userSlice';
 import imageReducer from './features/image/imageSlice';
+import videoReducer from './features/video/videoSlice'; // Ajoutez le réducteur de vidéos
 import jobReducer from './features/jobs/jobSlice';
 import themeReducer from './features/theme/themeSlice';
 import postReducer, { selectPostsWithDates } from './features/websocket/posts/postSlice';
@@ -17,6 +18,7 @@ const store = configureStore({
     company: companyReducer,
     user: userReducer,
     images: imageReducer,
+    videos: videoReducer, // Ajoutez le réducteur de vidéos
     jobs: jobReducer,
     theme: themeReducer,
     posts: postReducer,

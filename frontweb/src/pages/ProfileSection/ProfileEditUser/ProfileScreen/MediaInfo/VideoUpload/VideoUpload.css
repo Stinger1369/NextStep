@@ -1,0 +1,48 @@
+.VideoUpload-form-group {
+  margin-top: 20px;
+}
+
+.VideoUpload-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.VideoUpload-upload-icon-container {
+  position: relative;
+  cursor: pointer;
+  padding: 10px;
+  border: 2px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 300px;
+  margin-right: 20px;
+}
+
+.VideoUpload-upload-icon {
+  font-size: 24px;
+  color: #007bff;
+}
+
+.VideoUpload-upload-text {
+  margin-left: 10px;
+  font-size: 16px;
+  color: #007bff;
+}
+
+.VideoUpload-form-control {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.VideoUpload-text-danger {
+  color: red;
+  margin-top: 5px;
+}

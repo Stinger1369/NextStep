@@ -14,5 +14,8 @@ export const config = {
   redisURL: process.env.REDIS_URL || "redis://localhost:6379",
   imageServerURL:
     process.env.IMAGE_SERVER_URL || "http://localhost:7000/server-image", // Use localhost directly
+  videoServerURL:
+    process.env.VIDEO_SERVER_URL || "http://localhost:7000/server-video", // Configuration for video server
   maxImagesPerUser: parseInt(process.env.MAX_IMAGES_PER_USER || "5", 10),
+  maxVideosPerUser: parseInt(process.env.MAX_VIDEOS_PER_USER || "5", 10), // New parameter for max videos
 };

@@ -1,32 +1,32 @@
-/* Conteneur principal pour MediaInfo */
+/* Main container for MediaInfo */
 .MediaInfo-container {
   padding: 20px;
 }
 
-/* Formulaire dans MediaInfo */
+/* Form in MediaInfo */
 .MediaInfo-form {
   margin-top: 20px;
 }
 
-/* Conteneur des boutons dans MediaInfo */
+/* Button container in MediaInfo */
 .MediaInfo-button-container {
   display: flex;
   justify-content: space-between;
 }
 
-/* Message de succès pour l'ajout d'image */
+/* Success message for adding image */
 .MediaInfo-success-message {
   color: green;
   font-weight: bold;
 }
 
-/* Icônes d'en-tête dans MediaInfo */
+/* Header icons in MediaInfo */
 .MediaInfo-header-icons {
   display: flex;
   justify-content: space-between;
 }
 
-/* Style pour chaque icône dans MediaInfo */
+/* Style for each icon in MediaInfo */
 .MediaInfo-icon {
   cursor: pointer;
   font-size: 24px;

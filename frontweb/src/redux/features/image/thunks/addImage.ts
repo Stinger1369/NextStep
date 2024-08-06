@@ -1,17 +1,22 @@
+// src/redux/thunks/addImage.ts
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../../axiosConfig';
 import { AxiosError } from 'axios';
 
+// Interface pour les erreurs lors de l'ajout d'images
 interface AddImageError {
   message: string;
   code: string | null;
 }
 
+// Interface pour les données de réponse d'erreur
 interface ErrorResponseData {
   message: string;
   code: string | null;
 }
 
+// Créer une action asynchrone pour ajouter une image
 export const addImage = createAsyncThunk<
   string, // Le type de retour en cas de succès
   { userId: string; imageName: string; imageBase64: string }, // Les arguments
@@ -31,7 +36,7 @@ export const addImage = createAsyncThunk<
         code: response.data.code
       });
     }
-    return response.data.images[response.data.images.length - 1]; // return the last added image URL
+    return response.data.images[response.data.images.length - 1]; // Retourner l'URL de la dernière image ajoutée
   } catch (error) {
     console.error('Error adding image:', error);
     if (isAxiosError<ErrorResponseData>(error)) {
@@ -49,7 +54,7 @@ export const addImage = createAsyncThunk<
   }
 });
 
-// Helper function to check if an error is an AxiosError with a specific response data type
+// Fonction d'aide pour vérifier si une erreur est un AxiosError avec un type de données de réponse spécifique
 function isAxiosError<T>(error: unknown): error is AxiosError<T> {
   return (error as AxiosError<T>).isAxiosError !== undefined;
 }

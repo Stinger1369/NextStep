@@ -25,7 +25,7 @@ func main() {
 
 	// Routes pour les vidéos
 	r.POST("/server-video/ajouter-video", video.AjouterVideo)
-	r.GET("/server-video/video/:user_id/:nom", video.GetVideo)
+	r.GET("/server-video/video/:user_id/:nom", video.FetchVideo)
 	r.PUT("/server-video/update-video/:user_id/:nom", video.UpdateVideo)
 	r.DELETE("/server-video/delete-video/:user_id/:nom", video.DeleteVideo)
 
@@ -33,3 +33,4 @@ func main() {
 	log.Printf("Server starting on port %s", port)
 	r.Run(":" + port)
 }
+
