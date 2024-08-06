@@ -1,0 +1,38 @@
+/* ImagePreview.css */
+.image-previews {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.image-preview-container {
+  position: relative;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.image-preview-container img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.edit-icon,
+.delete-icon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.edit-icon {
+  right: 30px;
+}
+
+.delete-icon {
+  right: 5px;
+}

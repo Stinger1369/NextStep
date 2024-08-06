@@ -11,6 +11,7 @@
   background: rgba(0, 0, 0, 0.8);
   z-index: 1000;
   flex-direction: column;
+  overflow: hidden; /* Add this to prevent scroll issues */
 }
 
 /* Controls for crop actions */
@@ -20,6 +21,7 @@
   width: 100px;
   position: absolute;
   bottom: 60px;
+  z-index: 1100; /* Ensure it is above the image */
 }
 
 /* Buttons inside the crop controls */
@@ -28,15 +30,17 @@
   border: none;
   color: white;
   cursor: pointer;
+  font-size: 24px; /* Make icons more prominent */
 }
 
 /* Aspect ratio buttons for the crop tool */
 .FileUploadCrop-aspectRatioButtons {
   display: flex;
   justify-content: space-around;
-  width: 200px;
+  width: 300px; /* Increase width for spacing */
   position: absolute;
   bottom: 20px;
+  z-index: 1100; /* Ensure it is above the image */
 }
 
 /* Buttons inside aspect ratio options */

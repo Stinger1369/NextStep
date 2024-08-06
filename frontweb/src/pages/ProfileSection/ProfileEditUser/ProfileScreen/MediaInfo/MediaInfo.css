@@ -1,53 +1,33 @@
-.media-info-container {
+/* Conteneur principal pour MediaInfo */
+.MediaInfo-container {
   padding: 20px;
 }
 
-.header-icons {
+/* Formulaire dans MediaInfo */
+.MediaInfo-form {
+  margin-top: 20px;
+}
+
+/* Conteneur des boutons dans MediaInfo */
+.MediaInfo-button-container {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
 }
 
-.icon {
+/* Message de succès pour l'ajout d'image */
+.MediaInfo-success-message {
+  color: green;
+  font-weight: bold;
+}
+
+/* Icônes d'en-tête dans MediaInfo */
+.MediaInfo-header-icons {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Style pour chaque icône dans MediaInfo */
+.MediaInfo-icon {
   cursor: pointer;
   font-size: 24px;
-}
-
-.media-info-form {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.image-previews img {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  margin-right: 10px;
-  cursor: pointer; /* Ajouté pour indiquer que l'image est cliquable */
-}
-
-.image-preview-container {
-  position: relative;
-  display: inline-block;
-}
-
-.delete-icon {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  cursor: pointer;
-  color: red;
-}
-
-.button-container {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.alert-danger {
-  color: red;
 }

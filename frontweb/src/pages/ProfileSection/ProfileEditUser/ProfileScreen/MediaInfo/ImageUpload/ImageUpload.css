@@ -1,0 +1,75 @@
+/* Styles pour le conteneur principal du groupe de formulaire */
+.ImageUpload-form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Conteneur de l'icône de téléchargement et du champ de fichier */
+.ImageUpload-upload-icon-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  padding: 10px;
+  border: 2px dashed #007bff; /* Bordure en pointillés pour montrer la zone de téléchargement */
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+  background-color: #f7f7f7;
+  margin-top: 10px;
+  justify-content: center; /* Centrer le contenu horizontalement */
+  width: 250px; /* Fixer la largeur */
+  height: 50px; /* Fixer la hauteur */
+  overflow: hidden; /* Masquer le texte "aucun fichier choisi" */
+}
+
+/* Style de l'icône de téléchargement */
+.ImageUpload-upload-icon {
+  margin-right: 10px;
+  font-size: 24px; /* Taille plus grande pour rendre l'icône plus visible */
+  color: #007bff;
+  transition: color 0.3s ease;
+}
+
+/* Style du champ d'entrée de fichier */
+.ImageUpload-form-control {
+  opacity: 0; /* Rendre l'élément transparent */
+  position: absolute; /* Placer au-dessus du conteneur */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* Texte pour indiquer le bouton de téléchargement */
+.ImageUpload-upload-text {
+  font-size: 16px;
+  color: #007bff;
+  user-select: none; /* Empêcher la sélection de texte */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* Styles pour le texte d'erreur */
+.ImageUpload-text-danger {
+  color: #dc3545; /* Couleur rouge pour les messages d'erreur */
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Effet de survol pour l'icône et le conteneur de téléchargement */
+.ImageUpload-upload-icon-container:hover {
+  background-color: #e9ecef;
+}
+
+.ImageUpload-upload-icon-container:hover .ImageUpload-upload-icon {
+  color: #0056b3; /* Couleur plus sombre pour l'icône au survol */
+}
+
+.ImageUpload-upload-icon-container:hover .ImageUpload-upload-text {
+  color: #0056b3; /* Couleur plus sombre pour le texte au survol */
+}
