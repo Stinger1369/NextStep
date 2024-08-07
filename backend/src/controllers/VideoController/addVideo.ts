@@ -46,7 +46,7 @@ export const addVideo = async (req: Request, res: Response) => {
       console.log(`User ${id} has reached the maximum number of videos`);
       return res.status(400).json({
         message: "You have reached the maximum number of videos allowed.",
-        code: ERROR_CODES.ErrMaxVideosReached,
+        code: ERROR_CODES.ErrMaxVideosReached, // Utiliser le nouveau code d'erreur
       });
     }
 
@@ -70,7 +70,7 @@ export const addVideo = async (req: Request, res: Response) => {
       if (response.data.code === ERROR_CODES.ErrVideoNSFW) {
         return res.status(400).json({
           message: "Video is inappropriate (NSFW) and has been removed",
-          code: ERROR_CODES.ErrVideoNSFW,
+          code: ERROR_CODES.ErrVideoNSFW, // Utiliser le nouveau code d'erreur
         });
       }
 
@@ -109,7 +109,7 @@ export const addVideo = async (req: Request, res: Response) => {
       console.log(`Video already exists for user ${id}: ${relativeVideoPath}`);
       return res.status(400).json({
         message: "This video already exists.",
-        code: ERROR_CODES.ErrVideoAlreadyExists,
+        code: ERROR_CODES.ErrVideoAlreadyExists, // Utiliser le nouveau code d'erreur
       });
     }
   } catch (error) {

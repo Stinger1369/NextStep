@@ -14,6 +14,7 @@ import VideoUpload from './VideoUpload/VideoUpload'; // Import the VideoUpload c
 import useImageHandlers from './hooks/useImageHandlers';
 import useImageEffects from './hooks/useImageEffects';
 import { encodeFileToBase64 } from '../../../../../utils/fileUtils';
+import { handleVideoErrors } from '../../../../../utils/errorHandler';
 
 interface FormValues {
   images: File[];
@@ -36,6 +37,7 @@ const MediaInfo: React.FC = () => {
   const userData = useSelector((state: RootState) => state.user.user) as UserData | null;
   const imageError = useSelector((state: RootState) => state.images.error);
   const imageErrors = useSelector((state: RootState) => state.images.imageErrors);
+  const videoError = useSelector((state: RootState) => state.videos.error); // Add video error selector
 
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,7 +56,8 @@ const MediaInfo: React.FC = () => {
       setIsSubmitting(true);
       console.log('Submitting form with values:', values);
 
-      if (user && user._id && userData?.images) {
+      // Using optional chaining (?.) for better readability
+      if (user?._id && userData?.images) {
         const base64Images = await Promise.all(
           values.images.slice(0, 5 - userData.images.length).map(async (image) => {
             const base64 = await encodeFileToBase64(image);
@@ -116,7 +119,8 @@ const MediaInfo: React.FC = () => {
 
   // New function to handle video upload
   const handleVideoUpload = async (file: File) => {
-    if (!user || !user._id) {
+    if (!user?._id) {
+      // Using optional chaining
       console.error('User ID is missing');
       return;
     }
@@ -132,13 +136,25 @@ const MediaInfo: React.FC = () => {
         body: formData
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to upload video');
-      }
-
       const result = await response.json();
-      console.log('Video uploaded successfully:', result.link);
-      setShowSuccessMessage(true);
+      if (!response.ok) {
+        const errorResult = result as {
+          errors: { videoName: string; message: string; code: string }[];
+        }; // Cast to expected error response
+
+        // Map errors to include status
+        const mappedErrors = errorResult.errors.map((error) => ({
+          ...error,
+          status: 'failed' // Add status to each error
+        }));
+
+        console.error('Error uploading video:', mappedErrors);
+        handleVideoErrors(mappedErrors); // Handle video errors
+        setShowSuccessMessage(false);
+      } else {
+        console.log('Video uploaded successfully:', result.link);
+        setShowSuccessMessage(true);
+      }
     } catch (error) {
       console.error('Error uploading video:', error);
     }
@@ -154,9 +170,13 @@ const MediaInfo: React.FC = () => {
   }, [showSuccessMessage]);
 
   return (
-    <div className="MediaInfo-container">
+    <div className="media-info-container">
+      {' '}
+      {/* Using kebab-case for BEM class names */}
       <NavigationIcons navigate={navigate} />
-      <form onSubmit={formik.handleSubmit} className="MediaInfo-form">
+      <form onSubmit={formik.handleSubmit} className="media-info-form">
+        {' '}
+        {/* Using kebab-case for BEM class names */}
         {/* Bouton pour uploader des images */}
         <ImageUpload
           formik={formik}
@@ -164,7 +184,6 @@ const MediaInfo: React.FC = () => {
           isSaveDisabled={isSaveDisabled}
           userData={userData || { images: [] }}
         />
-
         {/* Preview des images */}
         <ImagePreview
           imagePreviews={imagePreviews}
@@ -172,7 +191,9 @@ const MediaInfo: React.FC = () => {
           openCropModal={openCropModal}
           handleDeleteImage={handleDeleteImage}
         />
-        <div className="MediaInfo-button-container">
+        <div className="media-info-button-container">
+          {' '}
+          {/* Using kebab-case for BEM class names */}
           <button
             type="submit"
             className="btn btn-primary"
@@ -183,28 +204,31 @@ const MediaInfo: React.FC = () => {
           <button
             type="button"
             className="btn btn-success ms-2"
-            onClick={() => navigate(`/user-profile/${user?._id}`)}
+            onClick={() => navigate(`/user-profile/${user?._id}`)} // Using optional chaining
           >
             Finish
           </button>
         </div>
       </form>
-
       {/* Bouton pour uploader des vidéos */}
       <VideoUpload handleVideoUpload={handleVideoUpload} />
-
       {showSuccessMessage && (
-        <div className="MediaInfo-success-message mt-3">
+        <div className="media-info-success-message mt-3">
+          {' '}
+          {/* Using kebab-case for BEM class names */}
           <p>Your image or video has been added successfully.</p>
         </div>
       )}
-
       {imageError && (
         <div className="alert alert-danger mt-3" role="alert">
           {imageError.message}
         </div>
       )}
-
+      {videoError && (
+        <div className="alert alert-danger mt-3" role="alert">
+          {videoError.message}
+        </div>
+      )}
       {croppingImage && (
         <FileUploadCrop
           imageSrc={croppingImage}

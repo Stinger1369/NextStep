@@ -1,9 +1,15 @@
-// src/utils/errorHandler.ts
+// frontweb/src/utils/errorHandler.ts
 
 import { userFriendlyMessages } from './errorMessages';
 
+export interface VideoError {
+  videoName: string;
+  status: string;
+  message: string;
+  code: string | null;
+}
+
 export interface ImageError {
-  // Ajoutez 'export' ici
   imageName: string;
   status: string;
   message: string;
@@ -16,7 +22,25 @@ export const handleImageErrors = (results: ImageError[]) => {
     failedImages.forEach((failedImage) => {
       const errorMessage = failedImage.message || 'Unknown error occurred';
       console.error(
-        `Error with image "${failedImage.imageName}": ${userFriendlyMessages[failedImage.code as keyof typeof userFriendlyMessages] || errorMessage}`
+        `Error with image "${failedImage.imageName}": ${
+          userFriendlyMessages[failedImage.code as keyof typeof userFriendlyMessages] ||
+          errorMessage
+        }`
+      );
+    });
+  }
+};
+
+export const handleVideoErrors = (results: VideoError[]) => {
+  const failedVideos = results.filter((result) => result.status === 'failed');
+  if (failedVideos.length > 0) {
+    failedVideos.forEach((failedVideo) => {
+      const errorMessage = failedVideo.message || 'Unknown error occurred';
+      console.error(
+        `Error with video "${failedVideo.videoName}": ${
+          userFriendlyMessages[failedVideo.code as keyof typeof userFriendlyMessages] ||
+          errorMessage
+        }`
       );
     });
   }
