@@ -10,7 +10,8 @@ import FileUploadCrop from '../../../../../components/FileUploadAndCrop/CropImag
 import ImageUpload from './ImageUpload/ImageUpload';
 import ImagePreview from './ImagePreview/ScreenImagePreview';
 import NavigationIcons from './NavigationIcons/NavigationIcons';
-import VideoUpload from './VideoUpload/VideoUpload';
+import VideoUpload from './VideoUpload/VideoUpload/VideoUpload';
+import VideoRecord from './VideoUpload/VideoRecord/VideoRecord';
 import useImageHandlers from './hooks/useImageHandlers';
 import useImageEffects from './hooks/useImageEffects';
 import { encodeFileToBase64 } from '../../../../../utils/fileUtils';
@@ -45,7 +46,7 @@ const MediaInfo: React.FC = () => {
   const imageErrors = useSelector((state: RootState) => state.images.imageErrors);
   const videoError = useSelector((state: RootState) => state.videos.error);
 
-  const [imagePreviews, setImagePreviews] = useState<ImagePreviewItem[]>([]); // Updated type
+  const [imagePreviews, setImagePreviews] = useState<ImagePreviewItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
@@ -163,23 +164,20 @@ const MediaInfo: React.FC = () => {
     setIsSubmitting(false);
   };
 
-  // UseEffect for NSFW image handling
- useEffect(() => {
-  if (imageErrors.length > 0) {
-    // Filtrez les images inappropriées
-    const appropriateImages = formik.values.images.filter(
-      (image) => !imageErrors.some(error => error.imageName === image.name)
-    );
-    formik.setFieldValue('images', appropriateImages);
+  useEffect(() => {
+    if (imageErrors.length > 0) {
+      const appropriateImages = formik.values.images.filter(
+        (image) => !imageErrors.some((error) => error.imageName === image.name)
+      );
+      formik.setFieldValue('images', appropriateImages);
 
-    // Mettez à jour les aperçus d'images
-    setImagePreviews(prevPreviews =>
-      prevPreviews.filter(preview =>
-        !imageErrors.some(error => error.imageName === preview.file.name)
-      )
-    );
-  }
-}, [imageErrors]);
+      setImagePreviews((prevPreviews) =>
+        prevPreviews.filter(
+          (preview) => !imageErrors.some((error) => error.imageName === preview.file.name)
+        )
+      );
+    }
+  }, [imageErrors]);
 
   useEffect(() => {
     if (showSuccessMessage) {
@@ -221,7 +219,11 @@ const MediaInfo: React.FC = () => {
           </button>
         </div>
       </form>
-      <VideoUpload handleVideoUpload={handleVideoUpload} />
+      <div className="video-section">
+        <h2>Upload or Record Video</h2>
+        <VideoUpload handleVideoUpload={handleVideoUpload} />
+        <VideoRecord handleVideoUpload={handleVideoUpload} />
+      </div>
       {showSuccessMessage && (
         <div className="media-info-success-message mt-3">
           <p>Your image or video has been added successfully.</p>

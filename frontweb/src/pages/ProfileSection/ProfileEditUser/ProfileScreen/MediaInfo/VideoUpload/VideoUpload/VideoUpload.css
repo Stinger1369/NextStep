@@ -1,0 +1,48 @@
+.VideoUpload-form-group,
+.VideoRecord-form-group {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.VideoUpload-options,
+.VideoRecord-options {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.VideoUpload-button,
+.VideoRecord-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  margin-right: 10px;
+}
+
+.VideoUpload-stop-button,
+.VideoRecord-stop-button {
+  background-color: #dc3545;
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  cursor: pointer;
+}
+
+.VideoUpload-upload-icon,
+.VideoRecord-icon {
+  margin-right: 8px;
+}
+
+.VideoUpload-progress-bar,
+.VideoRecord-progress-bar {
+  margin-top: 10px;
+  height: 20px;
+}
+
+.VideoUpload-text-danger,
+.VideoRecord-text-danger {
+  color: #dc3545;
+  margin-top: 5px;
+}

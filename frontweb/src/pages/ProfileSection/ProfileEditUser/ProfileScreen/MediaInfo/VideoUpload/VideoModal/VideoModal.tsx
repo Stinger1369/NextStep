@@ -16,14 +16,14 @@ const VideoModal: React.FC<VideoModalProps> = ({ show, onHide, onUpload, onRecor
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
 
-      // Vérifie la taille du fichier (estimation de taille de fichier vidéo de 2 minutes maximum)
+      // Check file size (approximate limit for a 2-minute video)
       const maxSize = 200 * 1024 * 1024; // Approx 200MB for 2-minute video
       if (file.size > maxSize) {
         setErrorMessage('The video must not exceed 2 minutes.');
       } else {
         setErrorMessage(null);
-        onUpload(file); // Envoie la vidéo après sélection du fichier
-        onHide(); // Ferme le modal après avoir sélectionné un fichier
+        onUpload(file); // Send video after selecting file
+        onHide(); // Close the modal after file selection
       }
     }
   };
@@ -40,7 +40,7 @@ const VideoModal: React.FC<VideoModalProps> = ({ show, onHide, onUpload, onRecor
               type="file"
               accept="video/*"
               style={{ display: 'none' }}
-              onChange={handleFileChange} // Gestionnaire de sélection de fichier
+              onChange={handleFileChange} // File selection handler
             />
             Select Video
           </label>
