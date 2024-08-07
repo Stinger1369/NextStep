@@ -1,14 +1,12 @@
-// src/redux/features/images/imageSlice.ts
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { addImage } from './thunks/addImage';
+import { addImage, AddImageResponse } from './thunks/addImage';
 import { addImages } from './thunks/addImages';
 import { deleteImage } from './thunks/deleteImage';
 import { updateImage } from './thunks/updateImage';
 import { ERROR_CODES } from '../../../utils/errorCodes';
 import { userFriendlyMessages } from '../../../utils/errorMessages';
 
-// Interface pour l'état des images
+// Interface for image state
 interface ImageState {
   images: string[];
   loading: boolean;
@@ -16,13 +14,13 @@ interface ImageState {
   imageErrors: { imageName: string; message: string; code: string | null }[];
 }
 
-// Interface pour les erreurs
+// Interface for error payload
 interface ErrorPayload {
   message: string;
   code: string | null;
 }
 
-// Interface pour les données d'images ajoutées
+// Interface for added image data
 interface AddImagesPayload {
   imageName: string;
   status: string;
@@ -31,7 +29,7 @@ interface AddImagesPayload {
   code?: string;
 }
 
-// État initial
+// Initial state
 const initialState: ImageState = {
   images: [],
   loading: false,
@@ -39,17 +37,27 @@ const initialState: ImageState = {
   imageErrors: []
 };
 
-// Fonction pour extraire le code d'erreur du message d'erreur
+// Function to extract error code from error message
 const extractErrorCode = (message: string): string | null => {
   const match = message.match(/\[([A-Z0-9]+)\]/);
   return match ? match[1] : null;
 };
 
-// Créer un slice pour les images
+// Create a slice for images
 const imageSlice = createSlice({
   name: 'images',
   initialState,
-  reducers: {},
+  reducers: {
+    removeNSFWImage: (state, action: PayloadAction<string>) => {
+      state.images = state.images.filter((image) => !image.includes(action.payload));
+      state.imageErrors = state.imageErrors.filter((error) => error.imageName !== action.payload);
+      state.error = null; // Reset error state
+    },
+    clearErrors: (state) => {
+      state.error = null;
+      state.imageErrors = [];
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(addImage.pending, (state) => {
@@ -57,23 +65,35 @@ const imageSlice = createSlice({
         state.error = null;
         console.log('addImage.pending');
       })
-      .addCase(addImage.fulfilled, (state, action) => {
+      .addCase(addImage.fulfilled, (state, action: PayloadAction<AddImageResponse>) => {
         state.loading = false;
-        state.images = [...new Set([...state.images, action.payload])]; // Éviter les duplicatas
+        state.images = [...new Set([...state.images, ...action.payload.images])]; // Avoid duplicates
         console.log('addImage.fulfilled:', action.payload);
       })
       .addCase(addImage.rejected, (state, action) => {
         state.loading = false;
-        console.error('addImage rejected:', action.payload);
         const payload = action.payload as ErrorPayload | undefined;
         if (payload && typeof payload.message === 'string') {
-          const errorCode = extractErrorCode(payload.message);
-          state.error = {
-            message: errorCode
-              ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
-              : payload.message.split(':')[0],
-            code: errorCode
-          };
+          const errorCode = payload.code || extractErrorCode(payload.message);
+
+          // Log NSFW images as info, not error
+          if (errorCode === ERROR_CODES.ErrImageNSFW) {
+            console.info('Image is inappropriate (NSFW):', payload.message);
+            state.imageErrors.push({
+              imageName: action.meta.arg.imageName,
+              message: 'Image is inappropriate (NSFW)',
+              code: errorCode
+            });
+          } else {
+            console.error('Error adding image:', payload.message);
+            state.error = {
+              message:
+                errorCode && userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
+                  ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
+                  : payload.message,
+              code: errorCode
+            };
+          }
         } else {
           state.error = {
             message: 'Failed to add image',
@@ -92,7 +112,7 @@ const imageSlice = createSlice({
         const successfulImages = action.payload
           .filter((img) => img.status === 'success' && img.url !== undefined)
           .map((img) => img.url as string);
-        state.images = [...new Set([...state.images, ...successfulImages])]; // Éviter les duplicatas
+        state.images = [...new Set([...state.images, ...successfulImages])];
         console.log('addImages.fulfilled:', action.payload);
         const failedImages = action.payload.filter((img) => img.status === 'failed');
         state.imageErrors = failedImages.map((img) => ({
@@ -105,27 +125,49 @@ const imageSlice = createSlice({
         state.loading = false;
         console.error('addImages rejected:', action.payload);
         const payload = action.payload as ErrorPayload | undefined;
-        if (payload && typeof payload.message === 'string') {
-          const errorCode = extractErrorCode(payload.message);
+        if (payload) {
+          const errorCode = payload.code || extractErrorCode(payload.message);
           state.error = {
-            message: errorCode
-              ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
-              : payload.message.split(':')[0],
+            message:
+              errorCode && userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
+                ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
+                : payload.message,
             code: errorCode
           };
+
+          if (errorCode === ERROR_CODES.ErrImageNSFW) {
+            console.info('Image is inappropriate (NSFW):', payload.message);
+            // Remove NSFW images from the state
+            state.images = state.images.filter((image) => !image.includes(payload.message));
+            // Add error to imageErrors
+            state.imageErrors.push({
+              imageName: payload.message,
+              message: 'Image is inappropriate (NSFW)',
+              code: errorCode
+            });
+          } else if (errorCode === ERROR_CODES.ErrMaxImagesReached) {
+            console.error('Maximum number of images reached:', payload.message);
+            state.imageErrors.push({
+              imageName: 'multiple',
+              message: 'Maximum number of images reached',
+              code: errorCode
+            });
+          }
         } else {
           state.error = {
             message: 'Failed to add images',
             code: 'UNKNOWN_ERROR'
           };
         }
+        // Reset general error after handling specific errors
+        state.error = null;
       })
       .addCase(deleteImage.pending, (state) => {
         state.loading = true;
         state.error = null;
         console.log('deleteImage.pending');
       })
-      .addCase(deleteImage.fulfilled, (state, action) => {
+      .addCase(deleteImage.fulfilled, (state, action: PayloadAction<{ imageName: string }>) => {
         state.loading = false;
         state.images = state.images.filter((image) => !image.includes(action.payload.imageName));
         console.log('deleteImage.fulfilled:', action.payload);
@@ -134,14 +176,24 @@ const imageSlice = createSlice({
         state.loading = false;
         console.error('deleteImage rejected:', action.payload);
         const payload = action.payload as ErrorPayload | undefined;
-        if (payload && typeof payload.message === 'string') {
-          const errorCode = extractErrorCode(payload.message);
+        if (payload) {
+          const errorCode = payload.code || extractErrorCode(payload.message);
           state.error = {
-            message: errorCode
-              ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
-              : payload.message.split(':')[0],
+            message:
+              errorCode && userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
+                ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
+                : payload.message,
             code: errorCode
           };
+
+          if (errorCode === ERROR_CODES.ErrImageNSFW) {
+            console.info('Image is inappropriate (NSFW):', payload.message);
+            state.images = state.images.filter(
+              (image) => !image.includes(action.meta.arg.imageName)
+            );
+          } else if (errorCode === ERROR_CODES.ErrMaxImagesReached) {
+            console.error('Maximum number of images reached:', payload.message);
+          }
         } else {
           state.error = {
             message: 'Failed to delete image',
@@ -166,14 +218,21 @@ const imageSlice = createSlice({
         state.loading = false;
         console.error('updateImage rejected:', action.payload);
         const payload = action.payload as ErrorPayload | undefined;
-        if (payload && typeof payload.message === 'string') {
-          const errorCode = extractErrorCode(payload.message);
+        if (payload) {
+          const errorCode = payload.code || extractErrorCode(payload.message);
           state.error = {
-            message: errorCode
-              ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
-              : payload.message.split(':')[0],
+            message:
+              errorCode && userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
+                ? userFriendlyMessages[errorCode as keyof typeof userFriendlyMessages]
+                : payload.message,
             code: errorCode
           };
+
+          if (errorCode === ERROR_CODES.ErrImageNSFW) {
+            console.info('Image is inappropriate (NSFW):', payload.message);
+          } else if (errorCode === ERROR_CODES.ErrMaxImagesReached) {
+            console.error('Maximum number of images reached:', payload.message);
+          }
         } else {
           state.error = {
             message: 'Failed to update image',
@@ -184,5 +243,6 @@ const imageSlice = createSlice({
   }
 });
 
+export const { removeNSFWImage, clearErrors } = imageSlice.actions; // Export de l'action removeNSFWImage
 export { addImage, addImages, deleteImage, updateImage };
 export default imageSlice.reducer;

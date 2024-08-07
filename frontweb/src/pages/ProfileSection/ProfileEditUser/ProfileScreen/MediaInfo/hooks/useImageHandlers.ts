@@ -1,5 +1,3 @@
-// hooks/useImageHandlers.ts
-
 import { useDispatch } from 'react-redux';
 import {
   addImage,
@@ -11,19 +9,31 @@ import { encodeFileToBase64 } from '../../../../../../utils/fileUtils';
 import { handleImageErrors, ImageError } from '../../../../../../utils/errorHandler';
 import { FormikProps } from 'formik';
 import { AppDispatch } from '../../../../../../redux/store';
+import { ERROR_CODES } from '../../../../../../utils/errorCodes';
+
+// Interface for image preview
+interface ImagePreviewItem {
+  src: string;
+  file: File;
+}
+
+interface ErrorResponse {
+  code: string;
+  message: string;
+}
 
 interface UseImageHandlersProps {
-  user: { _id: string } | null; // Allow null for user
-  userData: { images: string[] } | null; // Allow null for userData
+  user: { _id: string } | null;
+  userData: { images: string[] } | null;
   formik: FormikProps<{ images: File[] }>;
   setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
   setShowSuccessMessage: React.Dispatch<React.SetStateAction<boolean>>;
-  setImagePreviews: React.Dispatch<React.SetStateAction<string[]>>;
+  setImagePreviews: React.Dispatch<React.SetStateAction<ImagePreviewItem[]>>; // Updated type
   setCroppingImage: React.Dispatch<React.SetStateAction<string | null>>;
   setIsSaveDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   setCroppingFile: React.Dispatch<React.SetStateAction<File | null>>;
   setCurrentImageIndex: React.Dispatch<React.SetStateAction<number | null>>;
-  imagePreviews: string[];
+  imagePreviews: ImagePreviewItem[]; // Updated type
   croppingFile: File | null;
   currentImageIndex: number | null;
   croppingImage: string | null;
@@ -51,20 +61,33 @@ const useImageHandlers = ({
     if (user && user._id && userData) {
       try {
         const imageUrl = await dispatch(addImage({ userId: user._id, ...image })).unwrap();
-        console.log('Uploaded image URL:', imageUrl);
         const updatedValues = {
           ...userData,
-          images: Array.from(new Set([...(userData.images || []), imageUrl]))
+          images: Array.from(new Set([...(userData.images || []), ...imageUrl.images]))
         };
-        console.log('Updating user with media info:', updatedValues);
         await dispatch(updateUser({ id: user._id, userData: updatedValues }));
         formik.setFieldValue('images', []); // Reset images after upload
       } catch (error) {
-        if (error instanceof Error) {
-          console.error('Error adding image:', error.message);
-        } else {
-          console.error('Unexpected error adding image:', error);
+        if (error && typeof error === 'object' && 'code' in error) {
+          const errorCode = (error as ErrorResponse).code;
+          if (errorCode === ERROR_CODES.ErrImageNSFW) {
+            const imageIndex = formik.values.images.findIndex(
+              (img) => img.name === image.imageName
+            );
+            if (imageIndex !== -1) {
+              setImagePreviews((prev) => prev.filter((_, index) => index !== imageIndex));
+              formik.setFieldValue(
+                'images',
+                formik.values.images.filter((_, index) => index !== imageIndex)
+              );
+              console.info('Inappropriate image removed automatically');
+            }
+
+            // Clear the error for NSFW images
+            formik.setFieldError('images', undefined); // Clear formik error if any
+          }
         }
+        console.info('Error occurred while uploading image:', error);
       }
     }
   };
@@ -95,6 +118,27 @@ const useImageHandlers = ({
         }));
 
         handleImageErrors(fixedResults);
+
+        // Supprimer automatiquement les images inappropriées
+        results.forEach((result) => {
+          if (result.status === 'failed' && result.code === ERROR_CODES.ErrImageNSFW) {
+            const imageIndex = formik.values.images.findIndex(
+              (img) => img.name === result.imageName
+            );
+            if (imageIndex !== -1) {
+              setImagePreviews((prev) => prev.filter((_, index) => index !== imageIndex));
+              formik.setFieldValue(
+                'images',
+                formik.values.images.filter((_, index) => index !== imageIndex)
+              );
+              console.log('Inappropriate image removed automatically');
+            }
+          }
+        });
+
+        // Clear any remaining error for NSFW images
+        formik.setFieldError('images', undefined);
+
         formik.setFieldValue('images', []); // Reset images after upload
       } catch (error) {
         if (error instanceof Error) {
@@ -111,23 +155,27 @@ const useImageHandlers = ({
     const validFiles = files.slice(0, 5 - (userData?.images?.length || 0));
     console.log('Selected image files:', validFiles);
 
-    const previews = validFiles.map((file) => URL.createObjectURL(file));
+    const previews: ImagePreviewItem[] = validFiles.map((file) => ({
+      src: URL.createObjectURL(file),
+      file
+    }));
+
     setImagePreviews((prevPreviews) => [...prevPreviews, ...previews]);
     formik.setFieldValue('images', validFiles);
     setIsSaveDisabled(validFiles.length === 0 && !croppingImage);
   };
 
   const handleDeleteImage = async (imageUrl: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Stop the event from propagating to parent elements
+    e.stopPropagation();
     if (user && user._id) {
       try {
-        const imageName = imageUrl.split('/').pop(); // Extract image name correctly
+        const imageName = imageUrl.split('/').pop();
         if (!imageName) {
           throw new Error('Invalid image URL');
         }
 
         await dispatch(deleteImage({ userId: user._id, imageName })).unwrap();
-        await dispatch(getUserById(user._id));
+        await dispatch(getUserById(user._id)); // Refresh user data
       } catch (error) {
         if (error instanceof Error) {
           console.error('Error deleting image:', error.message);
@@ -145,7 +193,7 @@ const useImageHandlers = ({
     const preview = URL.createObjectURL(newFile);
     if (currentImageIndex !== null && userData?.images) {
       const updatedPreviews = [...imagePreviews];
-      updatedPreviews[currentImageIndex] = preview;
+      updatedPreviews[currentImageIndex] = { src: preview, file: newFile };
       setImagePreviews(updatedPreviews);
       const base64 = await encodeFileToBase64(newFile);
       if (user && user._id) {
@@ -169,7 +217,7 @@ const useImageHandlers = ({
         }
       }
     } else {
-      setImagePreviews((prevPreviews) => [...prevPreviews, preview]);
+      setImagePreviews((prevPreviews) => [...prevPreviews, { src: preview, file: newFile }]);
       formik.setFieldValue('images', [...formik.values.images, newFile]);
     }
     setCroppingImage(null);

@@ -56,6 +56,7 @@ func generateImageURL(filePath string) string {
 func processImage(userID, imageName, base64Data string) (string, error) {
 	userDir, err := checkAndCreateUserDir(userID)
 	if err != nil {
+		log.Printf("[%s] Error creating user directory: %v", utils.ErrCreatingUserDirectory, err)
 		return "", err
 	}
 
@@ -66,6 +67,7 @@ func processImage(userID, imageName, base64Data string) (string, error) {
 
 	exists, err := utils.HashExists(userDir, imageHash)
 	if err != nil {
+		log.Printf("[%s] Error checking if hash exists: %v", utils.ErrCheckingImageHash, err)
 		return "", err
 	}
 
@@ -77,40 +79,48 @@ func processImage(userID, imageName, base64Data string) (string, error) {
 	filePath := filepath.Join(userDir, filename)
 	data, err := base64.StdEncoding.DecodeString(base64Data)
 	if err != nil {
-		return "", fmt.Errorf("[%s] Error decoding base64: %v", utils.ErrDecodingBase64, err)
+		log.Printf("[%s] Error decoding base64: %v", utils.ErrDecodingBase64, err)
+		return "", err
 	}
 
 	if err := ioutil.WriteFile(filePath, data, 0644); err != nil {
-		return "", fmt.Errorf("[%s] Error writing file: %v", utils.ErrWritingFile, err)
+		log.Printf("[%s] Error writing file: %v", utils.ErrWritingFile, err)
+		return "", err
 	}
 
 	isNSFW, err := utils.CheckImageForNSFW(filePath)
 	if err != nil {
+		log.Printf("[%s] Error checking image for NSFW: %v", utils.ErrNSFWCheck, err)
 		os.Remove(filePath)
-		return "", fmt.Errorf("[%s] Error checking image for NSFW: %v", utils.ErrNSFWCheck, err)
+		return "", err
 	}
 
 	if isNSFW {
+		log.Printf("[%s] Image is inappropriate (NSFW) and has been removed: %s", utils.ErrImageNSFW, filePath)
 		os.Remove(filePath)
-		return "", fmt.Errorf("[%s] Image is inappropriate (NSFW) and has been removed: %s", utils.ErrImageNSFW, filePath)
+		return "", fmt.Errorf("[%s] Image is inappropriate (NSFW) and has been removed", utils.ErrImageNSFW)
 	}
 
 	compressedPath, err := compressImage(filePath)
 	if err != nil {
+		log.Printf("[%s] Error compressing image: %v", utils.ErrImageCompression, err)
 		os.Remove(filePath)
-		return "", fmt.Errorf("[%s] Error compressing image: %v", utils.ErrImageCompression, err)
+		return "", err
 	}
 
 	if filePath != compressedPath {
 		if err := os.Remove(filePath); err != nil {
-			return "", fmt.Errorf("[%s] Error removing original image: %v", utils.ErrRemovingOriginalImage, err)
+			log.Printf("[%s] Error removing original image: %v", utils.ErrRemovingOriginalImage, err)
+			return "", err
 		}
 	}
 
 	if err := utils.AddHash(userDir, imageHash, filename); err != nil {
-		return "", fmt.Errorf("[%s] Error adding hash: %v", utils.ErrAddingImageHash, err)
+		log.Printf("[%s] Error adding image hash: %v", utils.ErrAddingImageHash, err)
+		return "", err
 	}
 
 	return generateImageURL(compressedPath), nil
 }
+
 

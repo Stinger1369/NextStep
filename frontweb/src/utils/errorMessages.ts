@@ -1,9 +1,7 @@
-// frontweb/src/utils/errorMessages.ts
-
 import { ERROR_CODES } from './errorCodes';
 
 export const userFriendlyMessages = {
-  // Messages d'erreur existants pour les images
+  // Existing error messages for images
   [ERROR_CODES.ErrImageNSFW]: 'Image is inappropriate.',
   [ERROR_CODES.ErrImageCompression]:
     'Error compressing the image. The format might be unsupported.',
@@ -12,7 +10,7 @@ export const userFriendlyMessages = {
   [ERROR_CODES.ErrWritingFile]: 'There was an error saving the image. Please try again.',
   [ERROR_CODES.ErrMaxImagesReached]: 'You have reached the maximum number of images.',
 
-  // Messages d'erreur pour les vidéos
+  // Error messages for videos
   [ERROR_CODES.ErrMaxVideosReached]: 'You have reached the maximum number of videos.',
   [ERROR_CODES.ErrVideoNSFW]: 'The video contains inappropriate content (NSFW).',
   [ERROR_CODES.ErrDecodingVideoBase64]: 'There was an error decoding the video. Please try again.',

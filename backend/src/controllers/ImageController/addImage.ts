@@ -64,11 +64,11 @@ export const addImage = async (req: Request, res: Response) => {
 
     // Vérifier les erreurs renvoyées par le serveur d'images
     if (response.data.error) {
-      console.log(`Image rejected by image server: ${response.data.error}`);
+      console.info(`Image rejected by image server: ${response.data.error}`);
 
-      // Si l'image est NSFW, renvoyer un code d'erreur spécifique
+      // Si l'image est NSFW, renvoyer un code d'erreur spécifique sans déclencher une "Bad Request"
       if (response.data.code === ERROR_CODES.ErrImageNSFW) {
-        return res.status(400).json({
+        return res.status(200).json({
           message: "Image is inappropriate (NSFW) and has been removed",
           code: ERROR_CODES.ErrImageNSFW,
         });
@@ -113,8 +113,6 @@ export const addImage = async (req: Request, res: Response) => {
       });
     }
   } catch (error) {
-    console.error(`Caught an error: ${error}`);
-
     // Gérer les erreurs Axios
     if (
       isAxiosError(error) &&
@@ -123,7 +121,11 @@ export const addImage = async (req: Request, res: Response) => {
     ) {
       const errorData = error.response.data as AxiosErrorData;
       const errorMessage = errorData.error || "Error uploading image";
-      console.error(`Error uploading image: ${errorMessage}`);
+      if (errorData.code === ERROR_CODES.ErrImageNSFW) {
+        console.info(`NSFW image error handled: ${errorMessage}`);
+      } else {
+        console.warn(`Error uploading image: ${errorMessage}`);
+      }
       return res.status(400).json({
         message: errorMessage,
         code: errorData.code,
@@ -135,7 +137,7 @@ export const addImage = async (req: Request, res: Response) => {
     res.status(500).json({
       message: "An unexpected error occurred. Please try again later.",
       error: (error as Error).message,
-      code: "UNKNOWN_ERROR",
+      code: ERROR_CODES.UNKNOWN_ERROR,
     });
   }
 };

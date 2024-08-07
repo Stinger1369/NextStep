@@ -1,7 +1,5 @@
-// frontweb/src/utils/errorCodes.ts
-
 export const ERROR_CODES = {
-  // Codes d'erreur existants pour les images
+  // Existing error codes for images
   ErrInvalidRequestFormat: 'ERR001',
   ErrEmptyUserID: 'ERR002',
   ErrCreatingUserDirectory: 'ERR003',
@@ -16,11 +14,11 @@ export const ERROR_CODES = {
   ErrAddingImageHash: 'ERR012',
   ErrImageAlreadyExists: 'ERR013',
 
-  // Codes d'erreur pour les vidéos
-  ErrMaxVideosReached: 'ERR014', // Si le nombre maximum de vidéos est atteint
-  ErrVideoNSFW: 'ERR015', // Si la vidéo contient du contenu NSFW
-  ErrDecodingVideoBase64: 'ERR016', // Erreur lors du décodage de la vidéo
-  ErrVideoAlreadyExists: 'ERR017', // Si la vidéo existe déjà
-  ErrUploadingVideo: 'ERR018', // Erreur lors de l'upload de la vidéo
-  UNKNOWN_ERROR: 'UNKNOWN_ERROR' // Erreur inconnue
+  // Error codes for videos
+  ErrMaxVideosReached: 'ERR014', // If the maximum number of videos is reached
+  ErrVideoNSFW: 'ERR015', // If the video contains NSFW content
+  ErrDecodingVideoBase64: 'ERR016', // Error decoding video
+  ErrVideoAlreadyExists: 'ERR017', // If the video already exists
+  ErrUploadingVideo: 'ERR018', // Error uploading video
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR' // Unknown error
 };

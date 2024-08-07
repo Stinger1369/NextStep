@@ -1,25 +1,24 @@
-/* ImagePreview.css */
-.image-previews {
+.screen-image-previews {
   display: flex;
   flex-wrap: wrap;
   margin-top: 10px;
 }
 
-.image-preview-container {
+.screen-image-preview-container {
   position: relative;
   margin: 10px;
   cursor: pointer;
 }
 
-.image-preview-container img {
+.screen-image-preview-container img {
   width: 100px;
   height: 100px;
   object-fit: cover;
   border-radius: 8px;
 }
 
-.edit-icon,
-.delete-icon {
+.screen-edit-icon,
+.screen-delete-icon {
   position: absolute;
   top: 5px;
   right: 5px;
@@ -29,10 +28,15 @@
   padding: 5px;
 }
 
-.edit-icon {
+.screen-edit-icon {
   right: 30px;
 }
 
-.delete-icon {
+.screen-delete-icon {
   right: 5px;
+}
+
+.screen-text-danger {
+  color: red;
+  margin: 10px;
 }

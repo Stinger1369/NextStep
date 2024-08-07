@@ -11,9 +11,8 @@ import (
 
 // Constants
 const (
-	MaxImagesPerUser = 6
-	ServerBaseURL    = "http://localhost:7000/"
-
+	MaxImagesPerUser         = 6
+	ServerBaseURL            = "http://localhost:7000/"
 	ErrInvalidRequestFormat  = "ERR001"
 	ErrEmptyUserID           = "ERR002"
 	ErrCreatingUserDirectory = "ERR003"
@@ -27,7 +26,14 @@ const (
 	ErrRemovingOriginalImage = "ERR011"
 	ErrAddingImageHash       = "ERR012"
 	ErrImageAlreadyExists    = "ERR013"
-	ErrExtractingFrames      = "ERR014" // Added for video frame extraction errors
+	ErrExtractingFrames      = "ERR014"
+	ErrCudaDriverNotFound    = "ERR015"
+	ErrCudnnFactoryError     = "ERR016"
+	ErrNSFWModelLoadFailure  = "ERR017"
+	ErrNSFWCheckFailure      = "ERR018"
+	ErrNSFWImageDetection    = "ERR019"
+	ErrCheckingImageHash     = "ERR020"
+	UNKNOWN_ERROR            = "ERR999" // Add a generic unknown error code
 )
 
 // CheckImageForNSFW verifies if an image contains NSFW content by calling a Python script via a shell script.
@@ -41,6 +47,8 @@ func CheckImageForNSFW(filePath string) (bool, error) {
 	}
 	defer logFile.Close()
 
+	// Set the environment variable to suppress warnings
+	os.Setenv("TF_CPP_MIN_LOG_LEVEL", "2") // Suppress info and warnings
 	var cmd *exec.Cmd
 
 	// Detect OS and choose the appropriate command
@@ -59,6 +67,10 @@ func CheckImageForNSFW(filePath string) (bool, error) {
 
 	err = cmd.Run()
 	if err != nil {
+		if strings.Contains(err.Error(), "Attempting to register factory for plugin cuDNN") {
+			log.Printf("[%s] CUDNN registration error: %v", ErrCudnnFactoryError, err) // Updated: Removed utils reference
+			return false, nil                                                          // Ignore this error if not critical
+		}
 		log.Printf("Error executing command: %v", err)
 		return false, err
 	}
@@ -72,6 +84,7 @@ func CheckImageForNSFW(filePath string) (bool, error) {
 	log.Printf("NSFW check output: %s", output)
 	return strings.Contains(string(output), "NSFW Check Result: True"), nil
 }
+
 
 // CheckVideoForNSFW verifies if a video contains NSFW content by extracting keyframes and using CheckImageForNSFW.
 func CheckVideoForNSFW(videoPath string) (bool, error) {

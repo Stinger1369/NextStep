@@ -8,13 +8,21 @@ import './MediaInfo.css';
 import { RootState, AppDispatch } from '../../../../../redux/store';
 import FileUploadCrop from '../../../../../components/FileUploadAndCrop/CropImage/FileUploadCrop';
 import ImageUpload from './ImageUpload/ImageUpload';
-import ImagePreview from './ImagePreview/ImagePreview';
+import ImagePreview from './ImagePreview/ScreenImagePreview';
 import NavigationIcons from './NavigationIcons/NavigationIcons';
-import VideoUpload from './VideoUpload/VideoUpload'; // Import the VideoUpload component
+import VideoUpload from './VideoUpload/VideoUpload';
 import useImageHandlers from './hooks/useImageHandlers';
 import useImageEffects from './hooks/useImageEffects';
 import { encodeFileToBase64 } from '../../../../../utils/fileUtils';
 import { handleVideoErrors } from '../../../../../utils/errorHandler';
+import { ERROR_CODES } from '../../../../../utils/errorCodes';
+import { removeNSFWImage } from '../../../../../redux/features/image/imageSlice';
+
+// Define the interface for image previews
+export interface ImagePreviewItem {
+  src: string; // Blob URL
+  file: File; // Original file
+}
 
 interface FormValues {
   images: File[];
@@ -22,12 +30,10 @@ interface FormValues {
 
 interface User {
   _id: string;
-  // Other properties if needed
 }
 
 interface UserData {
   images: string[];
-  // Other properties if needed
 }
 
 const MediaInfo: React.FC = () => {
@@ -37,9 +43,9 @@ const MediaInfo: React.FC = () => {
   const userData = useSelector((state: RootState) => state.user.user) as UserData | null;
   const imageError = useSelector((state: RootState) => state.images.error);
   const imageErrors = useSelector((state: RootState) => state.images.imageErrors);
-  const videoError = useSelector((state: RootState) => state.videos.error); // Add video error selector
+  const videoError = useSelector((state: RootState) => state.videos.error);
 
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<ImagePreviewItem[]>([]); // Updated type
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
@@ -56,7 +62,6 @@ const MediaInfo: React.FC = () => {
       setIsSubmitting(true);
       console.log('Submitting form with values:', values);
 
-      // Using optional chaining (?.) for better readability
       if (user?._id && userData?.images) {
         const base64Images = await Promise.all(
           values.images.slice(0, 5 - userData.images.length).map(async (image) => {
@@ -117,10 +122,8 @@ const MediaInfo: React.FC = () => {
     croppingImage
   });
 
-  // New function to handle video upload
   const handleVideoUpload = async (file: File) => {
     if (!user?._id) {
-      // Using optional chaining
       console.error('User ID is missing');
       return;
     }
@@ -140,16 +143,15 @@ const MediaInfo: React.FC = () => {
       if (!response.ok) {
         const errorResult = result as {
           errors: { videoName: string; message: string; code: string }[];
-        }; // Cast to expected error response
+        };
 
-        // Map errors to include status
         const mappedErrors = errorResult.errors.map((error) => ({
           ...error,
-          status: 'failed' // Add status to each error
+          status: 'failed'
         }));
 
         console.error('Error uploading video:', mappedErrors);
-        handleVideoErrors(mappedErrors); // Handle video errors
+        handleVideoErrors(mappedErrors);
         setShowSuccessMessage(false);
       } else {
         console.log('Video uploaded successfully:', result.link);
@@ -161,7 +163,24 @@ const MediaInfo: React.FC = () => {
     setIsSubmitting(false);
   };
 
-  // Effect to clear the success message after a few seconds
+  // UseEffect for NSFW image handling
+ useEffect(() => {
+  if (imageErrors.length > 0) {
+    // Filtrez les images inappropriées
+    const appropriateImages = formik.values.images.filter(
+      (image) => !imageErrors.some(error => error.imageName === image.name)
+    );
+    formik.setFieldValue('images', appropriateImages);
+
+    // Mettez à jour les aperçus d'images
+    setImagePreviews(prevPreviews =>
+      prevPreviews.filter(preview =>
+        !imageErrors.some(error => error.imageName === preview.file.name)
+      )
+    );
+  }
+}, [imageErrors]);
+
   useEffect(() => {
     if (showSuccessMessage) {
       const timer = setTimeout(() => setShowSuccessMessage(false), 3000);
@@ -171,20 +190,14 @@ const MediaInfo: React.FC = () => {
 
   return (
     <div className="media-info-container">
-      {' '}
-      {/* Using kebab-case for BEM class names */}
       <NavigationIcons navigate={navigate} />
       <form onSubmit={formik.handleSubmit} className="media-info-form">
-        {' '}
-        {/* Using kebab-case for BEM class names */}
-        {/* Bouton pour uploader des images */}
         <ImageUpload
           formik={formik}
           handleImagesChange={handleImagesChange}
           isSaveDisabled={isSaveDisabled}
           userData={userData || { images: [] }}
         />
-        {/* Preview des images */}
         <ImagePreview
           imagePreviews={imagePreviews}
           imageErrors={imageErrors}
@@ -192,8 +205,6 @@ const MediaInfo: React.FC = () => {
           handleDeleteImage={handleDeleteImage}
         />
         <div className="media-info-button-container">
-          {' '}
-          {/* Using kebab-case for BEM class names */}
           <button
             type="submit"
             className="btn btn-primary"
@@ -204,18 +215,15 @@ const MediaInfo: React.FC = () => {
           <button
             type="button"
             className="btn btn-success ms-2"
-            onClick={() => navigate(`/user-profile/${user?._id}`)} // Using optional chaining
+            onClick={() => navigate(`/user-profile/${user?._id}`)}
           >
             Finish
           </button>
         </div>
       </form>
-      {/* Bouton pour uploader des vidéos */}
       <VideoUpload handleVideoUpload={handleVideoUpload} />
       {showSuccessMessage && (
         <div className="media-info-success-message mt-3">
-          {' '}
-          {/* Using kebab-case for BEM class names */}
           <p>Your image or video has been added successfully.</p>
         </div>
       )}
