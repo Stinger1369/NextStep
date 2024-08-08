@@ -21,7 +21,6 @@ import PersonalInfo from '../pages/ProfileSection/ProfileEditUser/ProfileScreen/
 import AddressInfo from '../pages/ProfileSection/ProfileEditUser/ProfileScreen/AddressInfo/AddressInfo';
 import ProfessionInfo from '../pages/ProfileSection/ProfileEditUser/ProfileScreen/ProfessionInfo/ProfessionInfo';
 import BioSkillsInfo from '../pages/ProfileSection/ProfileEditUser/ProfileScreen/BioSkillsInfo/BioSkillsInfo';
-import MediaInfo from '../pages/ProfileSection/ProfileEditUser/ProfileScreen/MediaInfo/MediaInfo';
 import RoleSelection from '../pages/ProfileSection/RoleSelection/RoleSelection';
 import ProfileEditRecruits from '../pages/ProfileSection/ProfileEditRecruits/ProfileEditRecruits';
 import RecruitAddressInfo from '../pages/ProfileSection/ProfileEditRecruits/AddressInfo/AddressInfo';
@@ -50,11 +49,14 @@ import SearchSite from '../components/SearchDropdown/SearchSite/SearchSite';
 import SearchJobs from '../components/SearchDropdown/SearchJobs/SearchJobs';
 import SearchActivities from '../components/SearchDropdown/SearchActivities/SearchActivities';
 import SearchMembers from '../components/SearchDropdown/SearchMembers/SearchMembers';
-import { FaArrowsAltH, FaPencilAlt, FaEye, FaToggleOn, FaToggleOff } from 'react-icons/fa'; // Add theme icons
+import { FaArrowsAltH, FaPencilAlt, FaEye, FaToggleOn, FaToggleOff } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../App.css';
 import '../index.css';
 import './AppRoutes.css';
+
+import ImageScreen from '../pages/ProfileSection/ProfileEditUser/ProfileScreen/MediaInfo/ImageScreen/ImageScreen';
+import VideoScreen from '../pages/ProfileSection/ProfileEditUser/ProfileScreen/MediaInfo/VideoScreen/VideoScreen';
 
 const AppRoutes: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -72,7 +74,6 @@ const AppRoutes: React.FC = () => {
 
   const isPortfolioPage = location.pathname.includes('/portfolio');
 
-  // State for controlling drag-and-drop and view mode
   const [isDragEnabled, setIsDragEnabled] = useState(true);
   const [isFinalView, setIsFinalView] = useState(false);
 
@@ -92,7 +93,7 @@ const AppRoutes: React.FC = () => {
   const toggleTheme = useCallback(() => {
     if (user) {
       const isCurrentlyEnabled = themeStatus.theme_enabled;
-      console.log(`Current theme state: ${isCurrentlyEnabled ? 'Enabled' : 'Disabled'}`); // Log current theme state
+      console.log(`Current theme state: ${isCurrentlyEnabled ? 'Enabled' : 'Disabled'}`);
 
       dispatch(
         changeThemeStatus({ userId: user._id, profession: user.profession || 'No Profession' })
@@ -103,10 +104,10 @@ const AppRoutes: React.FC = () => {
           );
 
           const newThemeState = !isCurrentlyEnabled;
-          console.log(`Theme ${newThemeState ? 'Enabled' : 'Disabled'} successfully`); // Log new theme state
+          console.log(`Theme ${newThemeState ? 'Enabled' : 'Disabled'} successfully`);
         })
         .catch((error) => {
-          console.error('Failed to toggle theme:', error); // Log any errors
+          console.error('Failed to toggle theme:', error);
         });
     }
   }, [dispatch, user, themeStatus]);
@@ -115,7 +116,6 @@ const AppRoutes: React.FC = () => {
     <>
       <Navbar />
       <div className="AppRoutes-mainContent">
-        {/* Controls for drag-and-drop, view mode, and other profile actions */}
         {location.pathname.startsWith('/user-profile') && (
           <div className="AppRoutes-controls">
             <button
@@ -175,10 +175,6 @@ const AppRoutes: React.FC = () => {
               element={user ? <BioSkillsInfo /> : <Navigate to="/login" />}
             />
             <Route
-              path="/profile-edit-user/media-info"
-              element={user ? <MediaInfo /> : <Navigate to="/login" />}
-            />
-            <Route
               path="/role-selection"
               element={user ? <RoleSelection /> : <Navigate to="/login" />}
             />
@@ -227,6 +223,18 @@ const AppRoutes: React.FC = () => {
             <Route path="/search-jobs" element={<SearchJobs />} />
             <Route path="/search-activities" element={<SearchActivities />} />
             <Route path="/search-members" element={<SearchMembers />} />
+            <Route
+              path="/media-info/images"
+              element={user ? <ImageScreen /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/media-info/videos"
+              element={user ? <VideoScreen /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/profile-edit-user/image"
+              element={user ? <ImageScreen /> : <Navigate to="/login" />}
+            />
           </Routes>
         </div>
       </div>

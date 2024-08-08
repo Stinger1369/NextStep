@@ -1,0 +1,63 @@
+/* Main container for MediaInfo */
+.MediaInfo-container {
+  padding: 20px;
+}
+
+/* Form in MediaInfo */
+.MediaInfo-form {
+  margin-top: 20px;
+}
+
+/* Button container in MediaInfo */
+.MediaInfo-button-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Success message for adding image */
+.MediaInfo-success-message {
+  color: green;
+  font-weight: bold;
+}
+
+/* Header icons in MediaInfo */
+.MediaInfo-header-icons {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Style for each icon in MediaInfo */
+.MediaInfo-icon {
+  cursor: pointer;
+  font-size: 24px;
+}
+
+/* Video upload styles */
+.MediaInfoVideoUpload-form-group {
+  margin-bottom: 20px;
+}
+
+.MediaInfoVideoUpload-options {
+  display: flex;
+  align-items: center;
+}
+
+.MediaInfoVideoUpload-upload-icon {
+  margin-right: 10px;
+}
+
+.MediaInfoVideoUpload-upload-text {
+  font-weight: bold;
+}
+
+.MediaInfoVideoUpload-text-danger {
+  color: red;
+  margin-top: 10px;
+}
+
+.MediaInfo-video-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}

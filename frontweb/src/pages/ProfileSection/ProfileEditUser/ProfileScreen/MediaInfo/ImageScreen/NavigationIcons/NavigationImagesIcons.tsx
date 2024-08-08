@@ -3,7 +3,7 @@
 import React from 'react';
 import { FaArrowLeft, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import './NavigationIcons.css';
+import './NavigationImagesIcons.css';
 
 interface NavigationIconsProps {
   navigate: ReturnType<typeof useNavigate>;

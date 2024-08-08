@@ -1,9 +1,9 @@
 import React, { useEffect, Dispatch, SetStateAction } from 'react';
 import { FormikProps } from 'formik'; // Import FormikProps from formik
 import { useDispatch } from 'react-redux'; // Import useDispatch
-import { AppDispatch } from '../../../../../../redux/store'; // Import AppDispatch from your store
-import { getUserById } from '../../../../../../redux/features/user/userSlice'; // Import getUserById action
-import ImagePreviewItem  from '../MediaInfo'; // Import ImagePreviewItem if it's defined elsewhere
+import { AppDispatch } from '../../../../../../../redux/store'; // Import AppDispatch from your store
+import { getUserById } from '../../../../../../../redux/features/user/userSlice'; // Import getUserById action
+import ImagePreviewItem from '../ImagePreview/ScreenImagePreview';
 
 // Define the interface for image previews if not already defined
 interface ImagePreviewItem {

@@ -3,7 +3,7 @@ import { FaPlus } from 'react-icons/fa';
 import { FormikProps } from 'formik';
 import { useSelector } from 'react-redux';
 import './ImageUpload.css';
-import { RootState } from '../../../../../../redux/store';
+import { RootState } from '../../../../../../../redux/store';
 
 interface ImageUploadProps {
   formik: FormikProps<{ images: File[] }>;

@@ -60,7 +60,7 @@ const BioSkillsInfo: React.FC = () => {
         console.log('Updating user with bio and skills info:', updatedValues);
         await dispatch(updateUser({ id: user._id, userData: updatedValues }));
         setIsSubmitting(false);
-        navigate('/profile-edit-user/media-info');
+        navigate('/profile-edit-user/image');
       }
     }
   });

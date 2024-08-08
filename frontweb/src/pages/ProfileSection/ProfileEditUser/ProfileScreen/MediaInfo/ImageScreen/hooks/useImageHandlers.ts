@@ -3,13 +3,13 @@ import {
   addImage,
   addImages,
   deleteImage
-} from '../../../../../../redux/features/image/imageSlice';
-import { updateUser, getUserById } from '../../../../../../redux/features/user/userSlice';
-import { encodeFileToBase64 } from '../../../../../../utils/fileUtils';
-import { handleImageErrors, ImageError } from '../../../../../../utils/errorHandler';
+} from '../../../../../../../redux/features/image/imageSlice';
+import { updateUser, getUserById } from '../../../../../../../redux/features/user/userSlice';
+import { encodeFileToBase64 } from '../../../../../../../utils/fileUtils';
+import { handleImageErrors, ImageError } from '../../../../../../../utils/errorHandler';
 import { FormikProps } from 'formik';
-import { AppDispatch } from '../../../../../../redux/store';
-import { ERROR_CODES } from '../../../../../../utils/errorCodes';
+import { AppDispatch } from '../../../../../../../redux/store';
+import { ERROR_CODES } from '../../../../../../../utils/errorCodes';
 
 // Interface for image preview
 interface ImagePreviewItem {

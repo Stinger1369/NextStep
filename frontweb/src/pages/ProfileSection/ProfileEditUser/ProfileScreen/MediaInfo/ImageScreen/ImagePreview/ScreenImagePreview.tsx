@@ -1,8 +1,8 @@
 import React from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { userFriendlyMessages } from '../../../../../../utils/errorMessages';
+import { userFriendlyMessages } from '../../../../../../../utils/errorMessages';
 import './ScreenImagePreview.css';
-import { ERROR_CODES } from '../../../../../../utils/errorCodes';
+import { ERROR_CODES } from '../../../../../../../utils/errorCodes';
 
 // Define the interface for image previews
 interface ImagePreviewItem {
